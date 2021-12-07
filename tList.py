@@ -16,13 +16,12 @@ class tList():
         return "tList(%s)" % msg[:-2]
 
     def __bool__(self): return True if self.data else False
-    
+    def __contains__(self, key): return key.lower() in [k.lower() for (k, v) in self.data]
+    def __delitem__(self, key): del self.data[self.index(key)]
+    def __len__(self): return len(self.data)
+
     def __iter__(self):
         for i in self.data: yield i
-
-    def __contains__(self, key): return key.lower() in [k.lower() for (k, v) in self.data]
-    
-    def __len__(self): return len(self.data)
 
     def __getitem__(self, key):
         if key.lower() in self: return {k.lower(): v for (k, v) in self.data}[key.lower()]
@@ -35,14 +34,10 @@ class tList():
                     self.data[i] = ((key, value))
                     break
 
-    def __delitem__(self, key): del self.data[self.index(key)]
-
     def __add__(self, other):
         res = self.copy()
         for (key, value) in other: res[key] = value
         return res
-
-    def __iadd__(self, other): return self + other
 
     def __sub__(self, other):
         res = tList()
@@ -50,18 +45,19 @@ class tList():
             if key not in other: res.append((key, value))
         return res
     
+    def __iadd__(self, other): return self + other
     def __isub__(self, other): return self - other
+
+    def append(self, item): return self.data.append(item)
 
     def copy(self): return tList(*self.data)
 
     def index(self, key): return [k.lower() for (k, v) in self.data].index(key.lower())
-
-    def pop(self, index): return self.data.pop(index)
-
-    def append(self, item): return self.data.append(item)
 
     def random(self, other = tList()):
         from random import choice
         pool = self - other or self
         key, value = choice(pool.data)
         return self.pop(self.index(key))
+    
+    def pop(self, index): return self.data.pop(index)

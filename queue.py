@@ -12,6 +12,7 @@ class Queue():
     def __bool__(self): return self.isopen
     def __contains__(self, user): return user in self.entries
     def __iter__(self): return self.entries.__iter__()
+    def __len__(self): return len(self.entries)
 
     def open(self): 
         self.isopen = True
@@ -51,7 +52,7 @@ class Queue():
         msg = "Random queue is %s" % ("open" if self else "closed")
 
         if self.entries: 
-            msg += " • There are %d songs in the queue" % len(self.entries)
+            msg += " • There are %d songs in the queue" % len(self)
         else:
             msg += " • Queue is empty"
 
@@ -75,7 +76,7 @@ class Queue():
     def played(self):
         if not self.picked: return "Nothing's been played yet"
         msg = "Songs already played: "
-        for _, s in self.picked: msg += "\"%s\", " % trunc(s, msl)
+        for u, s in self.picked: msg += "\"%s\", " % trunc(s, msl)
         return msg[:-2]
 
     def picksong(self): 
