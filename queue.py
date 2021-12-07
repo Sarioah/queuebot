@@ -86,11 +86,15 @@ class Queue():
         for u, s in self.picked: msg += "\"%s\", " % trunc(s, msl)
         return msg[:-2]
 
-    def picksong(self): 
+    def picksong(self, selection = 0): 
         try:
-            user, song = self.entries.random(self.picked)
-        except IndexError:
-            return "Queue is empty"
+            if selection: user, song = self.entries.pop(selection - 1)
+            else: user, song = self.entries.random(self.picked)
+        except TypeError:
+            return "Please specify a song number"
+        except IndexError as x:
+            if x.args[0] == "pop index out of range": return "No such song"
+            else: return "Queue is empty"
         else:
             self.current["user"], self.current["song"] = user, song
             self.picked.append((user, song))
