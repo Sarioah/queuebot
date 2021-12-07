@@ -48,7 +48,7 @@ class irc_bot(SingleServerIRCBot):
     def on_disconnect():
         print('disconnect')
 
-def start_bot(parse_message):
+def start_bot(message_handler):
     channel = config["channel"]
     username = config["bot_nick"]
     password = config["tmi_token"]
