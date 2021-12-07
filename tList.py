@@ -54,8 +54,9 @@ class tList():
 
     def index(self, key): return [k.lower() for (k, v) in self.data].index(key.lower())
 
-    def random(self, other = tList()):
+    def random(self, other = ""):
         from random import choice
+        if not other: other = tList()
         pool = self - other or self
         key, value = choice(pool.data)
         return self.pop(self.index(key))
