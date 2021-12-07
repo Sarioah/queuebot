@@ -22,6 +22,13 @@ class Queue():
         self.isopen = False
         return "Queue is now closed"
 
+    def currentsong(self):
+        if self.current:
+            return "Current song is \"%s\", requested by %s" % (
+                    trunc(self.current["song"], ssl), self.current["user"])
+        else:
+            return "Nothing's been played yet"
+
     def addsong(self, user, song):
         if not self: return "Sorry %s, the queue is closed" % user
         oldsong = self.entries[user]
