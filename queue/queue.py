@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 class Queue():
     def __init__(self, channel, *tuples):
+        import threading
         from queue.tList import tList
         self.channel = channel
+        self.lock = threading.Lock()
         self.isopen = False
         self.entries = tList(*tuples)
         self.current = {}

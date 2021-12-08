@@ -1,29 +1,40 @@
 import time
-from threading import Thread
+from threading import Thread, Lock
 
 class background_bot():
     def __init__(self, bot):
         self.running = False
         self.command = ""
+        self.lock = Lock()
         self.bot = bot
         self.thread = bgtask(self)
 
     def run(self):
         while True:
-            if self.command:
-                getattr(self.bot, self.command)()
-                self.command = ""
-            if self.running and self.bot.connection.is_connected(): self.bot.poll()
+            with self.lock:
+                if self.command:
+                    getattr(self.bot, self.command)()
+                    self.command = ""
+                if self.running and self.bot.connection.is_connected(): self.bot.poll()
             time.sleep(0.1)
 
     def start(self):
-        self.running = True
-        self.command = "_connect"
+        with self.lock:
+            self.running = True
+            self.command = "_connect"
 
     def stop(self):
-        self.running = False
-        self.command = "disconnect"
+        with self.lock:
+            self.running = False
+            self.command = "disconnect"
 
+
+    def send_command(self, command):
+        while self.command:
+            time.sleep(0.05)
+        with self.lock:
+            self.command = command
+            
 def bgtask(bgbot):
     t1 = Thread(target = bgbot.run)
     t1.start()
