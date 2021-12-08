@@ -1,9 +1,8 @@
-from queue import trunc
-
 class message_handler:
-    def __init__(self, sep, q):
+    def __init__(self, sep, q, trunc):
         self.sep = sep
         self.queue = q
+        self.trunc = trunc
         self.commands = {"testqueue": "test",
                     "sr": "addsong",
                     "leave": "leave",
@@ -33,5 +32,5 @@ class message_handler:
                 try: args = chat_command[1]
                 except IndexError: args = ""
                 res = cmd(user, args)
-                return trunc(res, 450)
+                return self.trunc(res, 450)
         except KeyError: pass

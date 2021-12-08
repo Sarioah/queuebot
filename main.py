@@ -1,8 +1,8 @@
 import random, time
 from configparser import ConfigParser
-from irc_bot import irc_bot
-from queue import Queue
-import message_handler
+from irc_bot.irc_bot import irc_bot
+from queue.queue import Queue, trunc
+from irc_bot.message_handler import message_handler
 
 config = ConfigParser()
 config.read(".config")
@@ -15,7 +15,7 @@ import test
 for i in test.data: q.addsong(*i)
 print("Bot loaded with test queue")
 
-m = message_handler.message_handler(config["bot_prefix"], q)
+m = message_handler(config["bot_prefix"], q, trunc)
 
 bot = irc_bot(config["bot_nick"], config["tmi_token"], config["channel"], m.handle_msg)
 bot.start_bot()
