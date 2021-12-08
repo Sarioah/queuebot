@@ -26,9 +26,9 @@ while not bot.joined:
 print("Bot is ready for commands")
 
 while True:
-    msg = input("> ") or '0'
-    res = eval(msg)
-    print(res)
+    #msg = input("> ") or '0'
+    #res = eval(msg)
+    #print(res)
     try:
         pass
     except Exception as e:

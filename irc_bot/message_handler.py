@@ -21,10 +21,8 @@ class message_handler:
         chat_msg = msg.arguments[0]
         chat_command = chat_msg.split(" ", 1)
         chat_tags = {i["key"]: i["value"] for i in msg.tags}
-
-        
-        print("*****\n%s: %s\n******\n" % (chat_tags["display-name"], chat_msg))
-        for k in chat_tags: print("%s: %s" % (k, chat_tags[k]))
+ 
+        print("<%s>: %s" % (chat_tags["display-name"], chat_msg))
         try:
             if chat_msg[:1] == self.sep:
                 cmd = getattr(self.queue, self.commands[chat_command[0][1:]])
