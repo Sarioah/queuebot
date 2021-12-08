@@ -27,8 +27,9 @@ print("Bot is ready for commands")
 
 
 while True:
-    #msg = input("> ")
-    #bot.send_msg(msg)
+    #msg = input("> ") or '0'
+    #res = eval(msg)
+    #print(res)
     try:
         bot.poll()
     except Exception as e:
