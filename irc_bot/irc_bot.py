@@ -41,8 +41,6 @@ class irc_bot(SingleServerIRCBot):
     def on_error(self, client, _): print('error')
     def on_disconnect(self, client, _): 
         print('disconnect')
-        sleep(5)
-        self._connect()
 
     def start_bot(self):
         print("Bot starting...")
