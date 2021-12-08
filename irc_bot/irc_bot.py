@@ -31,8 +31,8 @@ class irc_bot(SingleServerIRCBot):
     def on_pubmsg(self, client, message):
         response = self.message_handler(message)
 
-        if response:
-            print("Sending %s" % response)
+        if response: 
+            print("- Bot - %s" % response)
             client.privmsg(self.channel, response)
 
     def on_pubnotice(self, client, message): print(message)
