@@ -31,6 +31,7 @@ class message_handler:
                 user = chat_tags["display-name"]
                 try: args = chat_command[1]
                 except IndexError: args = ""
-                res = cmd(user, args)
+                with self.queue.lock:
+                    res = cmd(user, args)
                 return self.trunc(res, 450)
         except KeyError: pass
