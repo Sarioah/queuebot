@@ -26,13 +26,13 @@ class irc_bot(SingleServerIRCBot):
 
         self.client = client
         self.joined = True
-        print("Welcomed into channel \"%s\"" % self.channel[1:])
+        print(f"Welcomed into channel \"{self.channel[1:]}\"")
 
     def on_pubmsg(self, client, message):
         response = self.message_handler(message)
 
         if response: 
-            print("- Bot - %s" % response)
+            print(f"- Bot - {response}")
             client.privmsg(self.channel, response)
 
     def on_pubnotice(self, client, message): print(message)
@@ -54,6 +54,6 @@ class irc_bot(SingleServerIRCBot):
     def send_msg(self, msg): 
         if msg and self.joined: 
             self.client.privmsg(self.channel, msg)
-            return "sent %s" % msg
+            return f"sent {msg}"
         else:
             return "bot not ready to send"
