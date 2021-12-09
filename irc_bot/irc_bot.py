@@ -1,7 +1,6 @@
+import sys
 from time import sleep
-from tools.colours import colours
-
-col = colours()
+from tools.colours import colourise as col
 
 try:
     from irc.bot import SingleServerIRCBot
