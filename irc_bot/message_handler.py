@@ -1,3 +1,5 @@
+from tools.colours import colours as col
+
 class message_handler:
     def __init__(self, sep, q, trunc):
         self.sep = sep
@@ -21,8 +23,8 @@ class message_handler:
         chat_msg = msg.arguments[0]
         chat_command = chat_msg.split(" ", 1)
         chat_tags = {i["key"]: i["value"] for i in msg.tags}
- 
-        print(f"<{chat_tags['display-name']}>: {chat_msg}")
+
+        print(f"<{col.CYAN}{chat_tags['display-name']}{col.WHITE}>: {chat_msg}")
         try:
             if chat_msg[:1] == self.sep:
                 cmd = getattr(self.queue, self.commands[chat_command[0][1:]])

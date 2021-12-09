@@ -1,9 +1,12 @@
 from time import sleep
+from tools.colours import colours
+
+col = colours()
 
 try:
     from irc.bot import SingleServerIRCBot
 except (ModuleNotFoundError, ImportError):
-    print("IRC module not found, exiting")
+    print(col("IRC module not found, exiting", "RED"))
     sys.exit(1)
 
 server = 'irc.chat.twitch.tv'
@@ -16,7 +19,7 @@ class irc_bot(SingleServerIRCBot):
         self.message_handler = message_handler
 
         super().__init__([(server, port, password)], username, username)
-        print('Initialising bot...')
+        print(col("Initialising bot...", "GREY"))
 
     def on_welcome(self, client, _):
         client.cap('REQ', ':twitch.tv/membership')
@@ -26,27 +29,27 @@ class irc_bot(SingleServerIRCBot):
 
         self.client = client
         self.joined = True
-        print(f"Welcomed into channel \"{self.channel[1:]}\"")
+        print(col(f"Welcomed into channel \"{self.channel[1:]}\"", "GREY"))
 
     def on_pubmsg(self, client, message):
         response = self.message_handler(message)
 
         if response: 
-            print(f"- Bot - {response}")
+            print(col(f"- Bot - {response}", "YELLOW"))
             client.privmsg(self.channel, response)
 
     def on_pubnotice(self, client, message): print(message)
     def on_join(self, client, _): pass
     def on_leave(self, client, _): pass
-    def on_error(self, client, _): print('error')
+    def on_error(self, client, _): print(col("Error", "RED"))
     def on_disconnect(self, client, _): 
         self.joined = False
-        print('disconnect')
+        print(col("Disconnect...", "RED"))
 
     def connected(self): return self.connection.is_connected()
 
     def start_bot(self):
-        print("Bot starting...")
+        print(col("Bot starting...", "GREY"))
         self._connect()
 
     def poll(self): self.reactor.process_once()
