@@ -33,3 +33,16 @@ class message_handler:
                     res = cmd(user, args)
                 return self.trunc(res, 450)
         except KeyError: pass
+
+    def run_cmd(self, msg):
+        chat_command = msg.split(" ", 1)
+        try:
+            if msg[:1] == self.sep:
+                cmd = getattr(self.queue, self.commands[chat_command[0][1:]])
+                user = "Sarioah"
+                try: args = chat_command[1]
+                except IndexError: args = ""
+                with self.queue.lock:
+                    res = cmd(user, args)
+                return self.trunc(res, 450)
+        except KeyError: pass
