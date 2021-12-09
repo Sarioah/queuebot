@@ -28,6 +28,8 @@ class background_bot():
             self.running = False
             self.command = "disconnect"
 
+    def mute(self): self.bot.muted = True
+    def unmute(self): self.bot.muted = False
 
     def send_command(self, command):
         while self.command:

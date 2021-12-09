@@ -12,13 +12,15 @@ server = 'irc.chat.twitch.tv'
 port = 6667
 
 class irc_bot(SingleServerIRCBot):
-    def __init__(self, username, password, channel, message_handler):
+    def __init__(self, username, password, channel, muted, message_handler):
         self.channel = '#' + channel
         self.joined = False
+        self.muted = 1 if muted == "True" else 0
         self.message_handler = message_handler
-
         super().__init__([(server, port, password)], username, username)
+
         print(col("Initialising bot...", "GREY"))
+        if self.muted: print(col("Bot is muted", "RED"))
 
     def on_welcome(self, client, _):
         client.cap('REQ', ':twitch.tv/membership')
@@ -32,10 +34,11 @@ class irc_bot(SingleServerIRCBot):
 
     def on_pubmsg(self, client, message):
         response = self.message_handler(message)
-
-        if response: 
-            print(col(f"- Bot - {response}", "YELLOW"))
+        c = "RED" if self.muted else "YELLOW"
+        if not response: return
+        elif not self.muted:
             client.privmsg(self.channel, response)
+        print(col(f"- Bot - {response}", c))
 
     def on_pubnotice(self, client, message): print(message)
     def on_join(self, client, _): pass
@@ -53,9 +56,10 @@ class irc_bot(SingleServerIRCBot):
 
     def poll(self): self.reactor.process_once()
 
-    def send_msg(self, msg): 
-        if msg and self.joined: 
+    def send_msg(self, msg):
+        if self.muted: return col("Bot is muted", "RED")
+        elif msg and self.joined: 
             self.client.privmsg(self.channel, msg)
-            return f"sent {msg}"
+            return col(f"sent {msg}", "YELLOW")
         else:
-            return "bot not ready to send"
+            return col("bot not ready to send", "RED")
