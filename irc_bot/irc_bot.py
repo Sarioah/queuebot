@@ -40,7 +40,10 @@ class irc_bot(SingleServerIRCBot):
     def on_leave(self, client, _): pass
     def on_error(self, client, _): print('error')
     def on_disconnect(self, client, _): 
+        self.joined = False
         print('disconnect')
+
+    def connected(self): return self.connection.is_connected()
 
     def start_bot(self):
         print("Bot starting...")
@@ -49,7 +52,7 @@ class irc_bot(SingleServerIRCBot):
     def poll(self): self.reactor.process_once()
 
     def send_msg(self, msg): 
-        if self.joined: 
+        if msg and self.joined: 
             self.client.privmsg(self.channel, msg)
             return "sent %s" % msg
         else:
