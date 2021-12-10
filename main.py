@@ -22,8 +22,6 @@ channel = sys.argv[1] if len(sys.argv) > 1 else config["channel"]
 bot = irc_bot(config["bot_nick"], config["tmi_token"], channel, config["muted"], m.handle_msg)
 bgbot = background_bot(bot)
 
-bgbot.start()
-
 def cmd(msg):
     res = m.run_cmd(msg)
     bot.send_msg(res)
@@ -33,13 +31,17 @@ while not bot.joined: bot.poll()
 else: print(col("Bot is ready for commands", "GREEN"))
 
 while True:
-    msg = input("> ") or '0'
-    res = eval(msg)
-    print(res)
     try:
-        pass
+        msg = input("> ") or '0'
+        res = eval(msg)
+        print(res)
+    except KeyboardInterrupt:
+        bgbot.quit()
+        break
     except Exception as e:
         import traceback
         print("oh no....anyway")
         traceback.print_exc()
     time.sleep(1)
+
+print("Exiting...")
