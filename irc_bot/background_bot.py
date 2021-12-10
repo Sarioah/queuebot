@@ -3,8 +3,9 @@ from threading import Thread, Lock
 
 class background_bot():
     def __init__(self, bot):
-        self.running = False
-        self.command = ""
+        self.running = True
+        self.connect_delay = 1
+        self.command = []
         self.lock = Lock()
         self.bot = bot
         self.thread = bgtask(self)
@@ -12,30 +13,39 @@ class background_bot():
     def run(self):
         while True:
             with self.lock:
+                if self.bot.connected(): self.bot.poll()
+                else: self.reconnect()
+
                 if self.command:
-                    getattr(self.bot, self.command)()
-                    self.command = ""
-                if self.running and self.bot.connection.is_connected(): self.bot.poll()
+                    getattr(self.bot, self.command[0])(*self.command[1])
+                    self.command = []
+                elif not self.running: break
             time.sleep(0.1)
+        print("\nBot stopped")
 
-    def start(self):
-        with self.lock:
-            self.running = True
-            self.command = "_connect"
-
-    def stop(self):
+    def mute(self):   self.bot.muted = True
+    def unmute(self): self.bot.muted = False
+    def start(self):  self.send_command("_connect")
+    def stop(self):   self.send_command("disconnect")
+    def quit(self):
         with self.lock:
             self.running = False
-            self.command = "disconnect"
+        self.send_command("die")
 
-    def mute(self): self.bot.muted = True
-    def unmute(self): self.bot.muted = False
+    def reconnect(self):
+        while not self.bot.connected():
+            self.bot.start_bot()
+            time.sleep(self.connect_delay)
+            self.connect_delay *= 2
+        else: self.connect_delay = 1
 
-    def send_command(self, command):
+    def say(self, msg): self.send_command("send_msg", msg)
+
+    def send_command(self, command, *a):
         while self.command:
             time.sleep(0.05)
         with self.lock:
-            self.command = command
+            self.command += [command, a]
             
 def bgtask(bgbot):
     t1 = Thread(target = bgbot.run)
