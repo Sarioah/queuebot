@@ -1,7 +1,13 @@
 #!/usr/bin/python3
 
 class tList():
+    """Implements a dict - like object that also maintains ordering of key: value pairs
+
+    Addressing by key is case - insensitive
+
+    Implements simple mathematical operators as set - like interactions"""
     def __init__(self, *tuples):
+        """key: value pairs should be passed in as a collection of tuples"""
         self.data = []
         for item in tuples: self.data.append(item)
 
@@ -35,11 +41,16 @@ class tList():
                     break
 
     def __add__(self, other):
+        """Accepts another tList.
+        Values from second tList added to the first, any common values are taken from
+        the second tList"""
         res = self.copy()
         for (key, value) in other: res[key] = value
         return res
 
     def __sub__(self, other):
+        """Accepts another tList.
+        If the first tList contains keys present in the second, remove them"""
         res = tList()
         for (key, value) in self:
             if key not in other: res.append((key, value))
@@ -55,6 +66,9 @@ class tList():
     def index(self, key): return [k.lower() for (k, v) in self.data].index(key.lower())
 
     def random(self, other = ""):
+        """Picks a key: value pair at random.
+        If another tList is provided, prefer to pick keys unique to the first tList
+        if possible"""
         from random import choice
         if not other: other = tList()
         pool = self - other or self
