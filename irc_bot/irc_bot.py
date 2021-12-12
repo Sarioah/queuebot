@@ -40,7 +40,8 @@ class irc_bot(SingleServerIRCBot):
             client.privmsg(self.channel, response)
         print(col(f"- Bot - {response}", c))
 
-    def on_pubnotice(self, client, message): print(message)
+    def on_pubnotice(self, client, message): print(f"pubnotice: {message}")
+    def on_action(self, client, message): print(f"action: {message}")
     def on_join(self, client, _): pass
     def on_leave(self, client, _): pass
     def on_error(self, client, _): print(col("Error", "RED"))
