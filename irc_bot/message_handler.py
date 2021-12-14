@@ -3,7 +3,7 @@ from tools.colours import colourise as col
 - Take the message
 - Split it into relevant parts (msg body, msg as words, msg tags)
 - check first word for command prefix
-- process command, checking for moderator role of needed
+- process command, checking for moderator role if needed
 - if command found, run associatied Queue method and return response
 - failures bubble back up through to the original callback as None returns
 """
@@ -27,17 +27,22 @@ class message_handler:
                          "pick"       : ("m", "picksong"),}
 
     def handle_msg(self, chat_msg):
+        with open("messages.log", "a") as file:
+            file.write(str(chat_msg) + "\n")
+
         msg = {}
-        msg['msg'] = chat_msg.arguments[0]
+        try: msg['msg'] = chat_msg.arguments[0]
+        except: IndexError: msg['msg'] = ""
+
         msg['words'] = msg['msg'].split(" ")
         msg['tags'] = {i['key']: i['value'] for i in chat_msg.tags}
         
         res = self.handle_command(**msg)
-        
-        modded = self.modcheck(msg['tags']['badges'])
-        colour = "BLUE" if modded else "YELLOW"
-        print(f"<{col(msg['tags']['display-name'], 'CYAN')}, {col(msg['tags']['badges'], 'GREEN')}>: {msg['msg']}")
-        print(f"response was {col(res, 'YELLOW')}, {col('modded', colour)}")
+        if res: return res
+        res = self.handle_systemmsg(**msg)
+        if res: return res
+
+        print(f"<{col(msg['tags']['display-name'], 'CYAN')}>{self.format_badges(msg)}: {msg['msg']}")
         return 
 
         try:
@@ -58,6 +63,9 @@ class message_handler:
             #command =  queue.execute, maybe pass off to new method in Queue
             return command
 
+    def handle_systemmsg(self, msg, words, tags):
+            if 'system-msg' in tags: return col(tags['system-msg'], "GREY")
+
     def find_command(self, badges, request):
         try: cmd = self.commands[request]
         except KeyError: return
@@ -65,10 +73,22 @@ class message_handler:
             if self.modcheck(badges): return cmd
         else: return cmd
 
-    def modcheck(self, badges):
+    def role_check(self, badges, *roles):
+        roles = roles or ("moderator", "broadcaster")
         try: return any([role in badge for badge in badges.split(",") 
-                            for role in ("moderator", "broadcaster")])
+                            for role in roles])
         except AttributeError: return False
+
+    def format_badges(self, msg):
+        badges = msg['tags']['badges']
+        res = ''
+        roles = [("RED", ("broadcaster",), "B"),
+                 ("GREEN", ("moderator",), "M"),
+                 ("BLUE", ("subscriber", "premium"), "S"),
+                 ("PURPLE", ("vip",), "V")]
+        for role in roles:
+            res += col(role[2], role[0]) if self.role_check(badges, *role[1]) else ''
+        return res
 
     def run_cmd(self, msg):
         chat_command = msg.split(" ", 1)
