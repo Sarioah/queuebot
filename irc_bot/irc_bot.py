@@ -41,6 +41,10 @@ class irc_bot(SingleServerIRCBot):
         print(col(f"- Bot - {response}", c))
 
     def on_pubnotice(self, client, message): print(f"pubnotice: {message}")
+    def on_privnotice(self, client, message): print(f"privnotice: {message}")
+    def on_usernotice(self, client, message): print(self.message_handler(message))
+    def on_notice(self, client, message): print(f"notice: {message}")
+    def on_whisper(self, client, message): print(f"whisper: {message}")
     def on_action(self, client, message): print(f"action: {message}")
     def on_join(self, client, _): pass
     def on_leave(self, client, _): pass
