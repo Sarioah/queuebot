@@ -32,7 +32,7 @@ class message_handler:
 
         msg = {}
         try: msg['msg'] = chat_msg.arguments[0]
-        except: IndexError: msg['msg'] = ""
+        except IndexError: msg['msg'] = ""
 
         msg['words'] = msg['msg'].split(" ")
         msg['tags'] = {i['key']: i['value'] for i in chat_msg.tags}
@@ -40,7 +40,7 @@ class message_handler:
         res = self.handle_command(**msg)
         if res: return res
         res = self.handle_systemmsg(**msg)
-        if res: return res
+        if res: return res + f" - {msg['msg'] or '<no msg>'}"
 
         print(f"<{col(msg['tags']['display-name'], 'CYAN')}>{self.format_badges(msg)}: {msg['msg']}")
         return 
