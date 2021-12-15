@@ -33,18 +33,18 @@ class irc_bot(SingleServerIRCBot):
         print(col(f"Welcomed into channel \"{self.channel[1:]}\"", "GREY"))
 
     def on_pubmsg(self, client, message):
-        response = self.message_handler(message)
-        c = "RED" if self.muted else "YELLOW"
-        if not response: return
-        elif not self.muted:
-            client.privmsg(self.channel, response)
-        print(col(f"- Bot - {response}", c))
+        response = self.message_handler(message, "pubmsg")
+        if response:
+            c = "RED" if self.muted else "YELLOW"
+            print(col(response, c))
+            if not self.muted:
+                client.privmsg(self.channel, response)
 
-    def on_pubnotice(self, client, message): self.log(message, "pubnotice")
-    def on_privnotice(self, client, message): self.log(message, "privnotice")
-    def on_usernotice(self, client, message): self.log(message, "usernotice")
-    def on_whisper(self, client, message): self.log(message, "whisper") 
-    def on_action(self, client, message): self.log(message, "action")
+    def on_pubnotice(self, client, message): self.message_handler(message, "pubnotice")
+    def on_privnotice(self, client, message): self.message_handler(message, "privnotice")
+    def on_usernotice(self, client, message): self.message_handler(message, "usernotice")
+    def on_whisper(self, client, message): self.message_handler(message, "whisper") 
+    def on_action(self, client, message): self.message_handler(message, "action")
     def on_join(self, client, _): pass
     def on_leave(self, client, _): pass
     def on_error(self, client, _): print(col("Error", "RED"))
@@ -58,8 +58,6 @@ class irc_bot(SingleServerIRCBot):
         print(col("Bot starting...", "GREY"))
         self._connect()
 
-    def log(self, msg, msg_type): print(self.message_handler(msg, msg_type))
-    
     def poll(self): self.reactor.process_once()
 
     def send_msg(self, msg):
