@@ -14,8 +14,8 @@ config = config["DEFAULT"]
 #for i in test.data: q.addsong(*i)
 #print("Bot loaded with test queue")
 
-m = message_handler(config['channel'], config["bot_prefix"], trunc)
 channel = sys.argv[1] if len(sys.argv) > 1 else config["channel"]
+m = message_handler(channel, config["bot_prefix"], trunc)
 bot = irc_bot(config["bot_nick"], config["tmi_token"], channel, config["muted"], m.handle_msg)
 bgbot = background_bot(bot)
 
