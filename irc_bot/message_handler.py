@@ -55,14 +55,17 @@ class message_handler:
         if words[0][:1] == self.sep:
             sender = tags['display-name']
             command = self.find_command(tags['badges'], words[0][1:])
-            return command
+            if not command: return
+            else:
+                with self.queue.lock:
+                    return getattr(self.queue, command)(sender, " ".join(words[1:]))
 
     def find_command(self, badges, request):
         try: cmd = self.commands[request]
         except KeyError: return
         if cmd[0] == "m":
-            if role_check(badges): return cmd
-        else: return cmd
+            if role_check(badges): return cmd[1]
+        else: return cmd[1]
 
     def format_badges(self, msg):
         badges = msg['tags']['badges']
