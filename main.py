@@ -10,14 +10,11 @@ config = ConfigParser()
 config.read(".config")
 config = config["DEFAULT"]
 
-q = Queue(config["channel"])
-q.open()
-
 #import test
 #for i in test.data: q.addsong(*i)
 #print("Bot loaded with test queue")
 
-m = message_handler(config["bot_prefix"], q, trunc)
+m = message_handler(config['channel'], config["bot_prefix"], trunc)
 channel = sys.argv[1] if len(sys.argv) > 1 else config["channel"]
 bot = irc_bot(config["bot_nick"], config["tmi_token"], channel, config["muted"], m.handle_msg)
 bgbot = background_bot(bot)
@@ -44,4 +41,5 @@ while True:
         traceback.print_exc()
     time.sleep(1)
 
+m.shelve.close()
 print("Exiting...")

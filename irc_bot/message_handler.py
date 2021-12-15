@@ -1,17 +1,23 @@
+import threading, shelve
 from irc_bot.events import handle_event, role_check
 from tools.colours import colourise as col
+from queue.queue import Queue
 """
 - Take the message
 - Split it into relevant parts (msg body, msg as words, msg tags)
 - check first word for command prefix
 - process command, checking for moderator role if needed
-- if command found, run associatied Queue method and return response
+- if command found, run associated Queue method and return response
 - failures bubble back up through to the original callback as None returns
 """
 class message_handler:
-    def __init__(self, sep, q, trunc):
+    def __init__(self, channel, sep, trunc):
         self.sep = sep
-        self.queue = q
+        self.channel = channel
+        self.shelve = shelve.open(self.channel + ".db", "c", writeback = True)
+        if self.channel not in self.shelve:
+            self.shelve[self.channel] = Queue(self.channel)
+        self.lock = threading.Lock()
         self.trunc = trunc
         self.commands = {"testqueue"  : ("m", "test"),
                          "sr"         : ("e", "addsong"),
@@ -40,25 +46,16 @@ class message_handler:
        
         return handle_event(msg)(msg_type, self.handle_command)
 
-        try:
-            if chat_msg[:1] == self.sep:
-                cmd = getattr(self.queue, self.commands[chat_command[0][1:]][1])
-                user = chat_tags["display-name"]
-                try: args = chat_command[1]
-                except IndexError: args = ""
-                with self.queue.lock:
-                    res = cmd(user, args)
-                return self.trunc(res, 450)
-        except KeyError: pass
-
     def handle_command(self, msg, words, tags):
         if words[0][:1] == self.sep:
             sender = tags['display-name']
             command = self.find_command(tags['badges'], words[0][1:])
             if not command: return
             else:
-                with self.queue.lock:
-                    return getattr(self.queue, command)(sender, " ".join(words[1:]))
+                with self.lock:
+                    res = getattr(self.shelve[self.channel], command)(sender, " ".join(words[1:]))
+                    self.shelve.sync()
+                return res
 
     def find_command(self, badges, request):
         try: cmd = self.commands[request]
@@ -66,7 +63,7 @@ class message_handler:
         if cmd[0] == "m":
             if role_check(badges): return cmd[1]
         else: return cmd[1]
-
+    
     def format_badges(self, msg):
         badges = msg['tags']['badges']
         res = ''
