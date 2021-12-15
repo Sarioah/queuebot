@@ -40,12 +40,11 @@ class irc_bot(SingleServerIRCBot):
             client.privmsg(self.channel, response)
         print(col(f"- Bot - {response}", c))
 
-    def on_pubnotice(self, client, message): print(f"pubnotice: {message}")
-    def on_privnotice(self, client, message): print(f"privnotice: {message}")
-    def on_usernotice(self, client, message): print(self.message_handler(message))
-    def on_notice(self, client, message): print(f"notice: {message}")
-    def on_whisper(self, client, message): print(f"whisper: {message}")
-    def on_action(self, client, message): print(f"action: {message}")
+    def on_pubnotice(self, client, message): self.log(message, "pubnotice")
+    def on_privnotice(self, client, message): self.log(message, "privnotice")
+    def on_usernotice(self, client, message): self.log(message, "usernotice")
+    def on_whisper(self, client, message): self.log(message, "whisper") 
+    def on_action(self, client, message): self.log(message, "action")
     def on_join(self, client, _): pass
     def on_leave(self, client, _): pass
     def on_error(self, client, _): print(col("Error", "RED"))
@@ -59,6 +58,8 @@ class irc_bot(SingleServerIRCBot):
         print(col("Bot starting...", "GREY"))
         self._connect()
 
+    def log(self, msg, msg_type): print(self.message_handler(msg, msg_type))
+    
     def poll(self): self.reactor.process_once()
 
     def send_msg(self, msg):

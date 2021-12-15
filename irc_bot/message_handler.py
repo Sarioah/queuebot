@@ -1,3 +1,4 @@
+from irc_bot.events import handle_event
 from tools.colours import colourise as col
 """
 - Take the message
@@ -26,7 +27,7 @@ class message_handler:
                          "picked"     : ("e", "played"),
                          "pick"       : ("m", "picksong"),}
 
-    def handle_msg(self, chat_msg):
+    def handle_msg(self, chat_msg, msg_type = "pubmsg"):
         with open("messages.log", "a") as file:
             file.write(str(chat_msg) + "\n")
 
@@ -36,7 +37,9 @@ class message_handler:
 
         msg['words'] = msg['msg'].split(" ")
         msg['tags'] = {i['key']: i['value'] for i in chat_msg.tags}
-        
+       
+        res = handle_event()(msg, msg_type)
+        if res: return res
         res = self.handle_command(**msg)
         if res: return res
         res = self.handle_systemmsg(**msg)
