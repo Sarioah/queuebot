@@ -1,7 +1,7 @@
 [DEFAULT]
-TMI_TOKEN=***********
-CLIENT_ID=***********
-BOT_NICK=<bot account name>
-BOT_PREFIX=!
-CHANNEL=<channel name>
-MUTED = True
+TMI_TOKEN = ***********
+CLIENT_ID = ***********
+BOT_NICK = <bot account name>
+BOT_PREFIX = !
+CHANNEL = <channel name>
+MUTED = False

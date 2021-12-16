@@ -4,7 +4,7 @@ from irc_bot.background_bot import background_bot
 from irc_bot.irc_bot import irc_bot
 from irc_bot.message_handler import message_handler
 from tools.colours import colourise as col
-from queue.queue import Queue, trunc
+from tools.Queue import Queue, trunc
 
 if not os.path.isdir("data"): os.mkdir("data")
 

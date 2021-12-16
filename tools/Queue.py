@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 class Queue():
     def __init__(self, channel, *tuples):
-        from queue.tList import tList
+        from tools.tList import tList
         self.channel = channel
         self.isopen = False
         self.entries = tList(*tuples)
