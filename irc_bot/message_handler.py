@@ -14,7 +14,7 @@ class message_handler:
     def __init__(self, channel, sep, trunc):
         self.sep = sep
         self.channel = channel
-        self.shelve = shelve.open(self.channel + ".db", "c", writeback = True)
+        self.shelve = shelve.open(f"data/{self.channel}.db", "c", writeback = True)
         if self.channel not in self.shelve:
             self.shelve[self.channel] = Queue(self.channel)
         self.lock = threading.Lock()
