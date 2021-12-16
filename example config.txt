@@ -4,3 +4,4 @@ CLIENT_ID=***********
 BOT_NICK=<bot account name>
 BOT_PREFIX=!
 CHANNEL=<channel name>
+MUTED = True
