@@ -34,7 +34,7 @@ class message_handler:
                          "pick"       : ("m", "picksong"),}
 
     def handle_msg(self, chat_msg, msg_type = "pubmsg"):
-        with open("messages.log", "a") as file:
+        with open("messages.log", "a", encoding = "UTF-8") as file:
             file.write(str(chat_msg) + "\n")
 
         msg = {}
