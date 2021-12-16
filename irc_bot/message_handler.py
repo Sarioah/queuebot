@@ -1,7 +1,7 @@
 import threading, shelve
 from irc_bot.events import handle_event, role_check
 from tools.colours import colourise as col
-from queue.queue import Queue
+from tools.Queue import Queue
 """
 - Take the message
 - Split it into relevant parts (msg body, msg as words, msg tags)
