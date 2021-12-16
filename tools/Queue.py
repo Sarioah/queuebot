@@ -1,12 +1,11 @@
 #!/usr/bin/python3
+from tools.tList import tList
+
 class Queue():
     def __init__(self, channel, *tuples):
-        from tools.tList import tList
         self.channel = channel
         self.isopen = False
-        self.entries = tList(*tuples)
-        self.current = {}
-        self.picked = tList()
+        self.entries, self.current, self.picked = tList(*tuples), {}, tList()
         print("init complete")
 
     def __bool__(self): return self.isopen
@@ -21,7 +20,9 @@ class Queue():
     def close(self, *a):
         self.isopen = False
         return "Queue is now closed"
-
+    def clear(self, *a):
+        self.entries, self.current, self.picked = tList(), {}, tList()
+        return "Queue has been cleared"
     def currentsong(self, *a):
         if self.current: return f"Current song is \"{trunc(self.current['song'], ssl)}\", "\
                                 f"requested by {self.current['user']}"
