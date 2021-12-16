@@ -19,11 +19,11 @@ class message_handler:
             self.shelve[self.channel] = Queue(self.channel)
         self.lock = threading.Lock()
         self.trunc = trunc
-        self.commands = {"testqueue"  : ("m", "test"),
-                         "sr"         : ("e", "addsong"),
+        self.commands = {"sr"         : ("e", "addsong"),
                          "leave"      : ("e", "leave"),
                          "openqueue"  : ("m", "open"),
                          "closequeue" : ("m", "close"),
+                         "clearqueue" : ("m", "clear"),
                          "removesong" : ("m", "removesong"),
                          "removeuser" : ("m", "removeuser"),
                          "listqueue"  : ("e", "listsongs"),
@@ -49,7 +49,7 @@ class message_handler:
     def handle_command(self, msg, words, tags):
         if words[0][:1] == self.sep:
             sender = tags['display-name']
-            command = self.find_command(tags['badges'], words[0][1:])
+            command = self.find_command(tags['badges'], words[0][1:].lower())
             if not command: return
             else:
                 with self.lock:
