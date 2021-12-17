@@ -11,32 +11,32 @@ def cmd(msg):
     bot.send_msg(res)
     return res
 
-def catch_exit(*a): raise KeyboardInterrupt
-
 def close(*a):
-    bgbot.quit()
-    m.shelve.close()
     print("Exiting...")
+    bgbot.quit()
+    bgbot.thread.join()
+    m.shelve.close()
+    print("Cleanup complete")
     time.sleep(3)
-    return False
 
 if not os.path.isdir("data"): os.mkdir("data")
 
 colorama.init()
 
-if os.name == "nt":
-    import win32api
-    win32api.SetConsoleCtrlHandler(close, True)
-
 config = ConfigParser()
 config.read(".config")
 config = config["DEFAULT"]
+channel = sys.argv[1] if len(sys.argv) > 1 else config["channel"]
+
+if os.name == "nt":
+    import win32api
+    win32api.SetConsoleCtrlHandler(close, True)
+    win32api.SetConsoleTitle(f"Sari queuebot acting as '{config['bot_nick']}' in channel '{channel}'")
 
 #import test
 #for i in test.data: q.addsong(*i)
 #print("Bot loaded with test queue")
 
-channel = sys.argv[1] if len(sys.argv) > 1 else config["channel"]
 m = message_handler(channel, config["bot_prefix"], trunc)
 bot = irc_bot(config["bot_nick"], config["tmi_token"], channel, config["muted"], m.handle_msg)
 bgbot = background_bot(bot)
