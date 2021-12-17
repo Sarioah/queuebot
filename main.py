@@ -52,9 +52,11 @@ while True:
         res = eval(msg)
         print(res)
     except (KeyboardInterrupt, EOFError):
-        sys.exit()
+        break
     except Exception as e:
         import traceback
         print("oh no....anyway")
         traceback.print_exc()
     time.sleep(1)
+
+if os.name != "nt": close()
