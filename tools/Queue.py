@@ -20,9 +20,11 @@ class Queue():
     def close(self, *a):
         self.isopen = False
         return "Queue is now closed"
+
     def clear(self, *a):
         self.entries, self.current, self.picked = tList(), {}, tList()
         return "Queue has been cleared"
+
     def currentsong(self, *a):
         if self.current: return f"Current song is \"{trunc(self.current['song'], ssl)}\", "\
                                 f"requested by {self.current['user']}"
