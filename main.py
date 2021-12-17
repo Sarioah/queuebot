@@ -34,7 +34,7 @@ while True:
         msg = input("> ") or '0'
         res = eval(msg)
         print(res)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, EOFError):
         bgbot.quit()
         break
     except Exception as e:
