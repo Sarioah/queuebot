@@ -41,7 +41,9 @@ m = message_handler(channel, config["bot_prefix"], trunc)
 bot = irc_bot(config["bot_nick"], config["tmi_token"], channel, config["muted"], m.handle_msg)
 bgbot = background_bot(bot)
 
-while not bot.joined: bot.poll()
+while not bot.joined: 
+    bot.poll()
+    time.sleep(1)
 else: print(col("Bot is ready for commands", "GREEN"))
 
 while True:

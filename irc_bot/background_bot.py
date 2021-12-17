@@ -1,5 +1,6 @@
 import time
 from threading import Thread, Lock
+from tools.colours import colourise as col
 
 class background_bot():
     def __init__(self, bot):
@@ -34,8 +35,9 @@ class background_bot():
 
     def reconnect(self):
         while not self.bot.connected():
-            self.bot.start_bot()
+            print(col("Bot is attempting reconnection...", "GREY"))
             time.sleep(self.connect_delay)
+            self.bot.start_bot()
             self.connect_delay *= 2
         else: self.connect_delay = 1
 
