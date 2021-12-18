@@ -2,6 +2,7 @@ import random, time, sys, os, colorama
 from irc_bot.background_bot import background_bot
 from irc_bot.irc_bot import irc_bot
 from irc_bot.message_handler import message_handler
+from readchar import readchar
 from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration
@@ -25,7 +26,8 @@ colorama.init()
 
 try: config = configuration(".config").get_config()
 except Exception as e: 
-    print(str(e))
+    print(str(e) + col('\nPress any key to exit...', "GREY"))
+    _ = readchar()
     sys.exit()
 
 channel = sys.argv[1] if len(sys.argv) > 1 else config["channel"]
