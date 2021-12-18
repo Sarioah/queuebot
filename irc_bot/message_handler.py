@@ -1,4 +1,4 @@
-import threading, shelve
+import threading, shelve, time
 from irc_bot.events import handle_event, role_check
 from tools.colours import colourise as col
 from tools.Queue import Queue
@@ -19,19 +19,20 @@ class message_handler:
             self.shelve[self.channel] = Queue(self.channel)
         self.lock = threading.Lock()
         self.trunc = trunc
-        self.commands = {"sr"         : ("e", "addsong"),
-                         "leave"      : ("e", "leave"),
-                         "openqueue"  : ("m", "open"),
-                         "closequeue" : ("m", "close"),
-                         "clearqueue" : ("m", "clear"),
-                         "removesong" : ("m", "removesong"),
-                         "removeuser" : ("m", "removeuser"),
-                         "listqueue"  : ("e", "listsongs"),
-                         "listusers"  : ("m", "listusers"),
-                         "currentsong": ("e", "currentsong"),
-                         "queue"      : ("e", "status"),
-                         "picked"     : ("e", "played"),
-                         "pick"       : ("m", "picksong"),}
+        self.commands = {"sr"         : ("e", "addsong",      0),
+                         "leave"      : ("e", "leave",        0),
+                         "openqueue"  : ("m", "open",         3),
+                         "closequeue" : ("m", "close",        3),
+                         "clearqueue" : ("m", "clear",        3),
+                         "removesong" : ("m", "removesong",   3),
+                         "removeuser" : ("m", "removeuser",   3),
+                         "listqueue"  : ("e", "listsongs",   10),
+                         "listusers"  : ("m", "listusers",   15),
+                         "currentsong": ("e", "currentsong", 10),
+                         "queue"      : ("e", "status",       0),
+                         "picked"     : ("e", "played",      10),
+                         "pick"       : ("m", "picksong",     3),}
+        self.cooldowns = {k: 0 for k in self.commands}
 
     def handle_msg(self, chat_msg, msg_type = "pubmsg"):
         with open("messages.log", "a", encoding = "UTF-8") as file:
@@ -49,13 +50,24 @@ class message_handler:
     def handle_command(self, msg, words, tags):
         if words[0][:1] == self.sep:
             sender = tags['display-name']
-            command = self.find_command(tags['badges'], words[0][1:].lower())
-            if not command: return
+            command = words[0][1:].lower()
+            action = self.find_command(tags['badges'], command)
+            if not action: return
             else:
+                if not self.check_cooldown(command): return
                 with self.lock:
-                    res = getattr(self.shelve[self.channel], command)(sender, " ".join(words[1:]))
+                    res = getattr(self.shelve[self.channel], action)(sender, " ".join(words[1:]))
                     self.shelve.sync()
                 return res
+
+    def check_cooldown(self, cmd):
+        current = time.clock_gettime(0)
+        timeleft = current - self.cooldowns.get(cmd, 0) - self.commands[cmd][2]
+        if timeleft >= 0:
+            self.cooldowns[cmd] = current
+            return True
+        else:
+            print(col(f"'{cmd}' still on cooldown for {round(timeleft, 1) * -1}s", "GREY"))
 
     def find_command(self, badges, request):
         try: cmd = self.commands[request]

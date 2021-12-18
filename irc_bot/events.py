@@ -19,17 +19,19 @@ class handle_event():
     def on_usernotice(self, *a):
         res = col(self.tags['system-msg'], "GREY" ) if 'system-msg' in self.tags else ''
         if res: print(res + f" - {self.msg or '<no msg>'}")
-    def on_whisper(self, *a): print(col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))
+    def on_whisper(self, *a):
+        print(col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))
 
-    def format_badges(self):                                                                       
-        badges = self.tags['badges']                                                                  
-        res = ''                                                                                        
-        roles = [("RED", ("broadcaster",), "B"),                                                        
-                 ("GREEN", ("moderator",), "M"),                                                        
-                 ("BLUE", ("subscriber", "premium"), "S"),                                              
-                 ("PURPLE", ("vip",), "V")]                                                             
-        for role in roles:                                                                              
-            res += col(role[2], role[0]) if role_check(badges, *role[1]) else ''                   
+    def format_badges(self):
+        badges = self.tags['badges']
+        res = ''
+        roles = [("RED", ("broadcaster",), "B"), 
+                 ("GREEN", ("moderator",), "M"),                                        
+                 ("BLUE", ("subscriber", "premium"), "S"),                              
+                 ("PURPLE", ("vip",), "V")]
+
+        for role in roles:
+            res += col(role[2], role[0]) if role_check(badges, *role[1]) else ''
         return res
 
 def role_check(badges, *roles):                                     

@@ -18,7 +18,7 @@ def close(*a):
     bgbot.thread.join()
     m.shelve.close()
     print("Cleanup complete")
-    time.sleep(3)
+    time.sleep(2)
 
 if not os.path.isdir("data"): os.mkdir("data")
 
