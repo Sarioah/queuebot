@@ -6,7 +6,6 @@ class Queue():
         self.channel = channel
         self.isopen = False
         self.entries, self.current, self.picked = tList(*tuples), {}, tList()
-        print("init complete")
 
     def __bool__(self): return self.isopen
     def __contains__(self, user): return user in self.entries

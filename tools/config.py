@@ -1,5 +1,5 @@
-from tools.colours import colourise as col
 from configparser import ConfigParser, ParsingError
+from tools.colours import colourise as col
 
 defaults = {"TMI_TOKEN" : "********",
             "BOT_NICK"  : "********",
@@ -30,13 +30,15 @@ class configuration():
         with open(self.configfile, "w") as fd:
             self.c.write(fd)
 
-        res = [f"{msg} {col(self.configfile, 'YELLOW')}","",
-               f"Please log into twitch using your bot account, then visit {col('https://twitchapps.com/tmi', 'BLUE')} to generate an oauth code for the bot to login with. This code needs to be entered into the config file ({col(self.configfile, 'YELLOW')}) along with a couple other values:","",
-               f"     {col('TMI_TOKEN', 'GREEN')}: Oauth code, including the 'oauth:' part at the front",
-               f"     {col('BOT_NICK', 'GREEN')}: Name of the twitch account the bot will login with",
-               f"     {col('CHANNEL', 'GREEN')}: Name of the twich channel the bot will listen in, and send messages to",
-               f"     {col('BOT_PREFIX', 'GREEN')}: Symbol that should appear at the front of bot commands in chat.",
-               f"     {col('MUTED', 'GREEN')}: Whether or not the bot is allowed to send chat messages.","",
+        res = [f"{msg} '{col(self.configfile, 'YELLOW')}'","",
+               f"Please log into twitch using your bot account, then visit {col('https://twitchapps.com/tmi', 'BLUE')} to " +
+               f"generate an oauth code for the bot to login with. This code needs to be entered into the config file " +
+               f"('{col(self.configfile, 'YELLOW')}') along with a couple other values:","",
+               f"     {col('TMI_TOKEN', 'GREEN')}  : Oauth code, including the 'oauth:' part at the front",
+               f"     {col('BOT_NICK', 'GREEN')}   : Name of the twitch account the bot will login with",
+               f"     {col('CHANNEL', 'GREEN')}    : Name of the twitch channel the bot will listen in, and send messages to",
+               f"     {col('BOT_PREFIX', 'GREEN')} : Symbol that should appear at the front of bot commands in chat. Default is '!'",
+               f"     {col('MUTED', 'GREEN')}      : Mutes the bot if you need to stop it sending messages","",
                f"Once these are filled in, start the bot again."]
         raise Exception("\n".join(res))
 
