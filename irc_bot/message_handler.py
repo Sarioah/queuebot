@@ -71,7 +71,7 @@ class message_handler:
         return res[0] if res else cmd
 
     def check_cooldown(self, cmd):
-        current = time.clock_gettime(0)
+        current = time.time()
         timeleft = current - self.cooldowns.get(cmd, 0) - self.commands[cmd][2]
         if timeleft >= 0:
             self.cooldowns[cmd] = current
