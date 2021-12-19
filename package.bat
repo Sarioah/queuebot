@@ -4,4 +4,5 @@ py -m nuitka --standalone ^
 	     --include-package-data=jaraco.text ^
 	     -o "sari queuebot.exe" ^
 	     --windows-icon-from-ico=.\robot.ico ^
+	     --windows-onefile-tempdir-spec=".\Resources" ^
 	     .\main.py
