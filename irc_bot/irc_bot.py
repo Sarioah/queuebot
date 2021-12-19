@@ -15,7 +15,7 @@ class irc_bot(SingleServerIRCBot):
     def __init__(self, username, password, channel, muted, message_handler):
         self.channel = '#' + channel
         self.joined = False
-        self.muted = 1 if muted == "True" else 0
+        self.muted = True if muted == "True" else False
         self.message_handler = message_handler
         super().__init__([(server, port, password)], username, username)
 

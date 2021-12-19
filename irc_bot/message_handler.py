@@ -12,13 +12,14 @@ from tools.Queue import Queue
 - failures bubble back up through to the original callback as None returns
 """
 class message_handler:
-    def __init__(self, channel, sep, trunc):
+    def __init__(self, channel, sep, trunc, logging):
         self.sep = sep
         self.channel = channel
         self.shelve = shelve.open(f"data/{self.channel}.db", "c", writeback = True)
         if self.channel not in self.shelve:
             self.shelve[self.channel] = Queue(self.channel)
         self.lock = threading.Lock()
+        self.logging = True if logging == "True" else False
         self.trunc = trunc
         self.commands = {"sr"         : ("e", "addsong",      0),
                          "leave"      : ("e", "leave",        0),
@@ -39,8 +40,9 @@ class message_handler:
                         "picked"   : ("played",),}
 
     def handle_msg(self, chat_msg, msg_type = "pubmsg"):
-        with open("messages.log", "a", encoding = "UTF-8") as file:
-            file.write(str(chat_msg) + "\n")
+        if self.logging:
+            with open("messages.log", "a", encoding = "UTF-8") as file:
+                file.write(str(chat_msg) + "\n")
 
         msg = {}
         try: msg['msg'] = chat_msg.arguments[0]
