@@ -1,11 +1,12 @@
 from configparser import ConfigParser, ParsingError
 from tools.colours import colourise as col
 
-defaults = {"TMI_TOKEN" : "********",
-            "BOT_NICK"  : "********",
-            "CHANNEL"   : "********",
-            "BOT_PREFIX": "!",
-            "MUTED"     : "False"}
+defaults = {"tmi_token" : "********",
+            "bot_nick"  : "********",
+            "channel"   : "********",
+            "bot_prefix": "!",
+            "muted"     : "False",
+            "logging"   : "False"}
 
 class configuration():
     def __init__(self, configfile):
@@ -37,7 +38,8 @@ class configuration():
                f"     {col('bot_nick', 'GREEN')}   : Name of the twitch account the bot will login with",
                f"     {col('channel', 'GREEN')}    : Name of the twitch channel the bot will listen in, and send messages to",
                f"     {col('bot_prefix', 'GREEN')} : Symbol that should appear at the front of bot commands in chat. Default is '!'",
-               f"     {col('muted', 'GREEN')}      : Mutes the bot if you need to stop it sending messages","",
+               f"     {col('muted', 'GREEN')}      : Mutes the bot if you need to stop it sending messages",
+               f"     {col('logging', 'GREEN')}    : Saves each received chat message in '{col('messages.log', 'YELLOW')}', useful for debugging","",
                f"Once these are filled in, restart the bot."]
         raise Exception("\n".join(res))
 
