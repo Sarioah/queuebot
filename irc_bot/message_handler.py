@@ -11,6 +11,8 @@ from tools.Queue import Queue
 - if command found, run associated Queue method and return response
 - failures bubble back up through to the original callback as None returns
 """
+class CommandFound(Exception): pass
+
 class message_handler:
     def __init__(self, channel, sep, trunc, logging):
         self.sep = sep
@@ -57,12 +59,14 @@ class message_handler:
         if words[0][:1] == self.sep:
             sender = tags['display-name']
             command = self.check_aliases(words[0][1:].lower())
-            action = self.find_command(tags['badges'], command)
+            action, cmd_type = self.find_command(tags['badges'], command)
             if not action: return
             else:
                 if not self.check_cooldown(command): return
                 with self.lock:
-                    res = getattr(self.shelve[self.channel], action)(sender, " ".join(words[1:]))
+                    if cmd_type == "queue":
+                        res = getattr(self.shelve[self.channel], action)(sender, " ".join(words[1:]))
+                    else: pass
                     self.shelve.sync()
                 return res
 
@@ -80,8 +84,13 @@ class message_handler:
             print(col(f"'{cmd}' still on cooldown for {round(timeleft, 1) * -1}s", "GREY"))
 
     def find_command(self, badges, request):
-        try: cmd = self.commands[request]
-        except KeyError: return
-        if cmd[0] == "m":
-            if role_check(badges): return cmd[1]
-        else: return cmd[1]
+        try:
+            cmd = self.commands.get(request, '')
+            if cmd: raise CommandFound("queue")
+            #cmd = commands.get
+            if cmd: raise CommandFound("builtin")
+        except CommandFound as c:
+            if cmd[0] == "m":
+                if role_check(badges): return cmd[1], str(c)
+            else: return cmd[1], str(c)
+        else: return (None, None)
