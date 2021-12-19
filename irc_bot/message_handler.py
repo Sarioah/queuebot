@@ -34,6 +34,9 @@ class message_handler:
                          "picked"     : ("e", "played",      10),
                          "pick"       : ("m", "picksong",     3),}
         self.cooldowns = {k: 0 for k in self.commands}
+        self.aliases = {"sr"       : ("join",),
+                        "listqueue": ("queuelist",),
+                        "picked"   : ("played",),}
 
     def handle_msg(self, chat_msg, msg_type = "pubmsg"):
         with open("messages.log", "a", encoding = "UTF-8") as file:
@@ -51,7 +54,7 @@ class message_handler:
     def handle_command(self, msg, words, tags):
         if words[0][:1] == self.sep:
             sender = tags['display-name']
-            command = words[0][1:].lower()
+            command = self.check_aliases(words[0][1:].lower())
             action = self.find_command(tags['badges'], command)
             if not action: return
             else:
@@ -60,6 +63,10 @@ class message_handler:
                     res = getattr(self.shelve[self.channel], action)(sender, " ".join(words[1:]))
                     self.shelve.sync()
                 return res
+
+    def check_aliases(self, cmd):
+        res = [k for k in self.aliases if cmd.lower() in self.aliases[k]]
+        return res[0] if res else cmd
 
     def check_cooldown(self, cmd):
         current = time.clock_gettime(0)
