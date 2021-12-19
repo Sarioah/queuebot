@@ -1,5 +1,6 @@
 import threading, shelve, time
-from irc_bot.events import handle_event, role_check
+from irc_bot.events import handle_event
+from tools.chat import role_check
 from tools.colours import colourise as col
 from tools.Queue import Queue
 """
@@ -75,14 +76,3 @@ class message_handler:
         if cmd[0] == "m":
             if role_check(badges): return cmd[1]
         else: return cmd[1]
-    
-    def format_badges(self, msg):
-        badges = msg['tags']['badges']
-        res = ''
-        roles = [("RED", ("broadcaster",), "B"),
-                 ("GREEN", ("moderator",), "M"),
-                 ("BLUE", ("subscriber", "premium"), "S"),
-                 ("PURPLE", ("vip",), "V")]
-        for role in roles:
-            res += col(role[2], role[0]) if role_check(badges, *role[1]) else ''
-        return res
