@@ -1,5 +1,12 @@
 from tools.colours import colourise as col
 
+class Command():
+    def __init__(self): pass
+    def __getitem__(self, attr): return getattr(self, attr, None)
+
+    def help(self, *a):
+        return "Help text goes here"
+
 def format_badges(tags):
     badges = tags['badges']
     res = ''

@@ -9,6 +9,7 @@ class Queue():
 
     def __bool__(self): return self.isopen
     def __contains__(self, user): return user in self.entries
+    def __getitem__(self, attr): return getattr(self, attr, None)
     def __iter__(self): return self.entries.__iter__()
     def __len__(self): return len(self.entries)
 

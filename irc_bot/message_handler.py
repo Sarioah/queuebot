@@ -3,6 +3,8 @@ from irc_bot.events import handle_event
 from tools.chat import role_check
 from tools.colours import colourise as col
 from tools.Queue import Queue
+from tools.chat import Command
+
 """
 - Take the message
 - Split it into relevant parts (msg body, msg as words, msg tags)
@@ -35,7 +37,8 @@ class message_handler:
                          "currentsong": ("e", "currentsong", 10),
                          "queue"      : ("e", "status",       0),
                          "picked"     : ("e", "played",      10),
-                         "pick"       : ("m", "picksong",     3),}
+                         "pick"       : ("m", "picksong",     3),
+                         "help"       : ("e", "help",         3)}
         self.cooldowns = {k: 0 for k in self.commands}
         self.aliases = {"sr"       : ("join",),
                         "listqueue": ("queuelist",),
@@ -59,14 +62,12 @@ class message_handler:
         if words[0][:1] == self.sep:
             sender = tags['display-name']
             command = self.check_aliases(words[0][1:].lower())
-            action, cmd_type = self.find_command(tags['badges'], command)
+            action = self.find_command(tags['badges'], command)
             if not action: return
             else:
                 if not self.check_cooldown(command): return
                 with self.lock:
-                    if cmd_type == "queue":
-                        res = getattr(self.shelve[self.channel], action)(sender, " ".join(words[1:]))
-                    else: pass
+                    res = action(sender, " ".join(words[1:]))
                     self.shelve.sync()
                 return res
 
@@ -76,7 +77,7 @@ class message_handler:
 
     def check_cooldown(self, cmd):
         current = time.time()
-        timeleft = current - self.cooldowns.get(cmd, 0) - self.commands[cmd][2]
+        timeleft = current - self.cooldowns[cmd] - self.commands[cmd][2]
         if timeleft >= 0:
             self.cooldowns[cmd] = current
             return True
@@ -84,13 +85,14 @@ class message_handler:
             print(col(f"'{cmd}' still on cooldown for {round(timeleft, 1) * -1}s", "GREY"))
 
     def find_command(self, badges, request):
-        try:
-            cmd = self.commands.get(request, '')
-            if cmd: raise CommandFound("queue")
-            #cmd = commands.get
-            if cmd: raise CommandFound("builtin")
-        except CommandFound as c:
-            if cmd[0] == "m":
-                if role_check(badges): return cmd[1], str(c)
-            else: return cmd[1], str(c)
-        else: return (None, None)
+        cmd = self.commands.get(request, None)
+        if cmd:
+            try:
+                mthd = Command()[cmd[1]]
+                if mthd: raise CommandFound()
+                mthd = self.shelve[self.channel][cmd[1]]
+                if mthd: raise CommandFound()
+            except CommandFound as c:
+                if cmd[0] == "m":
+                    if role_check(badges): return mthd
+                else: return mthd
