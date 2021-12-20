@@ -1,48 +1,20 @@
-import threading, shelve, time
+import threading, shelve
 from irc_bot.events import handle_event
-from tools.chat import role_check
+from tools.chat import role_check, CommandHandler
 from tools.colours import colourise as col
 from tools.Queue import Queue
-from tools.chat import Command
-
-"""
-- Take the message
-- Split it into relevant parts (msg body, msg as words, msg tags)
-- check first word for command prefix
-- process command, checking for moderator role if needed
-- if command found, run associated Queue method and return response
-- failures bubble back up through to the original callback as None returns
-"""
-class CommandFound(Exception): pass
 
 class message_handler:
     def __init__(self, channel, sep, trunc, logging):
         self.sep = sep
         self.channel = channel
+        self.commandhandler = CommandHandler()
         self.shelve = shelve.open(f"data/{self.channel}.db", "c", writeback = True)
         if self.channel not in self.shelve:
             self.shelve[self.channel] = Queue(self.channel)
         self.lock = threading.Lock()
         self.logging = True if logging == "True" else False
         self.trunc = trunc
-        self.commands = {"sr"         : ("e", "addsong",      0),
-                         "leave"      : ("e", "leave",        0),
-                         "openqueue"  : ("m", "open",         3),
-                         "closequeue" : ("m", "close",        3),
-                         "clearqueue" : ("m", "clear",        3),
-                         "removesong" : ("m", "removesong",   3),
-                         "removeuser" : ("m", "removeuser",   3),
-                         "listqueue"  : ("e", "listsongs",   10),
-                         "listusers"  : ("m", "listusers",   15),
-                         "currentsong": ("e", "currentsong", 10),
-                         "queue"      : ("e", "status",       0),
-                         "picked"     : ("e", "played",      10),
-                         "pick"       : ("m", "picksong",     3),
-                         "help"       : ("e", "help",         3)}
-        self.cooldowns = {k: 0 for k in self.commands}
-        self.aliases = {"sr"       : ("join",),
-                        "listqueue": ("queuelist",),
-                        "picked"   : ("played",),}
 
     def handle_msg(self, chat_msg, msg_type = "pubmsg"):
         if self.logging:
@@ -61,31 +33,18 @@ class message_handler:
     def handle_command(self, msg, words, tags):
         if words[0][:1] == self.sep:
             sender = tags['display-name']
-            command = self.check_aliases(words[0][1:].lower())
-            action = self.find_command(tags['badges'], command)
+            action = self.commandhandler.find_command(tags['badges'],
+                                                      words[0][1:],
+                                                      self.shelve[self.channel].mthds)
             if not action: return
             else:
-                if not self.check_cooldown(command): return
                 with self.lock:
                     res = action(sender, " ".join(words[1:]))
                     self.shelve.sync()
                 return res
 
-    def check_aliases(self, cmd):
-        res = [k for k in self.aliases if cmd.lower() in self.aliases[k]]
-        return res[0] if res else cmd
-
-    def check_cooldown(self, cmd):
-        current = time.time()
-        timeleft = current - self.cooldowns[cmd] - self.commands[cmd][2]
-        if timeleft >= 0:
-            self.cooldowns[cmd] = current
-            return True
-        else:
-            print(col(f"'{cmd}' still on cooldown for {round(timeleft, 1) * -1}s", "GREY"))
-
     def find_command(self, badges, request):
-        cmd = self.commands.get(request, None)
+        cmd = self.commands[request]
         if cmd:
             try:
                 mthd = Command()[cmd[1]]
