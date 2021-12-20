@@ -1,5 +1,6 @@
 import time
 from threading import Thread, Lock
+from queue import Queue as Q
 from tools.colours import colourise as col
 
 class background_bot():
@@ -9,20 +10,25 @@ class background_bot():
         self.command = []
         self.lock = Lock()
         self.bot = bot
+        self.q = Q()
         self.thread = bgtask(self)
 
-    def run(self):
-        while True:
-            with self.lock:
-                if self.bot.connected(): self.bot.poll()
-                else: self.reconnect()
+    def run(self, q):
+        def do_work():
+            while True:
+                with self.lock:
+                    if self.bot.connected(): self.bot.poll()
+                    else: self.reconnect()
 
-                if self.command:
-                    getattr(self.bot, self.command[0])(*self.command[1])
-                    self.command = []
-                elif not self.running: break
-            time.sleep(0.1)
-        print("\nBot stopped")
+                    if self.command:
+                        getattr(self.bot, self.command[0])(*self.command[1])
+                        self.command = []
+                    elif not self.running: break
+                time.sleep(0.1)
+            print("\nBot stopped")
+
+        try: do_work()
+        except BaseException as e: q.put(e)
 
     def mute(self):   self.bot.muted = True
     def unmute(self): self.bot.muted = False
@@ -50,6 +56,6 @@ class background_bot():
             self.command += [command, a]
             
 def bgtask(bgbot):
-    t1 = Thread(target = bgbot.run)
+    t1 = Thread(target = bgbot.run, args = (bgbot.q,))
     t1.start()
     return t1

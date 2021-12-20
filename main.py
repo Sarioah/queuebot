@@ -7,7 +7,7 @@ from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration
 
-version = 'v0.10.0'
+version = 'v1.0.0'
 
 def cmd(msg):
     res = m.run_cmd(msg)
@@ -43,14 +43,14 @@ m = message_handler(channel, config['bot_prefix'], trunc, config['logging'])
 bot = irc_bot(config['bot_nick'], config['tmi_token'], channel, config['muted'], m.handle_msg)
 bgbot = background_bot(bot)
 
-while not bot.joined: 
+while not bot.joined:
     bot.poll()
     time.sleep(1)
-else: print(col("Bot is ready for commands", "GREEN"))
+else: print(col("Bot is ready for commands", "GREEN")
 
 while True:
     try:
-        input()
+        if not bgbot.q.empty(): raise bgbot.q.get()
     except (EOFError, KeyboardInterrupt):
         break
     except (BaseException) as e:
