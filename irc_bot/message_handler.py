@@ -42,16 +42,3 @@ class message_handler:
                     res = action(sender, " ".join(words[1:]))
                     self.shelve.sync()
                 return res
-
-    def find_command(self, badges, request):
-        cmd = self.commands[request]
-        if cmd:
-            try:
-                mthd = Command()[cmd[1]]
-                if mthd: raise CommandFound()
-                mthd = self.shelve[self.channel][cmd[1]]
-                if mthd: raise CommandFound()
-            except CommandFound as c:
-                if cmd[0] == "m":
-                    if role_check(badges): return mthd
-                else: return mthd
