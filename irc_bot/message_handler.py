@@ -36,8 +36,7 @@ class message_handler:
             action = self.commandhandler.find_command(tags['badges'],
                                                       words[0][1:],
                                                       self.shelve[self.channel].mthds)
-            if not action: return
-            else:
+            if action:
                 with self.lock:
                     res = action(sender, " ".join(words[1:]))
                     self.shelve.sync()
