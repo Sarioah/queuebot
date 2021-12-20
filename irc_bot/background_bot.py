@@ -28,7 +28,7 @@ class background_bot():
             print("\nBot stopped")
 
         try: do_work()
-        except BaseException as e: q.put(e)
+        except Exception as e: q.put(e)
 
     def mute(self):   self.bot.muted = True
     def unmute(self): self.bot.muted = False

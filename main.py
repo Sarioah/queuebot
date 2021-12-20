@@ -7,7 +7,7 @@ from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration
 
-version = 'v1.0.0'
+version = 'v1.0.1'
 
 def cmd(msg):
     res = m.run_cmd(msg)
@@ -26,7 +26,7 @@ if not os.path.isdir("data"): os.mkdir("data")
 
 colorama.init()
 
-try: config = configuration(".config").get_config()
+try: config = configuration("config.ini").get_config()
 except Exception as e: 
     print(str(e) + col('\nPress any key to exit...', "GREY"))
     _ = readchar()
@@ -46,11 +46,12 @@ bgbot = background_bot(bot)
 while not bot.joined:
     bot.poll()
     time.sleep(1)
-else: print(col("Bot is ready for commands", "GREEN")
+else: print(col("Bot is ready for commands", "GREEN"))
 
 while True:
     try:
         if not bgbot.q.empty(): raise bgbot.q.get()
+        time.sleep(1)
     except (EOFError, KeyboardInterrupt):
         break
     except (BaseException) as e:
@@ -62,7 +63,6 @@ while True:
         print(col("\nPress any key to exit...", "YELLOW"))
         _ = readchar()
         break
-    time.sleep(1)
 
 if os.name != "nt": close()
 
