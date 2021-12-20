@@ -7,7 +7,7 @@ from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration
 
-version = 'v0.9.1'
+version = 'v0.10.0'
 
 def cmd(msg):
     res = m.run_cmd(msg)
