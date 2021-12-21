@@ -30,7 +30,7 @@ class irc_bot(SingleServerIRCBot):
 
         self.client = client
         self.joined = True
-        print(col(f"Welcomed into channel \"{self.channel[1:]}\"", "GREY"))
+        print(col(f"Welcomed into channel \"{self.channel[1:]}\"", "GREEN"))
 
     def on_pubmsg(self, client, message):
         response = self.message_handler(message, "pubmsg")

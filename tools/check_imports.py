@@ -1,7 +1,8 @@
 import sys, os, importlib
 
-modules = ["colorama", "readchar", "irc", "nuitka"]
+modules = ["colorama", "readchar", "irc", "nuitka", "keyring"]
 if os.name == "nt": modules += ["win32api"]
+else: modules += ["sagecipher"]
 
 def check_module(module):
     try: importlib.import_module(module)

@@ -1,5 +1,6 @@
 from tools.chat import format_badges
 from tools.colours import colourise as col
+from tools.config import BadOAuth
 
 class handle_event():
     def __init__(self, msg):
@@ -17,7 +18,9 @@ class handle_event():
         return callback(self.msg, self.words, self.tags)
     def on_action(self, *a): print(col(f"{self.tags['display-name']}: {self.msg}", "CYAN"))
     def on_pubnotice(self, *a): print(col(self.msg, "GREY"))
-    def on_privnotice(self, *a): print(col(self.msg, "GREY"))
+    def on_privnotice(self, *a):
+        if self.msg in ("Improperly formatted auth", "Login authentication failed"): raise BadOAuth(self.msg)
+        print(col(self.msg, "GREY"))
     def on_usernotice(self, *a):
         res = col(self.tags['system-msg'], "GREY" ) if 'system-msg' in self.tags else ''
         if res: print(res + f" - {self.msg or '<no msg>'}")
