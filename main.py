@@ -7,7 +7,7 @@ from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration, BadOAuth, password_handler as P
 
-version = 'v1.0.1'
+version = 'v1.1.0'
 
 def cmd(msg):
     res = m.run_cmd(msg)
