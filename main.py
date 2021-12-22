@@ -8,6 +8,7 @@ from tools.Queue import Queue, trunc
 from tools.config import configuration, BadOAuth, password_handler as P
 
 version = 'v1.1.0'
+errored = False
 
 def cmd(msg):
     res = m.run_cmd(msg)
@@ -16,13 +17,18 @@ def cmd(msg):
 
 def close(*a):
     print(col("Exiting...", "GREY"))
-    bgbot.quit()
-    bgbot.thread.join()
-    m.shelve.close()
+    try:
+        bgbot.quit()
+        bgbot.thread.join()
+        m.shelve.close()
+    except: print(col("Bot was not running", "GREY"))
     print(col("Cleanup complete", "GREY"))
-    time.sleep(2)
+    if errored:
+        print("\nPress any key to exit...")
+        _ = readchar()
 
 def setup(*a):
+    global m, p, bgbot, errored
     if not os.path.isdir("data"): os.mkdir("data")
 
     colorama.init()
@@ -30,6 +36,7 @@ def setup(*a):
     try: config = configuration("config.ini").get_config()
     except Exception as e:
         print("\n" + str(e))
+        errored = True
         sys.exit()
 
     channel = a[1] if len(a) > 1 else config["channel"]
@@ -37,11 +44,10 @@ def setup(*a):
     if os.name == "nt":
         import win32api
         win32api.SetConsoleCtrlHandler(close, True)
-        win32api.SetConsoleTitle(f"Sari queuebot {version} acting as '{config['bot_nick']}' in channel '{channel}'")
-    global m, p, bgbot
-    p = P(channel)
+        win32api.SetConsoleTitle(f"Sari queuebot {version} acting as '{config['bot_name']}' in channel '{channel}'")
+    p = P(config['bot_name'])
     m = message_handler(channel, config['bot_prefix'], trunc, config['logging'])
-    bot = irc_bot(config['bot_nick'], p.get_password(), channel, config['muted'], m.handle_msg)
+    bot = irc_bot(config['bot_name'], p.get_password(), channel, config['muted'], m.handle_msg)
     bgbot = background_bot(bot)
 
     #while not bot.joined:
@@ -60,14 +66,14 @@ except BadOAuth as e:
     elif str(e) == "Improperly formatted auth": res = "oauth token is improperly formatted"
     print(col(res + ", please restart the bot and paste in a new token", "RED"))
     p.del_password()
+    errored = True
 except (BaseException) as e:
     import traceback
     error = traceback.format_exc()
     print(f"{col('Bot has encounted a problem and needs to close. Error is as follows:', 'RED')}\n{error}")
     with open("last error.log", "w") as fd: fd.write(error)
     print(f"Error saved to {col('last error.log', 'YELLOW')}")
+    errored = True
 finally:
-    print("\nPress any key to exit...")
-    _ = readchar()
     if os.name != "nt": close()
 

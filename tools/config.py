@@ -2,7 +2,7 @@ import keyring, os
 from configparser import ConfigParser, ParsingError
 from tools.colours import colourise as col
 
-defaults = {"bot_nick"  : "********",
+defaults = {"bot_name"  : "********",
             "channel"   : "********",
             "bot_prefix": "!",
             "muted"     : "False",
@@ -11,8 +11,8 @@ defaults = {"bot_nick"  : "********",
 class BadOAuth(Exception): pass
 
 class password_handler():
-    def __init__(self, channel):
-        self.channel = channel
+    def __init__(self, user):
+        self.user = user
         if os.name == "nt": 
             import keyring.backends.Windows
             keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
@@ -23,10 +23,10 @@ class password_handler():
         print(f"Please log into twitch using your bot account, then visit {col('https://twitchapps.com/tmi', 'BLUE')} to " +
               f"generate an oauth code for the bot to login with. Then paste it here and press enter.\n")
         passwd = input("Input your oauth code, including the 'oauth:' at the front: ")
-        keyring.set_password("TMI", self.channel, passwd)
+        keyring.set_password("TMI", self.user, passwd)
 
-    def get_password(self): return keyring.get_password("TMI", self.channel)
-    def del_password(self): return keyring.delete_password("TMI", self.channel)
+    def get_password(self): return keyring.get_password("TMI", self.user)
+    def del_password(self): return keyring.delete_password("TMI", self.user)
 
 class configuration():
     def __init__(self, configfile):
@@ -55,7 +55,7 @@ class configuration():
 
     def _config_empty(self, msg):
         res = [f"{msg} '{col(self.configfile, 'YELLOW')}'.\nPlease open this file and fill out the relevant fields:\n",
-               f"     {col('bot_nick', 'GREEN')}   : Name of the twitch account the bot will login with",
+               f"     {col('bot_name', 'GREEN')}   : Name of the twitch account the bot will login with",
                f"     {col('channel', 'GREEN')}    : Name of the twitch channel the bot will listen in, and send messages to",
                f"     {col('bot_prefix', 'GREEN')} : Symbol that should appear at the front of bot commands in chat. Default is '!'",
                f"     {col('muted', 'GREEN')}      : Mutes the bot if you need to stop it sending messages",
