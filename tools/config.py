@@ -1,4 +1,7 @@
-import keyring, os
+try: import keyring
+except: pass
+
+import os
 from configparser import ConfigParser, ParsingError
 from tools.colours import colourise as col
 
@@ -12,11 +15,14 @@ class BadOAuth(Exception): pass
 
 class password_handler():
     def __init__(self, user):
+        global keyring
         self.user = user
         if os.name == "nt": 
             import keyring.backends.Windows
             keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
-        else: import sagecipher
+        else: 
+            import sagecipher.keyring
+            keyring.set_keyring(sagecipher.keyring.Keyring())
         while not self.get_password(): self._no_passwd()
         
     def _no_passwd(self):
