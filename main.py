@@ -7,7 +7,10 @@ from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration, BadOAuth, password_handler as P
 
-version = 'v1.1.0'
+if os.path.isfile("VERSION"):
+    with open("VERSION", "r") as fd: version = fd.read()
+else: version = "v0"
+
 errored = False
 
 def cmd(msg):
