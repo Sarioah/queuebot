@@ -1,5 +1,5 @@
 #!/bin/bash
-git describe --tags >VERSION
+echo "version = \"$(git describe --tags)\"" > tools/version.py
 
 python3 ./tools/check_imports.py
 

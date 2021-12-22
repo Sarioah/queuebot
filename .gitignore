@@ -9,4 +9,5 @@
 sari_queuebot
 data/
 Resources/
+tools/version.py
 VERSION
