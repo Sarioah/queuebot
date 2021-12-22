@@ -1,4 +1,5 @@
 @ECHO OFF
+git describe --tags >VERSION
 
 py .\tools\check_imports.py
 if %ERRORLEVEL% GTR 0 exit

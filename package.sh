@@ -1,4 +1,6 @@
 #!/bin/bash
+git describe --tags >VERSION
+
 python3 ./tools/check_imports.py
 
 if [ "$?" = 0 ]; then
