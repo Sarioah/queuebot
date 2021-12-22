@@ -7,9 +7,10 @@ from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration, BadOAuth, password_handler as P
 
-if os.path.isfile("VERSION"):
-    with open("VERSION", "r") as fd: version = fd.read()
-else: version = "v0"
+try: 
+    import tools.version
+    version = tools.version.version
+except: version = "v0"
 
 errored = False
 
@@ -78,5 +79,5 @@ except (BaseException) as e:
     print(f"Error saved to {col('last error.log', 'YELLOW')}")
     errored = True
 finally:
-    if os.name != "nt": close()
+    if os.name != "nt" or errored: close()
 
