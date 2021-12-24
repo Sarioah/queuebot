@@ -36,8 +36,18 @@ The `!pick` logic will automatically pick people that haven't had a song played 
 *TODO: GUI, customisable alias' / cooldowns...*
 
 ## Credits
-The libraries mentioned in the last section <3
+#### Libraries
+`sagecipher` licensed under <a href="https://www.apache.org/licenses/LICENSE">Apache 1.0</a>
 
+`nuitka` licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a>
+
+`colorama` licensed under <a href="www.opensource.org/licenses/bsd-license.php">BSD License</a>
+
+`readchar`, `keyring` and `irc` licensed under <a href="https://opensource.org/licenses/MIT">MIT License</a>
+
+`keyring` and `pywin32` licensed under <a href="https://docs.python.org/3/license.html">Python Software Foundation License</a>
+
+#### Icon
 Bot icon sourced from <a href="https://iconscout.com/icon/robot-97" target="_blank">Robot Icon</a> on <a href="https://iconscout.com">Iconscout</a>
 
 ![Robot.png][1]
