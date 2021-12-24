@@ -35,14 +35,6 @@ The `!pick` logic will automatically pick people that haven't had a song played 
 
 *TODO: GUI, customisable alias' / cooldowns...*
 
-## Running from source code
-
-Requires the following modules installed: colorama, readchar, irc, keyring, pywin32 (on windows), sagecipher (on linux), nuitka (if packaging into binary)
-
-`py[thon3] -m pip install --user colorama readchar irc keyring [pywin32] [sagecipher] [nuitka]`
-
-It's python, so for desktop OS' you can probably just download the code then double click `main.py`
-
 ## Credits
 The libraries mentioned in the last section <3
 
