@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "version = \"$(git describe --tags)\"" > tools/version.py
+. ./tools/update\ version.sh
 
 python3 ./tools/check_imports.py
 

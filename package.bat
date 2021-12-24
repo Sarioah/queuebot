@@ -1,5 +1,5 @@
 @ECHO OFF
-for /f "usebackq tokens=*" %%a in (`git describe --tags`) do echo version = '%%a' >tools\version.py
+call ".\tools\update version.bat"
 
 py .\tools\check_imports.py
 if %ERRORLEVEL% GTR 0 exit
