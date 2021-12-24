@@ -43,15 +43,16 @@ def setup(*a):
         errored = True
         sys.exit()
 
-    channel = a[1] if len(a) > 1 else config["channel"]
+    channel = a[1].lower() if len(a) > 1 else config["channel"].lower()
+    bot_name = config['bot_name'].lower()
 
     if os.name == "nt":
         import win32api
         win32api.SetConsoleCtrlHandler(close, True)
         win32api.SetConsoleTitle(f"Sari queuebot {version} acting as '{config['bot_name']}' in channel '{channel}'")
-    p = P(config['bot_name'])
+    p = P(bot_name)
     m = message_handler(channel, config['bot_prefix'], trunc, config['logging'])
-    bot = irc_bot(config['bot_name'], p.get_password(), channel, config['muted'], m.handle_msg)
+    bot = irc_bot(bot_name, p.get_password(), channel, config['muted'], m.handle_msg)
     bgbot = background_bot(bot)
 
     #while not bot.joined:
