@@ -26,6 +26,7 @@ class Mthds():
 
     def addsong(self, user, song, *a):
         if not self.parent: return f"Sorry {user}, the queue is closed"
+        if not song: return f"@{user} please write a song name after !sr"
         oldsong = self.parent.entries[user]
         self.parent.entries[user] = song
         if oldsong: msg = f"{user}'s song changed from \"{trunc(oldsong, ssl // 2)}\" "\
