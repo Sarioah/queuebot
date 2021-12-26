@@ -63,7 +63,7 @@ def setup(*a):
     #else: print(col("Bot is ready for commands", "GREEN"))
 
 try:
-    setup(sys.argv)
+    setup(*sys.argv)
     while True:
         if not bgbot.q.empty(): raise bgbot.q.get()
         time.sleep(1)
