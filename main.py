@@ -5,7 +5,7 @@ from irc_bot.message_handler import message_handler
 from readchar import readchar
 from tools.colours import colourise as col
 from tools.Queue import Queue, trunc
-from tools.config import configuration, BadOAuth, password_handler as P
+from tools.config import configuration, BadOAuth, check_update, password_handler as P
 
 try: 
     import tools.version
@@ -36,6 +36,8 @@ def setup(*a):
     if not os.path.isdir("data"): os.mkdir("data")
 
     colorama.init()
+    res = check_update(version)
+    if res: print(res)
 
     try: config = configuration("config.ini").get_config()
     except Exception as e:
