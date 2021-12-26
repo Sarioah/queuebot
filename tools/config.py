@@ -1,9 +1,11 @@
 try: import keyring
 except: pass
 
-import os
+import os, json
 from configparser import ConfigParser, ParsingError
 from tools.colours import colourise as col
+from setuptools._vendor.packaging import version
+from urllib.request import urlopen
 
 defaults = {"bot_name"  : "********",
             "channel"   : "********",
@@ -73,3 +75,12 @@ class configuration():
         res = [f"Config file '{col(self.configfile, 'YELLOW')}' appears to be misformatted.",
                f"Please correct the error or delete the file, then restart the bot."]
         return Exception("\n".join(res))
+
+def check_update(ver):
+    try:
+        upstream = json.load(urlopen("https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout = 3))['name']
+    except: pass
+    else:
+        if version.parse(upstream) > version.parse(ver):
+            return (f"Updated bot found, version \"{col(upstream, 'BLUE')}\".\n" +
+                    f"Please visit {col('https://github.com/Sarioah/queuebot/releases/latest', 'YELLOW')} to download the new bot")
