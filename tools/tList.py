@@ -71,8 +71,13 @@ class tList():
         if possible"""
         from random import choice
         if not other: other = tList()
-        pool = self - other or self
+        pool = self - other
+        if pool:
+            repeat_pick = False
+        else:
+            repeat_pick = True
+            pool = self
         key, value = choice(pool.data)
-        return self.pop(self.index(key))
+        return self.pop(self.index(key)), repeat_pick
     
     def pop(self, index): return self.data.pop(index)
