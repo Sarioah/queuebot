@@ -7,11 +7,12 @@ from tools.colours import colourise as col
 from setuptools._vendor.packaging import version
 from urllib.request import urlopen
 
-defaults = {"bot_name"  : "********",
-            "channel"   : "********",
-            "bot_prefix": "!",
-            "muted"     : "False",
-            "logging"   : "False"}
+defaults = {"bot_name"    : "********",
+            "channel"     : "********",
+            "bot_prefix"  : "!",
+            "muted"       : "False",
+            "logging"     : "False",
+            "startup_msg" : "True"}
 
 class BadOAuth(Exception): pass
 
@@ -49,26 +50,30 @@ class configuration():
             res = self._config_empty("Configuration file not found, a default configuration file has been written to")
         elif any([True for k in self.c['DEFAULT'] if self.c['DEFAULT'][k] == "********"]):
             res = self._config_empty("Default fields need to be filled out in")
-        elif any([True for k in defaults if k not in self.c['DEFAULT']]):
+        elif any([True for k in ("bot_name", "channel") if k not in self.c['DEFAULT']]):
             res = self._config_empty("Fields missing in")
-        else: return
+        else: res = ""
         
+        self._write_config()
+        if res: raise res
+
+    def get_config(self): return self.c['DEFAULT']
+    
+    def _write_config(self):
         for k in defaults:
             if k not in self.c['DEFAULT']: self.c['DEFAULT'][k] = defaults[k]
         with open(self.configfile, "w") as fd:
             self.c.write(fd)
-        raise res
-
-    def get_config(self): return self.c['DEFAULT']
 
     def _config_empty(self, msg):
         res = [f"{msg} '{col(self.configfile, 'YELLOW')}'.\nPlease open this file and fill out the relevant fields:\n",
-               f"     {col('bot_name', 'GREEN')}   : Name of the twitch account the bot will login with",
-               f"     {col('channel', 'GREEN')}    : Name of the twitch channel the bot will listen in, and send messages to",
-               f"     {col('bot_prefix', 'GREEN')} : Symbol that should appear at the front of bot commands in chat. Default is '!'",
-               f"     {col('muted', 'GREEN')}      : Mutes the bot if you need to stop it sending messages",
-               f"     {col('logging', 'GREEN')}    : Saves each received chat message in '{col('messages.log', 'YELLOW')}', useful for debugging\n",
-               f"Once these are filled in, restart the bot."]
+               f"     {col('bot_name', 'GREEN')}    : Name of the twitch account the bot will login with",
+               f"     {col('channel', 'GREEN')}     : Name of the twitch channel the bot will listen in, and send messages to",
+               f"     {col('bot_prefix', 'GREEN')}  : Symbol that should appear at the front of bot commands in chat. Default is '!'",
+               f"     {col('muted', 'GREEN')}       : Mutes the bot if you need to stop it sending messages",
+               f"     {col('logging', 'GREEN')}     : Saves each received chat message in '{col('messages.log', 'YELLOW')}', useful for debugging",
+               f"     {col('startup_msg', 'GREEN')} : Send a message in chat when the bot has sucessfully connected",
+               f"\nOnce these are filled in, restart the bot."]
         return Exception("\n".join(res))
 
     def _config_bad(self):
