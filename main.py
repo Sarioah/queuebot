@@ -54,7 +54,7 @@ def setup(*a):
         win32api.SetConsoleTitle(f"Sari queuebot {version} acting as '{config['bot_name']}' in channel '{channel}'")
     p = P(bot_name)
     m = message_handler(channel, config['bot_prefix'], trunc, config['logging'])
-    bot = irc_bot(bot_name, p.get_password(), channel, config['muted'], m.handle_msg)
+    bot = irc_bot(bot_name, p.get_password(), channel, config['muted'], m.handle_msg, config['startup_msg'], version)
     bgbot = background_bot(bot)
 
     #while not bot.joined:
