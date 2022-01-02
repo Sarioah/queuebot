@@ -87,8 +87,10 @@ class Mthds():
 
     def picksong(self, _, selection = 0, *a): 
         try:
-            if selection: user, song = self.parent.entries.pop(int(selection) - 1)
-            else: user, song = self.parent.entries.random(self.parent.picked)
+            if selection: 
+                user, song = self.parent.entries.pop(int(selection) - 1)
+                repeat_pick = user in self.parent.picked
+            else: (user, song), repeat_pick = self.parent.entries.random(self.parent.picked)
         except ValueError:
             return "Please specify a song number"
         except IndexError as x:
@@ -97,12 +99,12 @@ class Mthds():
         else:
             self.parent.current["user"], self.parent.current["song"] = user, song
             self.parent.picked.append((user, song))
-            return f"{user} was picked, their song was \"{trunc(song, msl)}\""
+            return f"{user} was picked{' again' if repeat_pick else ''}, their song was \"{trunc(song, msl)}\""
 
 class Queue():
     def __init__(self, channel, *tuples):
         self.channel = channel
-        self.isopen = False
+        self.isopen = True
         self.entries, self.current, self.picked = tList(*tuples), {}, tList()
         self.mthds = Mthds(self)
 
