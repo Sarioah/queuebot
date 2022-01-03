@@ -78,7 +78,9 @@ except (BaseException) as e:
     import traceback
     error = traceback.format_exc()
     print(f"{col('Bot has encounted a problem and needs to close. Error is as follows:', 'RED')}\n{error}")
-    with open("last error.log", "w") as fd: fd.write(error)
+    with open("last error.log", "w") as fd:
+        fd.write(f"Bot {version}\n")
+        fd.write(error)
     print(f"Error saved to {col('last error.log', 'YELLOW')}")
     errored = True
 finally:
