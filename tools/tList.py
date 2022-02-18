@@ -65,7 +65,7 @@ class tList():
 
     def index(self, key): return [k.lower() for (k, v) in self.data].index(key.lower())
 
-    def random(self, other = ""):
+    def random(self, other = "", first = False):
         """Picks a key: value pair at random.
         If another tList is provided, prefer to pick keys unique to the first tList
         if possible"""
@@ -77,7 +77,8 @@ class tList():
         else:
             repeat_pick = True
             pool = self
-        key, value = choice(pool.data)
+        if first: key, value = pool.data[0]
+        else: key, value = choice(pool.data)
         return self.pop(self.index(key)), repeat_pick
     
     def pop(self, index): return self.data.pop(index)

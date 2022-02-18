@@ -1,15 +1,11 @@
 #!/usr/bin/python3
 from tools.tList import tList
 
-class Mthds():
+class BaseMethods():
     def __init__(self, parent):
         self.parent = parent
-    
-    def __getitem__(self, key): return getattr(self, key, None)
 
-    def open(self, *a): 
-        self.parent.isopen = True
-        return "Random queue is now open!"
+    def __getitem__(self, key): return getattr(self, key, None)
 
     def close(self, *a):
         self.parent.isopen = False
@@ -19,32 +15,17 @@ class Mthds():
         self.parent.entries, self.parent.current, self.parent.picked = tList(), {}, tList()
         return "Queue has been cleared"
 
-    def currentsong(self, *a):
-        if self.parent.current: return f"Current song is \"{trunc(self.parent.current['song'], ssl)}\", "\
-                                       f"requested by {self.parent.current['user']}"
-        else: return "Nothing's been played yet"
-
-    def addsong(self, user, song, *a):
-        if not self.parent: return f"Sorry {user}, the queue is closed"
-        if not song: return f"@{user} please write a song name after !sr"
-        oldsong = self.parent.entries[user]
-        self.parent.entries[user] = song
-        if oldsong: msg = f"{user}'s song changed from \"{trunc(oldsong, ssl // 2)}\" "\
-                          f"to \"{trunc(song, ssl // 2)}\""
-        else: msg = f"Added \"{trunc(song, ssl)}\" to the queue for {user}"
-        return msg
-
     def leave(self, user, *a):
         if user in self.parent:
             del self.parent.entries[user]
             return f"{user}, you have left the queue"
         else: return f"{user}, you weren't in the queue"
-
-    def removesong(self, _, index, *a):
-        try: user, song = self.parent.entries.pop(int(index) - 1)
-        except ValueError: return "Please specify a song number"
-        except IndexError: return "Specified song doesn't exist"
-        else: return f"Removed \"{trunc(song, ssl)}\" from the queue"
+    
+    def listusers(self, *a):
+        if not self.parent.entries: return "Queue is empty"
+        msg = "List of users in the queue: "
+        for u, s in self.parent.entries: msg += f"{u}, "
+        return msg[:-2]
 
     def removeuser(self, _, user = "", *a):
         try:
@@ -53,6 +34,38 @@ class Mthds():
         except AttributeError: return "Please specify a username"
         except ValueError: return f"{user} is not in the queue"
         else: return f"Removed {user} from the queue"
+
+class JDMethods(BaseMethods):
+    def jbqueue(self, *a):
+        self.parent.mthds = JBMethods(self.parent)
+        return "Queue is now in jackbox mode"
+
+    def jdqueue(self, *a): return "Queue is already in Just Dance mode"
+
+    def open(self, *a):
+        self.parent.isopen = True
+        return "Random queue is now open"
+
+    def currententry(self, *a):
+        if self.parent.current: return f"Current song is \"{trunc(self.parent.current['entry'], ssl)}\", "\
+                                       f"requested by {self.parent.current['user']}"
+        else: return "Nothing's been played yet"
+
+    def addentry(self, user, entry, *a):
+        if not self.parent: return f"Sorry {user}, the queue is closed"
+        if not entry: return f"@{user} please write a song name after !sr"
+        oldentry = self.parent.entries[user]
+        self.parent.entries[user] = entry
+        if oldentry: msg = f"{user}'s song changed from \"{trunc(oldentry, ssl // 2)}\" "\
+                           f"to \"{trunc(entry, ssl // 2)}\""
+        else: msg = f"Added \"{trunc(entry, ssl)}\" to the queue for {user}"
+        return msg
+
+    def removeentry(self, _, index, *a):
+        try: user, entry = self.parent.entries.pop(int(index) - 1)
+        except ValueError: return "Please specify a song number"
+        except IndexError: return "Specified song doesn't exist"
+        else: return f"Removed \"{trunc(entry, ssl)}\" from the queue"
 
     def status(self, user = "", *a):
         msg = f"Random queue is {'open' if self.parent else 'closed'}"
@@ -67,46 +80,110 @@ class Mthds():
 
         return msg
 
-    def listsongs(self, *a):
+    def listentries(self, *a):
         if not self.parent.entries: return "Queue is empty"
         msg = "List of songs in the queue: "
-        for i, (u, s) in enumerate(self.parent.entries): msg += f"{i + 1}. \"{trunc(s, msl)}\" • "
+        for i, (u, e) in enumerate(self.parent.entries): msg += f"{i + 1}. \"{trunc(e, msl)}\" • "
         return msg[:-3]
 
-    def listusers(self, *a):
-        if not self.parent.entries: return "Queue is empty"
-        msg = "List of users in the queue: "
-        for u, s in self.parent.entries: msg += f"{u}, "
-        return msg[:-2]
-
-    def played(self, *a):
+    def picked(self, *a):
         if not self.parent.picked: return "Nothing's been played yet"
         msg = "Songs already played: "
-        for u, s in self.parent.picked: msg += f"\"{trunc(s, msl)}\", "
+        for u, e in self.parent.picked: msg += f"\"{trunc(e, msl)}\", "
         return msg[:-2]
 
-    def picksong(self, _, selection = 0, *a): 
+    def pickentry(self, _, selection = 0, *a):
         try:
             if selection: 
-                user, song = self.parent.entries.pop(int(selection) - 1)
+                user, entry = self.parent.entries.pop(int(selection) - 1)
                 repeat_pick = user in self.parent.picked
-            else: (user, song), repeat_pick = self.parent.entries.random(self.parent.picked)
+            else: (user, entry), repeat_pick = self.parent.entries.random(self.parent.picked)
         except ValueError:
             return "Please specify a song number"
         except IndexError as x:
             if str(x) == "pop index out of range": return "No such song"
             else: return "Queue is empty"
         else:
-            self.parent.current["user"], self.parent.current["song"] = user, song
-            self.parent.picked.append((user, song))
-            return f"{user} was picked{' again' if repeat_pick else ''}, their song was \"{trunc(song, msl)}\""
+            self.parent.current["user"], self.parent.current["entry"] = user, entry
+            self.parent.picked.append((user, entry))
+            return f"{user} was picked{' again' if repeat_pick else ''}, their song was \"{trunc(entry, ssl)}\""
+
+class JBMethods(BaseMethods):
+    def jbqueue(self, *a): return "Queue is already in Jackbox mode"
+
+    def jdqueue(self, *a):
+        self.parent.mthds = JDMethods(self.parent)
+        return "Queue changed to Just Dance mode"
+
+    def open(self, *a):
+        self.parent.isopen = True
+        return "Priority queue is now open"
+
+    def currententry(self, *a):
+        if self.parent.current: return f"Current player is {trunc(self.parent.current['user'], ssl)}"
+        else: return "No-one's been picked yet"
+
+    def addentry(self, user, *a):
+        if not self.parent: return f"Sorry {user}, the queue is closed"
+        if user in self.parent.entries: msg = f"@{user} you are already in the queue at position {self.parent.entries.index(user) + 1}"
+        else:
+            self.parent.entries[user] = user
+            msg = f"Added {user} to the queue at position {self.parent.entries.index(user) + 1}"
+        return msg
+
+    def removeentry(self, _, index, *a):
+        try: user, entry = self.parent.entries.pop(int(index) - 1)
+        except ValueError: return "Please specify an entry"
+        except IndexError: return "Specified entry doesn't exist"
+        else: return f"Removed {user} from the queue"
+
+    def status(self, user = "", *a):
+        msg = f"Priority queue is {'open' if self.parent else 'closed'}"
+
+        if self.parent.entries:
+            msg += f" • There are {len(self.parent)} users in the queue"
+        else:
+            msg += " • Queue is empty"
+
+        if self.parent.entries[user]:
+            msg += f" • @{user} you are in the queue at position {self.parent.entries.index(user) + 1}"
+
+        return msg
+
+    def listentries(self, *a):
+        if not self.parent.entries: return "Queue is empty"
+        msg = "List of users in the queue: "
+        for i, (u, e) in enumerate(self.parent.entries): msg += f"{i + 1}. {u} • "
+        return msg[:-3]
+
+    def picked(self, *a):
+        if not self.parent.picked: return "No-one's been picked yet"
+        msg = "Users already picked: "
+        for u, e in self.parent.picked: msg += f"{u}, "
+        return msg[:-2]
+
+    def pickentry(self, _, selection = 0, *a):
+        try:
+            if selection:
+                user, entry = self.parent.entries.pop(int(selection) - 1)
+                repeat_pick = user in self.parent.picked
+            else: (user, entry), repeat_pick = self.parent.entries.random(self.parent.picked, True)
+        except ValueError:
+            return "Please specify a user number"
+        except IndexError as x:
+            if str(x) == "pop index out of range": return "No such user"
+            else: return "Queue is empty"
+        else:
+            self.parent.current["user"], self.parent.current["entry"] = user, entry
+            if user not in self.parent.picked: self.parent.picked.append((user, entry))
+            return f"Get ready to play, @{user}, you were picked from the queue{' again!' if repeat_pick else '!'}"
 
 class Queue():
     def __init__(self, channel, *tuples):
         self.channel = channel
         self.isopen = True
         self.entries, self.current, self.picked = tList(*tuples), {}, tList()
-        self.mthds = Mthds(self)
+        self.mthds = JDMethods(self)
 
     def __bool__(self): return self.isopen
     def __contains__(self, user): return user in self.entries
