@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 from tools.tList import tList
+from os import path
+from json import loads
+import time
 
 class BaseMethods():
     def __init__(self, parent):
@@ -34,6 +37,25 @@ class BaseMethods():
         except AttributeError: return "Please specify a username"
         except ValueError: return f"{user} is not in the queue"
         else: return f"Removed {user} from the queue"
+
+    def queueconfirm(self, *a):
+        try:
+            if time.time() - self.parent.testdata[1] < 10:
+                self.parent.entries = tList(*self.parent.testdata[0])
+                del(self.parent.testdata)
+                return "Test data loaded into queue"
+            else: del(self.parent.testdata)
+        except AttributeError: return
+
+    def testqueue(self, *a):
+        if path.exists('testdata.json'):
+            try: self.parent.testdata = [loads(open('testdata.json', 'r', encoding = 'utf-8').read())]
+            except: return "Failed to load test data"
+            else:
+                self.parent.testdata += [time.time()]
+                return "Test data loaded from file, do !queueconfirm within 10 seconds to overwrite the current queue entries"
+        else: return "No test data file found "
+
 
 class JDMethods(BaseMethods):
     def jbqueue(self, *a):
