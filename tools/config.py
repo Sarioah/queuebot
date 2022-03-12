@@ -3,7 +3,7 @@ except: pass
 
 import os, json
 from configparser import ConfigParser, ParsingError
-from tools.colours import colourise as col
+from tools.text import colourise as col
 from setuptools._vendor.packaging import version
 from urllib.request import urlopen
 

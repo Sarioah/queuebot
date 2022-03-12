@@ -1,6 +1,7 @@
 import sys
 from time import sleep
-from tools.colours import colourise as col
+from tools.text import colourise as col
+from tools.text import trim_bytes
 
 try:
     from irc.bot import SingleServerIRCBot
@@ -10,6 +11,7 @@ except (ModuleNotFoundError, ImportError):
 
 server = 'irc.chat.twitch.tv'
 port = 6667
+msg_limit = 499
 
 class irc_bot(SingleServerIRCBot):
     def __init__(self, username, password, channel, muted, message_handler, startup_msg, version):
@@ -18,6 +20,7 @@ class irc_bot(SingleServerIRCBot):
         self.muted = True if muted.lower() == "true" else False
         self.startup_msg = True if startup_msg.lower() == "true" else False
         self.message_handler = message_handler
+        self.message_limit = msg_limit - len(channel)
         self.version = version
         super().__init__([(server, port, password)], username, username)
 
@@ -36,7 +39,7 @@ class irc_bot(SingleServerIRCBot):
         if self.startup_msg: self.send_msg(f"Queuebot {self.version} started")
 
     def on_pubmsg(self, client, message):
-        response = self.message_handler(message, "pubmsg")
+        response = trim_bytes(self.message_handler(message, "pubmsg"), self.message_limit)
         if response:
             c = "RED" if self.muted else "YELLOW"
             print(col(response, c))
@@ -64,6 +67,7 @@ class irc_bot(SingleServerIRCBot):
     def poll(self): self.reactor.process_once()
 
     def send_msg(self, msg):
+        msg = trim_bytes(msg, self.message_limit)
         colour = "RED" if self.muted else "YELLOW"
         if msg and self.joined and not self.muted: self.client.privmsg(self.channel, msg)
         print(col(msg, colour))

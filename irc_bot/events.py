@@ -1,5 +1,5 @@
 from tools.chat import format_badges
-from tools.colours import colourise as col
+from tools.text import colourise as col
 from tools.config import BadOAuth
 
 class handle_event():
