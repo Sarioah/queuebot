@@ -14,28 +14,32 @@ class Commands():
 class CommandHandler():
     def __init__(self):
         self.mthds = Commands(self)
-        self.commands = {"sr"         : ("e", "addentry",      0),
-                         "leave"      : ("e", "leave",         0),
-                         "openqueue"  : ("m", "open",          3),
-                         "closequeue" : ("m", "close",         3),
-                         "clearqueue" : ("m", "clear",         3),
-                         "removesong" : ("m", "removeentry",   3),
-                         "removeuser" : ("m", "removeuser",    3),
-                         "listqueue"  : ("e", "listentries",  10),
-                         "listusers"  : ("m", "listusers",    30),
-                         "jbqueue"    : ("m", "jbqueue",       3),
-                         "jdqueue"    : ("m", "jdqueue",       3),
-                         "currentsong": ("e", "currententry", 10),
-                         "queue"      : ("e", "status",        0),
-                         "played"     : ("e", "picked",       10),
-                         "pick"       : ("m", "pickentry",     3),
-                         "help"       : ("e", "help",         10)}
+        self.commands = {"sr"           : ("e", "addentry",      0),
+                         "leave"        : ("e", "leave",         0),
+                         "openqueue"    : ("m", "open",          3),
+                         "closequeue"   : ("m", "close",         3),
+                         "clearqueue"   : ("m", "clear",         3),
+                         "removesong"   : ("m", "removeentry",   3),
+                         "removeuser"   : ("m", "removeuser",    3),
+                         "listqueue"    : ("e", "listentries",  10),
+                         "listusers"    : ("m", "listusers",    30),
+                         "jbqueue"      : ("m", "jbqueue",       3),
+                         "jdqueue"      : ("m", "jdqueue",       3),
+                         "currentsong"  : ("e", "currententry", 10),
+                         "queue"        : ("e", "status",        0),
+                         "played"       : ("e", "picked",       10),
+                         "pick"         : ("m", "pickentry",     3),
+                         "help"         : ("e", "help",         10),
+                         "testqueue"    : ("m", "testqueue",     5),
+                         "queueconfirm" : ("m", "queueconfirm",  0)}
         self.cooldowns = {}
-        self.aliases = {"sr"         : ("join",),
-                        "listqueue"  : ("queuelist",),
-                        "played"     : ("picked",),
-                        "removesong" : ("removeentry",),
-                        "currentsong": ("currentuser",)}
+        self.aliases = {"sr"          : ("join",),
+                        "listqueue"   : ("queuelist",),
+                        "played"      : ("picked",),
+                        "removesong"  : ("removeentry",),
+                        "currentsong" : ("currentuser",),
+                        "testqueue"   : ("queuetest",),
+                        "queueconfirm": ("confirmqueue",)}
 
     def __getitem__(self, attr): 
         return getattr(self.mthds, attr, None)
@@ -45,7 +49,6 @@ class CommandHandler():
         return res[0] if res else command
 
     def check_cooldowns(self, command):
-        import json
         current = time.time()
         timeleft = current - self.cooldowns.get(command[1], 0) - command[2]
         if timeleft >= 0:
