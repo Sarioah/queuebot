@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from tools.tList import tList
+from tools.text import paginate as p
 from os import path
 from json import loads
 import time
@@ -24,11 +25,11 @@ class BaseMethods():
             return f"{user}, you have left the queue"
         else: return f"{user}, you weren't in the queue"
     
-    def listusers(self, *a):
+    def listusers(self, user, page = 1, *a):
         if not self.parent.entries: return "Queue is empty"
         msg = "List of users in the queue: "
         for u, s in self.parent.entries: msg += f"{u}, "
-        return msg[:-2]
+        return p(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def removeuser(self, _, user = "", *a):
         try:
@@ -102,17 +103,17 @@ class JDMethods(BaseMethods):
 
         return msg
 
-    def listentries(self, *a):
+    def listentries(self, user, page = 1, *a):
         if not self.parent.entries: return "Queue is empty"
         msg = "List of songs in the queue: "
         for i, (u, e) in enumerate(self.parent.entries): msg += f"{i + 1}. \"{trunc(e, msl)}\" • "
-        return msg[:-3]
+        return p(msg[:-3], self.parent.msg_limit, " • ")[page]
 
-    def picked(self, *a):
+    def picked(self, user, page = 1, *a):
         if not self.parent.picked: return "Nothing's been played yet"
         msg = "Songs already played: "
         for u, e in self.parent.picked: msg += f"\"{trunc(e, msl)}\", "
-        return msg[:-2]
+        return p(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection = 0, *a):
         try:
@@ -172,17 +173,17 @@ class JBMethods(BaseMethods):
 
         return msg
 
-    def listentries(self, *a):
+    def listentries(self, user, page = 1, *a):
         if not self.parent.entries: return "Queue is empty"
         msg = "List of users in the queue: "
         for i, (u, e) in enumerate(self.parent.entries): msg += f"{i + 1}. {u} • "
-        return msg[:-3]
+        return p(msg[:-3], self.parent.msg_limit, " • ")[page]
 
-    def picked(self, *a):
+    def picked(self, user, page = 1, *a):
         if not self.parent.picked: return "No-one's been picked yet"
         msg = "Users already picked: "
         for u, e in self.parent.picked: msg += f"{u}, "
-        return msg[:-2]
+        return p(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection = 0, *a):
         try:
@@ -203,6 +204,7 @@ class JBMethods(BaseMethods):
 class Queue():
     def __init__(self, channel, *tuples):
         self.channel = channel
+        self.msg_limit = 499 - len(channel)
         self.isopen = True
         self.entries, self.current, self.picked = tList(*tuples), {}, tList()
         self.mthds = JDMethods(self)
@@ -214,7 +216,7 @@ class Queue():
     def __len__(self): return len(self.entries)
 
 ssl = 200 #single song length
-msl = 35 #multi song length (for lists)
+msl = 50 #multi song length (for lists)
 
 def trunc(msg, l):
     return msg if len(msg) <= l else msg[:l - 1] + "…"

@@ -39,7 +39,7 @@ class irc_bot(SingleServerIRCBot):
         if self.startup_msg: self.send_msg(f"Queuebot {self.version} started")
 
     def on_pubmsg(self, client, message):
-        response = trim_bytes(self.message_handler(message, "pubmsg"), self.message_limit)
+        response, _ = trim_bytes(self.message_handler(message, "pubmsg"), self.message_limit)
         if response:
             c = "RED" if self.muted else "YELLOW"
             print(col(response, c))
@@ -67,7 +67,7 @@ class irc_bot(SingleServerIRCBot):
     def poll(self): self.reactor.process_once()
 
     def send_msg(self, msg):
-        msg = trim_bytes(msg, self.message_limit)
+        msg, _ = trim_bytes(msg, self.message_limit)
         colour = "RED" if self.muted else "YELLOW"
         if msg and self.joined and not self.muted: self.client.privmsg(self.channel, msg)
         print(col(msg, colour))
