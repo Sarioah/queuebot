@@ -3,9 +3,11 @@
 ***.bin
 ***.log
 ***.exe
+***.ini
+***.old
+***.json
 ***~
 .config*
-***.ini
 sari_queuebot
 data/
 Resources/

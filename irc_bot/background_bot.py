@@ -1,7 +1,7 @@
 import time
 from threading import Thread, Lock
 from queue import Queue as Q
-from tools.colours import colourise as col
+from tools.text import colourise as col
 
 class background_bot():
     def __init__(self, bot):

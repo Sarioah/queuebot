@@ -1,3 +1,11 @@
+def trim_bytes(m = "", l = 0):
+    if not m: return m
+    m = bytes(m, encoding = 'utf-8')
+    while m:
+        try: m = str(m[:l], encoding = 'utf-8')
+        except (ValueError,): l -= 1
+        else: return m
+
 def colourise(string, colour):
     c = {
     "WHITE"  : "\033[0m",

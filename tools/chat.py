@@ -1,5 +1,5 @@
 import time
-from tools.colours import colourise as col
+from tools.text import colourise as col
 
 class CommandFound(Exception): pass
 

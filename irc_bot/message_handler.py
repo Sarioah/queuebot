@@ -1,7 +1,7 @@
 import threading, shelve
 from irc_bot.events import handle_event
 from tools.chat import role_check, CommandHandler
-from tools.colours import colourise as col
+from tools.text import colourise as col
 from tools.Queue import Queue
 
 class message_handler:
