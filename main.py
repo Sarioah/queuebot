@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import random, time, sys, os, colorama
 from irc_bot.background_bot import background_bot
 from irc_bot.irc_bot import irc_bot
@@ -6,6 +7,7 @@ from readchar import readchar
 from tools.text import colourise as col
 from tools.Queue import Queue, trunc
 from tools.config import configuration, BadOAuth, check_update, password_handler as P
+from tools.get_emotes import get_emotes
 
 try: 
     import tools.version
@@ -36,6 +38,7 @@ def setup(*a):
     if not os.path.isdir("data"): os.mkdir("data")
 
     colorama.init()
+    print(col("Checking for updates...", "GREY"))
     res = check_update(version)
     if res: print(res)
 
@@ -53,7 +56,9 @@ def setup(*a):
         win32api.SetConsoleCtrlHandler(close, True)
         win32api.SetConsoleTitle(f"Sari queuebot {version} acting as '{config['bot_name']}' in channel '{channel}'")
     p = P(bot_name)
-    m = message_handler(channel, config['bot_prefix'], trunc, config['logging'])
+    print(col("Checking for FFZ/BTTV emotes...", "GREY"))
+    emotes = get_emotes(channel)
+    m = message_handler(channel, config['bot_prefix'], trunc, config['logging'], emotes)
     bot = irc_bot(bot_name, p.get_password(), channel, config['muted'], m.handle_msg, config['startup_msg'], version)
     bgbot = background_bot(bot)
 

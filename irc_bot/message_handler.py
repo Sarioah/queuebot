@@ -3,11 +3,13 @@ from irc_bot.events import handle_event
 from tools.chat import role_check, CommandHandler
 from tools.text import colourise as col
 from tools.Queue import Queue
+from tools.highlight_string import highlighter
 
 class message_handler:
-    def __init__(self, channel, sep, trunc, logging):
+    def __init__(self, channel, sep, trunc, logging, emotes):
         self.sep = sep
         self.channel = channel
+        self.emotes = sum(emotes.values(), start = [])
         self.commandhandler = CommandHandler()
         self.shelve = shelve.open(f"data/{self.channel}.db", "c", writeback = True)
         if self.channel not in self.shelve:
@@ -24,10 +26,10 @@ class message_handler:
         msg = {}
         try: msg['msg'] = chat_msg.arguments[0]
         except IndexError: msg['msg'] = ""
-
         msg['words'] = msg['msg'].split(" ")
         msg['tags'] = {i['key']: i['value'] for i in chat_msg.tags}
-       
+        msg['msg'] = self.handle_emotes(msg)
+
         return handle_event(msg)(msg_type, self.handle_command)
 
     def handle_command(self, msg, words, tags):
@@ -41,3 +43,9 @@ class message_handler:
                     res = action(sender, " ".join(words[1:]))
                     self.shelve.sync()
                 return res
+
+    def handle_emotes(self, msg):
+        try: twitch_indices = [(int(p.split('-')[0]), int(p.split('-')[1]) + 1) for t in msg['tags']['emotes'].split('/') for p in t.split(':')[1].split(',')]
+        except Exception: twitch_indices = []
+
+        return highlighter(True)(msg['msg'], self.emotes, twitch_indices)
