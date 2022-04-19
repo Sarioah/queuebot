@@ -6,6 +6,14 @@ import asyncio
 import aiohttp
 
 
+if (
+        sys.version_info[0] == 3
+        and sys.version_info[1] >= 8
+        and sys.platform.startswith("win")
+        ):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+
 async def _get(url):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
@@ -73,11 +81,12 @@ async def _main(channels):
 
 
 def get_emotes(*channels):
-    return {
-            k: d[k]
-            for d in asyncio.run(_main(channels))
-            for k in d
-            }
+    res = {
+        k: d[k]
+        for d in asyncio.run(_main(channels))
+        for k in d
+        }
+    return res
 
 
 if __name__ == "__main__":
