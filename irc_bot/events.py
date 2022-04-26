@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from tools.chat import format_badges
 from tools.text import colourise as col
 from tools.config import BadOAuth
@@ -10,6 +12,10 @@ class handle_event():
         self.words = msg['words']
         self.tags = msg['tags']
 
+        dt = datetime.now()
+        prefix = dt.strftime("[%m-%d %H:%M:%S] ")
+        self.prefix = col(prefix, "GREY")
+
     def __call__(self, msg_type, callback):
         try:
             action = getattr(self, "on_" + msg_type)
@@ -20,17 +26,24 @@ class handle_event():
 
     def on_pubmsg(self, callback):
         print(
-            f"<{col(self.tags['display-name'], 'CYAN')}"
+            self.prefix
+            + f"<{col(self.tags['display-name'], 'CYAN')}"
             + f">{format_badges(self.tags)}: "
             + f"{self.msg}"
             )
         return callback(self.msg, self.words, self.tags)
 
     def on_action(self, *a):
-        print(col(f"{self.tags['display-name']}: {self.msg}", "CYAN"))
+        print(
+            self.prefix
+            + col(f"{self.tags['display-name']}: {self.msg}", "CYAN")
+            )
 
     def on_pubnotice(self, *a):
-        print(col(self.msg, "GREY"))
+        print(
+            self.prefix
+            + col(self.msg, "GREY")
+            )
 
     def on_privnotice(self, *a):
         if self.msg in (
@@ -38,15 +51,23 @@ class handle_event():
                 "Login authentication failed"):
             raise BadOAuth(self.msg)
         else:
-            print(col(self.msg, "GREY"))
+            print(
+                self.prefix
+                + col(self.msg, "GREY")
+                )
 
     def on_usernotice(self, *a):
         if 'system-msg' in self.tags:
             res = col(self.tags['system-msg'], "GREY")
-            print(res + f" - {self.msg or '<no msg>'}")
+            print(
+                self.prefix + res
+                + f" - {self.msg or '<no msg>'}"
+                )
 
     def on_whisper(self, *a):
-        print(col(
-            f"Whisper from {self.tags['display-name']}: {self.msg}",
-            "GREY"
+        print(
+            self.prefix
+            + col(
+                f"Whisper from {self.tags['display-name']}: {self.msg}",
+                "GREY"
             ))
