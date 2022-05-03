@@ -7,8 +7,8 @@ class highlighter():
     def __init__(self, emote=False):
         self.emote = emote
 
-    def __call__(self, string, substrings=[], positions=[]):
-        results = positions + find_strings(string, substrings)
+    def __call__(self, string, substrings=[], indices=[]):
+        results = indices + find_strings(string, substrings)
         if self.emote:
             results = [
                     p
