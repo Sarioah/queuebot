@@ -5,6 +5,7 @@ from irc_bot.events import handle_event
 from tools.chat import CommandHandler
 from tools.Queue import Queue
 from tools.highlight_string import highlighter
+from tools.highlight_string import find_strings
 
 
 class message_handler:
@@ -53,7 +54,10 @@ class message_handler:
                     )
             if action:
                 with self.lock:
-                    res = action(sender, " ".join(words[1:]))
+                    res = action(
+                        sender, " ".join(words[1:]),
+                        self.emote_indices_short
+                        )
                     self.shelve.sync()
                 return res
             else:
@@ -69,4 +73,19 @@ class message_handler:
         except Exception:
             twitch_indices = []
 
-        return highlighter(True)(msg['msg'], self.emotes, twitch_indices)
+        bttv_indices = find_strings(msg['msg'], self.emotes)
+        self.emote_indices = []
+        self.emote_indices = list(
+            set([
+                i for i in bttv_indices + twitch_indices
+                if i not in self.emote_indices
+                ])
+            )
+
+        adjustment = len(msg['words'][0]) + 1
+        self.emote_indices_short = [
+            (i - adjustment, j - adjustment)
+            for (i, j) in self.emote_indices
+            ]
+
+        return highlighter(True)(msg['msg'], indices=self.emote_indices)

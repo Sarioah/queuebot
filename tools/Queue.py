@@ -107,11 +107,23 @@ class JDMethods(BaseMethods):
         else:
             return "Nothing's been played yet"
 
-    def addentry(self, user, entry, *a):
+    def addentry(self, user, entry, emote_indices, *a):
         if not self.parent:
             return f"Sorry {user}, the queue is closed"
         if not entry:
             return f"@{user} please write a song name after !sr"
+
+        emote_indices = list(
+            set([
+                i for j in emote_indices
+                for i in j
+                ])
+            )
+        if len(entry) in emote_indices:
+            entry += " "
+        if 0 in emote_indices:
+            entry = " " + entry
+
         oldentry = self.parent.entries[user]
         self.parent.entries[user] = entry
         if oldentry:
