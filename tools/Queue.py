@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 import time
 from os import path
-from json import loads
+from json import loads, dumps
 
 from tools.tList import tList
+from tools.text import colourise as c
 from tools.text import paginate as p
 
 
@@ -314,10 +315,8 @@ class JBMethods(BaseMethods):
 class Queue():
 
     def __init__(self, channel, *tuples):
-        self.channel = channel
+        self.load(channel, *tuples)
         self.msg_limit = 499 - len(channel)
-        self.isopen = True
-        self.entries, self.current, self.picked = tList(*tuples), {}, tList()
         self.mthds = JDMethods(self)
 
     def __bool__(self):
@@ -334,6 +333,52 @@ class Queue():
 
     def __len__(self):
         return len(self.entries)
+
+    def new(self, channel, *tuples):
+        self.channel = channel
+        self.isopen = True
+        self.current, self.entries, self.picked = {}, tList(*tuples), tList()
+        self.save()
+
+    def save(self):
+        with open(
+                "data/%s.json" % self.channel,
+                "w", encoding="utf-8"
+                ) as f:
+            res = {}
+            res["channel"] = self.channel
+            res["isopen"] = self.isopen
+            res["current"] = self.current
+            res["entries"] = self.entries.serialise()
+            res["picked"] = self.picked.serialise()
+            f.write(dumps(res, indent=4))
+
+    def load(self, channel, *tuples):
+        try:
+            with open(
+                    "data/%s.json" % channel,
+                    "r", encoding="utf-8"
+                    ) as f:
+                res = loads(f.read())
+                self.channel = res["channel"]
+                self.isopen = res["isopen"]
+                self.current = res["current"]
+                self.entries = tList(*res["entries"])
+                self.picked = tList(*res["picked"])
+        except Exception:
+            import sys
+            from traceback import format_exception
+            tb = ''.join(
+                    format_exception(
+                        *sys.exc_info()
+                        )
+                    )
+            print(c(
+                f"\n{tb}\n"
+                "Failed to load saved queue, creating new one",
+                "GREY"
+                ))
+            self.new(channel, *tuples)
 
 
 def trunc(msg, L):

@@ -15,12 +15,7 @@ class message_handler:
         self.channel = channel
         self.emotes = sum(emotes.values(), start=[])
         self.commandhandler = CommandHandler()
-        self.shelve = shelve.open(
-                f"data/{self.channel}.db", "c",
-                writeback=True
-                )
-        if self.channel not in self.shelve:
-            self.shelve[self.channel] = Queue(self.channel)
+        self.q = Queue(self.channel)
         self.lock = threading.Lock()
         self.logging = True if logging == "True" else False
         self.trunc = trunc
@@ -50,7 +45,7 @@ class message_handler:
             action = self.commandhandler.find_command(
                     tags['badges'],
                     words[0][1:],
-                    self.shelve[self.channel].mthds
+                    self.q.mthds
                     )
             if action:
                 with self.lock:
@@ -58,7 +53,7 @@ class message_handler:
                         sender, " ".join(words[1:]),
                         self.emote_indices_short
                         )
-                    self.shelve.sync()
+                    self.q.save()
                 return res
             else:
                 return None
