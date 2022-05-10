@@ -15,14 +15,14 @@ class tList():
 
     def __str__(self):
         msg = "tList contents:\n"
-        for i in self.data:
-            msg += "%s: \"%s\"\n" % i
+        for k, v in self.data:
+            msg += "%s: \"%s\"\n" % (k, v)
         return msg[:-1]
 
     def __repr__(self):
         msg = ""
-        for i in self.data:
-            msg += "(\"%s\", \"%s\"), " % i
+        for k, v in self.data:
+            msg += "(\"%s\", \"%s\"), " % (k, v)
         return "tList(%s)" % msg[:-2]
 
     def __bool__(self):
@@ -117,3 +117,9 @@ class tList():
 
     def pop(self, index):
         return self.data.pop(index)
+
+    def serialise(self):
+        return [
+            (k, v)
+            for k, v in self.data
+            ]

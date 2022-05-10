@@ -5,6 +5,7 @@ import sys
 import os
 
 import colorama
+
 from irc_bot.background_bot import background_bot
 from irc_bot.irc_bot import irc_bot
 from irc_bot.message_handler import message_handler
@@ -36,7 +37,7 @@ def close(*a):
     try:
         bgbot.quit()
         bgbot.thread.join()
-        m.shelve.close()
+        m.q.save()
     except Exception:
         print(col("Bot was not running", "GREY"))
     print(col("Cleanup complete", "GREY"))
