@@ -80,8 +80,9 @@ def colourise(string, colour):
         }
 
     try:
-        string = string.replace("\33[0m", c[colour])
-        return(
+        if string:
+            string = string.replace("\33[0m", c[colour])
+        return (
             f"{c[colour]}"
             f"{string}"
             f"{c['WHITE']}"
