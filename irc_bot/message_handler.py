@@ -1,5 +1,4 @@
 import threading
-import shelve
 
 from irc_bot.events import handle_event
 from tools.chat import CommandHandler
