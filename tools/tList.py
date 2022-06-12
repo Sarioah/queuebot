@@ -90,6 +90,13 @@ class tList():
     def copy(self):
         return tList(*self.data)
 
+    def deprioritise(self, other=""):
+        if not other:
+            other = tList()
+        front = self - other
+        back = self - front
+        return front + back
+
     def index(self, key):
         return [
             k.lower()

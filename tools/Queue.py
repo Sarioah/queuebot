@@ -236,6 +236,9 @@ class JBMethods(BaseMethods):
                 )
         else:
             self.parent.entries[user] = user
+            self.parent.entries = self.parent.entries.deprioritise(
+                self.parent.picked
+                )
             msg = (
                 f"Added {user} to the queue at position "
                 f"{self.parent.entries.index(user) + 1}"
@@ -291,7 +294,7 @@ class JBMethods(BaseMethods):
                 repeat_pick = user in self.parent.picked
             else:
                 (user, entry), repeat_pick = (
-                    self.parent.entries.random(self.parent.picked, True)
+                    self.parent.entries.random(self.parent.picked, first=True)
                     )
         except ValueError:
             return "Please specify a user number"
@@ -304,8 +307,7 @@ class JBMethods(BaseMethods):
             self.parent.current["user"], self.parent.current["entry"] = (
                 user, entry
                 )
-            if user not in self.parent.picked:
-                self.parent.picked.append((user, entry))
+            self.parent.picked.append((user, entry))
             return (
                 f"Get ready to play, @{user}, you were picked from the "
                 f"queue{' again!' if repeat_pick else '!'}"
