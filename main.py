@@ -8,7 +8,7 @@ import colorama
 
 from irc_bot.background_bot import BackgroundBot
 from irc_bot.irc_bot import IrcBot
-from irc_bot.message_handler import message_handler
+from irc_bot.message_handler import MessageHandler
 from readchar import readchar
 
 from tools.text import colourise as col
@@ -37,7 +37,7 @@ def close(*a):
     try:
         bgbot.quit()
         bgbot.thread.join()
-        m.q.save()
+        m.song_queue.save()
     except Exception:
         print(col("Bot was not running", "GREY"))
     print(col("Cleanup complete", "GREY"))
@@ -77,7 +77,7 @@ def setup(*a):
     p = P(bot_name)
     print(col("Checking for FFZ/BTTV emotes...", "GREY"))
     emotes = get_emotes(channel)
-    m = message_handler(
+    m = MessageHandler(
             channel, config['bot_prefix'],
             trunc, config['logging'], emotes
             )
