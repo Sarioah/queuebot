@@ -93,7 +93,8 @@ class IrcBot(SingleServerIRCBot):
 
     def send_msg(self, msg):
         msg, _ = trim_bytes(msg, self.message_limit)
-        colour = "RED" if self.muted else "YELLOW"
-        if msg and self.joined and not self.muted:
-            self.client.privmsg(self.channel, msg)
-        print(col(msg, colour))
+        if msg:
+            colour = "RED" if self.muted else "YELLOW"
+            print(col(msg, colour))
+            if self.joined and not self.muted:
+                self.client.privmsg(self.channel, msg)
