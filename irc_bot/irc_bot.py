@@ -10,34 +10,35 @@ except (ModuleNotFoundError, ImportError):
     print(col("IRC module not found, exiting", "RED"))
     sys.exit(1)
 
-server = 'irc.chat.twitch.tv'
-port = 6667
-msg_limit = 499
+SERVER = 'irc.chat.twitch.tv'
+PORT = 6667
+MSG_LIMIT = 499
 
 
-class irc_bot(SingleServerIRCBot):
-
+class IrcBot(SingleServerIRCBot):
     def __init__(
-            self, username, password,
-            channel, muted, message_handler,
-            startup_msg, version):
+        self, username, password,
+        channel, muted, message_handler,
+        startup_msg, version
+    ):
         self.channel = '#' + channel
+        self.client = None
         self.joined = False
-        self.muted = True if muted.lower() == "true" else False
-        self.startup_msg = True if startup_msg.lower() == "true" else False
+        self.muted = bool(muted.lower() == "true")
+        self.startup_msg = bool(startup_msg.lower() == "true")
         self.message_handler = message_handler
-        self.message_limit = msg_limit - len(channel)
+        self.message_limit = MSG_LIMIT - len(channel)
         self.version = version
-        super().__init__(
-                [(server, port, password)],
-                username, username
-                )
 
+        super().__init__(
+            [(SERVER, PORT, password)],
+            username, username
+        )
         print(col("Initialising bot...", "GREY"))
         if self.muted:
             print(col("Bot is muted", "RED"))
 
-    def on_welcome(self, client, _):
+    def on_welcome(self, client, _msg):
         client.cap('REQ', ':twitch.tv/membership')
         client.cap('REQ', ':twitch.tv/tags')
         client.cap('REQ', ':twitch.tv/commands')
@@ -49,50 +50,46 @@ class irc_bot(SingleServerIRCBot):
         if self.startup_msg:
             self.send_msg(f"Queuebot {self.version} started")
 
-    def on_pubmsg(self, client, message):
-        response, _ = trim_bytes(
-                self.message_handler(message, "pubmsg"),
-                self.message_limit
-                )
-        if response:
-            c = "RED" if self.muted else "YELLOW"
-            print(col(response, c))
-            if not self.muted:
-                client.privmsg(self.channel, response)
+    def on_pubmsg(self, _client, msg):
+        self.send_msg(self.message_handler(msg, "pubmsg"))
 
-    def on_pubnotice(self, client, message):
-        self.message_handler(message, "pubnotice")
+    def on_pubnotice(self, _client, msg):
+        self.message_handler(msg, "pubnotice")
 
-    def on_privnotice(self, client, message):
-        self.message_handler(message, "privnotice")
+    def on_privnotice(self, _client, msg):
+        self.message_handler(msg, "privnotice")
 
-    def on_usernotice(self, client, message):
-        self.message_handler(message, "usernotice")
+    def on_usernotice(self, _client, msg):
+        self.message_handler(msg, "usernotice")
 
-    def on_whisper(self, client, message):
-        self.message_handler(message, "whisper")
+    def on_whisper(self, _client, msg):
+        self.message_handler(msg, "whisper")
 
-    def on_action(self, client, message):
-        self.message_handler(message, "action")
+    def on_action(self, _client, msg):
+        self.message_handler(msg, "action")
 
-    def on_join(self, client, _): pass
+    def on_join(self, _client, _msg):
+        pass
 
-    def on_leave(self, client, _): pass
+    def on_leave(self, _client, _msg):
+        pass
 
-    def on_error(self, client, _):
+    def on_error(self, _client, _msg):
         print(col("Error", "RED"))
 
-    def on_disconnect(self, client, _):
+    def on_disconnect(self, _client, _msg):
         self.joined = False
         print(col("Disconnect...", "RED"))
 
-    def connected(self): return self.connection.is_connected()
+    def connected(self):
+        return self.connection.is_connected()
 
     def start_bot(self):
         print(col("Bot starting...", "GREY"))
         self._connect()
 
-    def poll(self): self.reactor.process_once()
+    def poll(self):
+        self.reactor.process_once()
 
     def send_msg(self, msg):
         msg, _ = trim_bytes(msg, self.message_limit)

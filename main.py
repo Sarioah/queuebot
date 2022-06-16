@@ -7,7 +7,7 @@ import os
 import colorama
 
 from irc_bot.background_bot import BackgroundBot
-from irc_bot.irc_bot import irc_bot
+from irc_bot.irc_bot import IrcBot
 from irc_bot.message_handler import message_handler
 from readchar import readchar
 
@@ -81,7 +81,7 @@ def setup(*a):
             channel, config['bot_prefix'],
             trunc, config['logging'], emotes
             )
-    bot = irc_bot(
+    bot = IrcBot(
             bot_name, p.get_password(), channel, config['muted'],
             m.handle_msg, config['startup_msg'], version
             )
