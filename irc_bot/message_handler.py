@@ -1,6 +1,6 @@
 import threading
 
-from irc_bot.events import handle_event
+from irc_bot.events import HandleEvent
 from tools.chat import CommandHandler
 from tools.Queue import Queue
 from tools.highlight_string import highlighter
@@ -36,7 +36,7 @@ class message_handler:
                     }
         msg['msg'] = self.handle_emotes(msg)
 
-        return handle_event(msg)(msg_type, self.handle_command)
+        return HandleEvent(msg)(msg_type, self.handle_command)
 
     def handle_command(self, msg, words, tags):
         if msg.startswith(self.sep):

@@ -5,15 +5,13 @@ from tools.text import colourise as col
 from tools.config import BadOAuth
 
 
-class handle_event():
-
+class HandleEvent:
     def __init__(self, msg):
         self.msg = msg['msg']
         self.words = msg['words']
         self.tags = msg['tags']
 
-        dt = datetime.now()
-        prefix = dt.strftime("[%m-%d %H:%M:%S] ")
+        prefix = f"{datetime.now():[%m-%d %H:%M:%S] }"
         self.prefix = col(prefix, "GREY")
 
     def __call__(self, msg_type, callback):
@@ -30,31 +28,31 @@ class handle_event():
             + f"<{col(self.tags['display-name'], 'CYAN')}"
             + f">{format_badges(self.tags)}: "
             + f"{self.msg}"
-            )
+        )
         return callback(self.msg, self.words, self.tags)
 
-    def on_action(self, *a):
+    def on_action(self, *_args):
         print(
             self.prefix
             + col(f"{self.tags['display-name']}: {self.msg}", "CYAN")
-            )
+        )
 
-    def on_pubnotice(self, *a):
+    def on_pubnotice(self, *_args):
         print(
             self.prefix
             + col(self.msg, "GREY")
-            )
+        )
 
-    def on_privnotice(self, *a):
+    def on_privnotice(self, *_args):
         if self.msg in (
-                "Improperly formatted auth",
-                "Login authentication failed"):
+            "Improperly formatted auth",
+            "Login authentication failed"
+        ):
             raise BadOAuth(self.msg)
-        else:
-            print(
-                self.prefix
-                + col(self.msg, "GREY")
-                )
+        print(
+            self.prefix
+            + col(self.msg, "GREY")
+        )
 
     def on_usernotice(self, *_args):
         if self.tags.get("system-msg"):
@@ -66,10 +64,11 @@ class handle_event():
             + f" - {self.msg or '<no msg>'}"
         )
 
-    def on_whisper(self, *a):
+    def on_whisper(self, *_args):
         print(
             self.prefix
             + col(
                 f"Whisper from {self.tags['display-name']}: {self.msg}",
                 "GREY"
-            ))
+            )
+        )
