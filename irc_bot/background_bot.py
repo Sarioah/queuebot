@@ -5,17 +5,17 @@ from queue import Queue as Q
 from tools.text import colourise as col
 
 
-class background_bot():
+class BackgroundBot:
     def __init__(self, bot):
         self.running = True
         self.connect_delay = 1
         self.command = []
         self.lock = Lock()
         self.bot = bot
-        self.q = Q()
+        self.exception_queue = Q()
         self.thread = bgtask(self)
 
-    def run(self, q):
+    def run(self, exception_queue):
         def do_work():
             while True:
                 with self.lock:
@@ -34,8 +34,8 @@ class background_bot():
 
         try:
             do_work()
-        except Exception as e:
-            q.put(e)
+        except Exception as exc:
+            exception_queue.put(exc)
 
     def mute(self):
         self.bot.muted = True
@@ -60,8 +60,7 @@ class background_bot():
             time.sleep(self.connect_delay)
             self.bot.start_bot()
             self.connect_delay *= 2
-        else:
-            self.connect_delay = 1
+        self.connect_delay = 1
 
     def say(self, msg):
         self.send_command("send_msg", msg)
@@ -74,6 +73,6 @@ class background_bot():
 
 
 def bgtask(bgbot):
-    t1 = Thread(target=bgbot.run, args=(bgbot.q,))
-    t1.start()
-    return t1
+    bot_thread = Thread(target=bgbot.run, args=(bgbot.exception_queue,))
+    bot_thread.start()
+    return bot_thread

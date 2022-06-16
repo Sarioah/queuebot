@@ -6,7 +6,7 @@ import os
 
 import colorama
 
-from irc_bot.background_bot import background_bot
+from irc_bot.background_bot import BackgroundBot
 from irc_bot.irc_bot import irc_bot
 from irc_bot.message_handler import message_handler
 from readchar import readchar
@@ -85,7 +85,7 @@ def setup(*a):
             bot_name, p.get_password(), channel, config['muted'],
             m.handle_msg, config['startup_msg'], version
             )
-    bgbot = background_bot(bot)
+    bgbot = BackgroundBot(bot)
 
     # while not bot.joined:
     #     bot.poll()
@@ -96,8 +96,8 @@ def setup(*a):
 try:
     setup(*sys.argv)
     while True:
-        if not bgbot.q.empty():
-            raise bgbot.q.get()
+        if not bgbot.exception_queue.empty():
+            raise bgbot.exception_queue.get()
         time.sleep(1)
 except (EOFError, KeyboardInterrupt, SystemExit):
     pass
