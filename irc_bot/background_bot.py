@@ -65,11 +65,11 @@ class BackgroundBot:
     def say(self, msg):
         self.send_command("send_msg", msg)
 
-    def send_command(self, command, *a):
+    def send_command(self, command, *args):
         while self.command:
             time.sleep(0.05)
         with self.lock:
-            self.command += [command, a]
+            self.command += [command, args]
 
 
 def bgtask(bgbot):
