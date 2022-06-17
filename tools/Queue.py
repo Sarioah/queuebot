@@ -3,7 +3,7 @@ import time
 from os import path
 from json import loads, dumps
 
-from tools.tList import tList
+from tools.tuple_list import TupleList
 from tools.text import colourise as c
 from tools.text import Paginate
 
@@ -22,7 +22,7 @@ class BaseMethods():
 
     def clear(self, *a):
         self.parent.current = {}
-        self.parent.entries, self.parent.picked = tList(), tList()
+        self.parent.entries, self.parent.picked = TupleList(), TupleList()
         return "Queue has been cleared"
 
     def leave(self, user, *a):
@@ -56,7 +56,7 @@ class BaseMethods():
     def queueconfirm(self, *a):
         try:
             if time.time() - self.parent.testdata[1] < 10:
-                self.parent.entries = tList(*self.parent.testdata[0])
+                self.parent.entries = TupleList(*self.parent.testdata[0])
                 del(self.parent.testdata)
                 return "Test data loaded into queue"
             else:
@@ -339,7 +339,7 @@ class Queue():
     def new(self, channel, *tuples):
         self.channel = channel
         self.isopen = True
-        self.current, self.entries, self.picked = {}, tList(*tuples), tList()
+        self.current, self.entries, self.picked = {}, TupleList(*tuples), TupleList()
         self.save()
 
     def save(self):
@@ -365,8 +365,8 @@ class Queue():
                 self.channel = res["channel"]
                 self.isopen = res["isopen"]
                 self.current = res["current"]
-                self.entries = tList(*res["entries"])
-                self.picked = tList(*res["picked"])
+                self.entries = TupleList(*res["entries"])
+                self.picked = TupleList(*res["picked"])
         except Exception:
             import sys
             from traceback import format_exception
