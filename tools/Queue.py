@@ -5,7 +5,7 @@ from json import loads, dumps
 
 from tools.tList import tList
 from tools.text import colourise as c
-from tools.text import paginate as p
+from tools.text import Paginate
 
 
 class BaseMethods():
@@ -38,7 +38,7 @@ class BaseMethods():
         msg = "List of users in the queue: "
         for u, s in self.parent.entries:
             msg += f"{u}, "
-        return p(msg[:-2], self.parent.msg_limit, ", ")[page]
+        return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def removeuser(self, _, user="", *a):
         try:
@@ -168,7 +168,7 @@ class JDMethods(BaseMethods):
         msg = "List of songs in the queue: "
         for i, (u, e) in enumerate(self.parent.entries):
             msg += f"{i + 1}. \"{trunc(e, msl)}\" • "
-        return p(msg[:-3], self.parent.msg_limit, " • ")[page]
+        return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
     def picked(self, user, page=1, *a):
         if not self.parent.picked:
@@ -176,7 +176,7 @@ class JDMethods(BaseMethods):
         msg = "Songs already played: "
         for u, e in self.parent.picked:
             msg += f"\"{trunc(e, msl)}\", "
-        return p(msg[:-2], self.parent.msg_limit, ", ")[page]
+        return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection=0, *a):
         try:
@@ -277,7 +277,7 @@ class JBMethods(BaseMethods):
         msg = "List of users in the queue: "
         for i, (u, e) in enumerate(self.parent.entries):
             msg += f"{i + 1}. {u} • "
-        return p(msg[:-3], self.parent.msg_limit, " • ")[page]
+        return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
     def picked(self, user, page=1, *a):
         if not self.parent.picked:
@@ -285,7 +285,7 @@ class JBMethods(BaseMethods):
         msg = "Users already picked: "
         for u, e in self.parent.picked:
             msg += f"{u}, "
-        return p(msg[:-2], self.parent.msg_limit, ", ")[page]
+        return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection=0, *a):
         try:
