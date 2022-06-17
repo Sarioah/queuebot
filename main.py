@@ -12,7 +12,7 @@ from irc_bot.message_handler import MessageHandler
 from readchar import readchar
 
 from tools.text import colourise as col
-from tools.Queue import trunc
+from tools.song_queue import trunc
 from tools.config import Configuration, BadOAuth, check_update
 from tools.config import PasswordHandler
 from tools.get_emotes import get_emotes

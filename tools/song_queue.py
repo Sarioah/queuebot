@@ -1,46 +1,51 @@
 #!/usr/bin/python3
+import sys
 import time
+
 from os import path
 from json import loads, dumps
+from traceback import format_exception
 
 from tools.tuple_list import TupleList
 from tools.text import colourise as c
 from tools.text import Paginate
 
 
-class BaseMethods():
+SINGLE_SONG_LENGTH = 200
+MULTI_SONG_LENGTH = 50 # (for lists)
 
+
+class BaseMethods:
     def __init__(self, parent):
         self.parent = parent
 
     def __getitem__(self, key):
         return getattr(self, key, None)
 
-    def close(self, *a):
+    def close(self, *_args):
         self.parent.isopen = False
         return "Queue is now closed"
 
-    def clear(self, *a):
+    def clear(self, *_args):
         self.parent.current = {}
         self.parent.entries, self.parent.picked = TupleList(), TupleList()
         return "Queue has been cleared"
 
-    def leave(self, user, *a):
-        if user in self.parent:
-            del self.parent.entries[user]
-            return f"{user}, you have left the queue"
-        else:
-            return f"{user}, you weren't in the queue"
+    def leave(self, sender, /, *_args):
+        if sender in self.parent:
+            del self.parent.entries[sender]
+            return f"{sender}, you have left the queue"
+        return f"{sender}, you weren't in the queue"
 
-    def listusers(self, user, page=1, *a):
+    def listusers(self, _, page=1, /, *_args):
         if not self.parent.entries:
             return "Queue is empty"
         msg = "List of users in the queue: "
-        for u, s in self.parent.entries:
-            msg += f"{u}, "
+        for user, _song in self.parent.entries:
+            msg += f"{user}, "
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
-    def removeuser(self, _, user="", *a):
+    def removeuser(self, _, user="", /, *_args):
         try:
             if user:
                 del self.parent.entries[user]
@@ -53,26 +58,23 @@ class BaseMethods():
         else:
             return f"Removed {user} from the queue"
 
-    def queueconfirm(self, *a):
+    def queueconfirm(self, *_args):
         try:
             if time.time() - self.parent.testdata[1] < 10:
                 self.parent.entries = TupleList(*self.parent.testdata[0])
-                del(self.parent.testdata)
+                del self.parent.testdata
                 return "Test data loaded into queue"
-            else:
-                del(self.parent.testdata)
+            del self.parent.testdata
         except AttributeError:
-            return
+            pass
+        return None
 
-    def testqueue(self, *a):
+    def testqueue(self, *_args):
         if path.exists('testdata.json'):
             try:
-                self.parent.testdata = [
-                    loads(
-                        open(
-                            'testdata.json', 'r', encoding='utf-8'
-                            ).read()
-                        )
+                with open("testdata.json", "r", encoding="utf-8") as file_desc:
+                    self.parent.testdata = [
+                        loads(file_desc.read())
                     ]
             except Exception:
                 return "Failed to load test data"
@@ -87,66 +89,61 @@ class BaseMethods():
 
 
 class JDMethods(BaseMethods):
-
-    def jbqueue(self, *a):
+    def jbqueue(self, *_args):
         self.parent.mthds = JBMethods(self.parent)
         return "Queue is now in jackbox mode"
 
-    def jdqueue(self, *a):
+    def jdqueue(self, *_args):
         return "Queue is already in Just Dance mode"
 
-    def open(self, *a):
+    def open(self, *_args):
         self.parent.isopen = True
         return "Random queue is now open"
 
-    def currententry(self, *a):
+    def currententry(self, *_args):
         if self.parent.current:
             return (
-                f"Current song is \"{trunc(self.parent.current['entry'], ssl)}"
+                f"Current song is \"{trunc(self.parent.current['entry'], SINGLE_SONG_LENGTH)}"
                 f"\", requested by {self.parent.current['user']}"
-                )
-        else:
-            return "Nothing's been played yet"
-
-    def addentry(self, user, entry, emote_indices, *a):
-        if not self.parent:
-            return f"Sorry {user}, the queue is closed"
-        if not entry:
-            return f"@{user} please write a song name after !sr"
-
-        emote_indices = list(
-            set([
-                i for j in emote_indices
-                for i in j
-                ])
             )
+        return "Nothing's been played yet"
+
+    def addentry(self, sender, entry, emote_indices, /, *_args):
+        if not self.parent:
+            return f"Sorry {sender}, the queue is closed"
+        if not entry:
+            return f"@{sender} please write a song name after !sr"
+
+        emote_indices = list({
+            i for j in emote_indices
+            for i in j
+        })
+
         if len(entry) in emote_indices:
             entry += " "
         if 0 in emote_indices:
             entry = " " + entry
 
-        oldentry = self.parent.entries[user]
-        self.parent.entries[user] = entry
+        oldentry = self.parent.entries[sender]
+        self.parent.entries[sender] = entry
         if oldentry:
-            msg = (
-                f"{user}'s song changed from \"{trunc(oldentry, ssl // 2)}\" "
-                f"to \"{trunc(entry, ssl // 2)}\""
-                )
-        else:
-            msg = f"Added \"{trunc(entry, ssl)}\" to the queue for {user}"
-        return msg
+            return (
+                f"{sender}'s song changed from \"{trunc(oldentry, SINGLE_SONG_LENGTH // 2)}\" "
+                f"to \"{trunc(entry, SINGLE_SONG_LENGTH // 2)}\""
+            )
+        return f"Added \"{trunc(entry, SINGLE_SONG_LENGTH)}\" to the queue for {sender}"
 
-    def removeentry(self, _, index, *a):
+    def removeentry(self, _, index, /, *_args):
         try:
-            user, entry = self.parent.entries.pop(int(index) - 1)
+            _user, entry = self.parent.entries.pop(int(index) - 1)
         except ValueError:
             return "Please specify a song number"
         except IndexError:
             return "Specified song doesn't exist"
         else:
-            return f"Removed \"{trunc(entry, ssl)}\" from the queue"
+            return f"Removed \"{trunc(entry, SINGLE_SONG_LENGTH)}\" from the queue"
 
-    def status(self, user="", *a):
+    def status(self, sender, /, *_args):
         msg = f"Random queue is {'open' if self.parent else 'closed'}"
 
         if self.parent.entries:
@@ -154,100 +151,96 @@ class JDMethods(BaseMethods):
         else:
             msg += " • Queue is empty"
 
-        if self.parent.entries[user]:
+        if self.parent.entries[sender]:
             msg += (
-                f" • {user} your song is "
-                f"\"{trunc(self.parent.entries[user], ssl)}\""
-                )
-
+                f" • {sender} your song is "
+                f"\"{trunc(self.parent.entries[sender], SINGLE_SONG_LENGTH)}\""
+            )
         return msg
 
-    def listentries(self, user, page=1, *a):
+    def listentries(self, _, page=1, /, *_args):
         if not self.parent.entries:
             return "Queue is empty"
         msg = "List of songs in the queue: "
-        for i, (u, e) in enumerate(self.parent.entries):
-            msg += f"{i + 1}. \"{trunc(e, msl)}\" • "
+        for i, (_user, song) in enumerate(self.parent.entries):
+            msg += f"{i + 1}. \"{trunc(song, MULTI_SONG_LENGTH)}\" • "
         return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
-    def picked(self, user, page=1, *a):
+    def picked(self, _, page=1, /, *_args):
         if not self.parent.picked:
             return "Nothing's been played yet"
         msg = "Songs already played: "
-        for u, e in self.parent.picked:
-            msg += f"\"{trunc(e, msl)}\", "
+        for _user, song in self.parent.picked:
+            msg += f"\"{trunc(song, MULTI_SONG_LENGTH)}\", "
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
-    def pickentry(self, _, selection=0, *a):
+    def pickentry(self, _, selection=0, /, *_args):
         try:
             if selection:
-                user, entry = self.parent.entries.pop(int(selection) - 1)
+                user, song = self.parent.entries.pop(int(selection) - 1)
                 repeat_pick = user in self.parent.picked
             else:
-                (user, entry), repeat_pick = (
+                (user, song), repeat_pick = (
                     self.parent.entries.random(self.parent.picked)
-                    )
+                )
         except ValueError:
             return "Please specify a song number"
-        except IndexError as x:
-            if str(x) == "pop index out of range":
+        except IndexError as exc:
+            if str(exc) == "pop index out of range":
                 return "No such song"
-            else:
-                return "Queue is empty"
+            return "Queue is empty"
         else:
             self.parent.current["user"], self.parent.current["entry"] = (
-                user, entry
-                )
-            self.parent.picked.append((user, entry))
+                user, song
+            )
+            self.parent.picked.append((user, song))
             return (
                 f"{user} was picked{' again' if repeat_pick else ''}, "
-                f"their song was \"{trunc(entry, ssl)}\""
-                )
+                f"their song was \"{trunc(song, SINGLE_SONG_LENGTH)}\""
+            )
 
 
 class JBMethods(BaseMethods):
-
-    def jbqueue(self, *a):
+    def jbqueue(self, *_args):
         return "Queue is already in Jackbox mode"
 
-    def jdqueue(self, *a):
+    def jdqueue(self, *_args):
         self.parent.mthds = JDMethods(self.parent)
         return "Queue changed to Just Dance mode"
 
-    def open(self, *a):
+    def open(self, *_args):
         self.parent.isopen = True
         return "Priority queue is now open"
 
-    def currententry(self, *a):
+    def currententry(self, *_args):
         if self.parent.current:
             return (
-                f"Current player is {trunc(self.parent.current['user'], ssl)}"
-                )
-        else:
-            return "No-one's been picked yet"
+                f"Current player is {trunc(self.parent.current['user'], SINGLE_SONG_LENGTH)}"
+            )
+        return "No-one's been picked yet"
 
-    def addentry(self, user, *a):
+    def addentry(self, sender, /, *_args):
         if not self.parent:
-            return f"Sorry {user}, the queue is closed"
-        if user in self.parent.entries:
+            return f"Sorry {sender}, the queue is closed"
+        if sender in self.parent.entries:
             msg = (
-                f"@{user} you are already in the queue at position "
-                f"{self.parent.entries.index(user) + 1}"
-                )
+                f"@{sender} you are already in the queue at position "
+                f"{self.parent.entries.index(sender) + 1}"
+            )
         else:
-            self.parent.entries[user] = user
+            self.parent.entries[sender] = sender
             self.parent.entries = self.parent.entries.deprioritise(
                 self.parent.picked
-                )
+            )
             msg = (
-                f"Added {user} to the queue at position "
-                f"{self.parent.entries.index(user) + 1}"
-                )
+                f"Added {sender} to the queue at position "
+                f"{self.parent.entries.index(sender) + 1}"
+            )
         return msg
 
-    def removeentry(self, _, index, *a):
+    def removeentry(self, _, index, /, *_args):
         try:
-            user, entry = self.parent.entries.pop(int(index) - 1)
+            user, _entry = self.parent.entries.pop(int(index) - 1)
         except ValueError:
             return "Please specify an entry"
         except IndexError:
@@ -255,7 +248,7 @@ class JBMethods(BaseMethods):
         else:
             return f"Removed {user} from the queue"
 
-    def status(self, user="", *a):
+    def status(self, sender="", /, *_args):
         msg = f"Priority queue is {'open' if self.parent else 'closed'}"
 
         if self.parent.entries:
@@ -263,31 +256,31 @@ class JBMethods(BaseMethods):
         else:
             msg += " • Queue is empty"
 
-        if self.parent.entries[user]:
+        if self.parent.entries[sender]:
             msg += (
-                f" • @{user} you are in the queue at position "
-                f"{self.parent.entries.index(user) + 1}"
-                )
+                f" • @{sender} you are in the queue at position "
+                f"{self.parent.entries.index(sender) + 1}"
+            )
 
         return msg
 
-    def listentries(self, user, page=1, *a):
+    def listentries(self, _, page=1, /, *_args):
         if not self.parent.entries:
             return "Queue is empty"
         msg = "List of users in the queue: "
-        for i, (u, e) in enumerate(self.parent.entries):
-            msg += f"{i + 1}. {u} • "
+        for i, (user, _entry) in enumerate(self.parent.entries):
+            msg += f"{i + 1}. {user} • "
         return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
-    def picked(self, user, page=1, *a):
+    def picked(self, _, page=1, /, *_args):
         if not self.parent.picked:
             return "No-one's been picked yet"
         msg = "Users already picked: "
-        for u, e in self.parent.picked:
-            msg += f"{u}, "
+        for user, _entry in self.parent.picked:
+            msg += f"{user}, "
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
-    def pickentry(self, _, selection=0, *a):
+    def pickentry(self, _, selection=0, /, *_args):
         try:
             if selection:
                 user, entry = self.parent.entries.pop(int(selection) - 1)
@@ -295,31 +288,34 @@ class JBMethods(BaseMethods):
             else:
                 (user, entry), repeat_pick = (
                     self.parent.entries.random(self.parent.picked, first=True)
-                    )
+                )
         except ValueError:
             return "Please specify a user number"
-        except IndexError as x:
-            if str(x) == "pop index out of range":
+        except IndexError as exc:
+            if str(exc) == "pop index out of range":
                 return "No such user"
-            else:
-                return "Queue is empty"
+            return "Queue is empty"
         else:
             self.parent.current["user"], self.parent.current["entry"] = (
                 user, entry
-                )
+            )
             self.parent.picked.append((user, entry))
             return (
                 f"Get ready to play, @{user}, you were picked from the "
                 f"queue{' again!' if repeat_pick else '!'}"
-                )
+            )
 
 
-class Queue():
-
+class SongQueue:
     def __init__(self, channel, *tuples):
-        self.load(channel, *tuples)
+        self.channel = None
+        self.isopen = None
+        self.current = None
+        self.entries = None
+        self.picked = None
         self.msg_limit = 499 - len(channel)
         self.mthds = JDMethods(self)
+        self.load(channel, *tuples)
 
     def __bool__(self):
         return self.isopen
@@ -343,49 +339,37 @@ class Queue():
         self.save()
 
     def save(self):
-        with open(
-                "data/%s.json" % self.channel,
-                "w", encoding="utf-8"
-                ) as f:
+        with open(f"data/{self.channel}.json", "w", encoding="utf-8") as file_desc:
             res = {}
             res["channel"] = self.channel
             res["isopen"] = self.isopen
             res["current"] = self.current
             res["entries"] = self.entries.serialise()
             res["picked"] = self.picked.serialise()
-            f.write(dumps(res, indent=4))
+            file_desc.write(dumps(res, indent=4))
 
     def load(self, channel, *tuples):
         try:
-            with open(
-                    "data/%s.json" % channel,
-                    "r", encoding="utf-8"
-                    ) as f:
-                res = loads(f.read())
+            with open(f"data/{channel}.json", "r", encoding="utf-8") as file_desc:
+                res = loads(file_desc.read())
                 self.channel = res["channel"]
                 self.isopen = res["isopen"]
                 self.current = res["current"]
                 self.entries = TupleList(*res["entries"])
                 self.picked = TupleList(*res["picked"])
         except Exception:
-            import sys
-            from traceback import format_exception
-            tb = ''.join(
-                    format_exception(
-                        *sys.exc_info()
-                        )
-                    )
+            trace = ''.join(
+                format_exception(
+                    *sys.exc_info()
+                )
+            )
             print(c(
-                f"\n{tb}\n"
+                f"\n{trace}\n"
                 "Failed to load saved queue, creating new one",
                 "GREY"
-                ))
+            ))
             self.new(channel, *tuples)
 
 
-def trunc(msg, L):
-    return msg if len(msg) <= L else msg[:L - 1] + "…"
-
-
-ssl = 200  # single song length
-msl = 50  # multi song length (for lists)
+def trunc(msg, length):
+    return msg if len(msg) <= length else msg[:length - 1] + "…"
