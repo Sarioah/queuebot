@@ -13,8 +13,8 @@ from readchar import readchar
 
 from tools.text import colourise as col
 from tools.Queue import trunc
-from tools.config import configuration, BadOAuth, check_update
-from tools.config import password_handler as P
+from tools.config import Configuration, BadOAuth, check_update
+from tools.config import PasswordHandler
 from tools.get_emotes import get_emotes
 
 try:
@@ -27,7 +27,7 @@ errored = False
 
 
 def cmd(msg):
-    res = m.run_cmd(msg)
+    res = message_handler.run_cmd(msg)
     bgbot.send_msg(res)
     return res
 
@@ -37,7 +37,7 @@ def close(*a):
     try:
         bgbot.quit()
         bgbot.thread.join()
-        m.song_queue.save()
+        message_handler.song_queue.save()
     except Exception:
         print(col("Bot was not running", "GREY"))
     print(col("Cleanup complete", "GREY"))
@@ -47,7 +47,7 @@ def close(*a):
 
 
 def setup(*a):
-    global m, p, bgbot, errored
+    global message_handler, password_handler, bgbot, errored
     if not os.path.isdir("data"):
         os.mkdir("data")
 
@@ -58,7 +58,7 @@ def setup(*a):
         print(res)
 
     try:
-        config = configuration("config.ini").get_config()
+        config = Configuration("config.ini").get_config()
     except Exception as e:
         print("\n" + str(e))
         errored = True
@@ -74,16 +74,17 @@ def setup(*a):
                 f"Sari queuebot {version} acting as "
                 + f"'{config['bot_name']}' in channel '{channel}'"
                 )
-    p = P(bot_name)
+    password_handler = PasswordHandler(bot_name)
     print(col("Checking for FFZ/BTTV emotes...", "GREY"))
     emotes = get_emotes(channel)
-    m = MessageHandler(
+    message_handler = MessageHandler(
             channel, config['bot_prefix'],
             trunc, config['logging'], emotes
             )
     bot = IrcBot(
-            bot_name, p.get_password(), channel, config['muted'],
-            m.handle_msg, config['startup_msg'], version
+            bot_name, password_handler.get_password(), channel,
+            config['muted'], message_handler.handle_msg,
+            config['startup_msg'], version
             )
     bgbot = BackgroundBot(bot)
 
@@ -109,7 +110,7 @@ except BadOAuth as e:
     print(col(
         res + ", please restart the bot and paste in a new token", "RED"
         ))
-    p.del_password()
+    password_handler.del_password()
     errored = True
 except BaseException:
     import traceback
