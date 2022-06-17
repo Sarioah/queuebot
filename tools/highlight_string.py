@@ -1,57 +1,58 @@
-#!/usr/bin/python3
-import sys
+class Highlighter:
+    def __init__(self, emote=False, string='', substrings=None, indices=None):
+        self.string = string
+        substrings = substrings if substrings is not None else []
+        indices = indices if indices is not None else []
+        indices += list(set(
+            find_strings(string, substrings)
+        ))
+        if emote:
+            indices = [index for index in indices if _is_emote(string, index)]
+        self.indices = list(set(indices))
+
+    def get_highlight(self):
+        return _highlight(self.string, self.indices)
+
+    def get_string(self):
+        return self.string
 
 
-class highlighter():
-
-    def __init__(self, emote=False):
-        self.emote = emote
-
-    def __call__(self, string, substrings=[], indices=[]):
-        results = indices + find_strings(string, substrings)
-        if self.emote:
-            results = [
-                    p
-                    for p in results
-                    if is_emote(string, p)
-                    ]
-        return highlight(string, results)
-
-
-def highlight(string, positions):
-    L = list(string)
+def _highlight(string, positions):
+    exploded_string = list(string)
     for i in sorted(positions, reverse=True):
-        L.insert(i[1], '[0m')
-        L.insert(i[0], '[36;2m')
-    return "".join(L)
+        exploded_string.insert(i[1], '\33[0m')
+        exploded_string.insert(i[0], '\33[36;2m')
+    return "".join(exploded_string)
 
 
-def substring(string, search, padding=0):
-    L = len(search)
+def _calc_indices(string, search, padding=0):
+    length = len(search)
     try:
         position = string.index(search)
-        start, end = padding + position, padding + position + L
-        return [(start, end)] + substring(string[position + L:], search, end)
+        start, end = padding + position, padding + position + length
+        return (
+            [(start, end)] + _calc_indices(string[position + length:], search, end)
+        )
     except ValueError:
         return []
 
 
+def _is_emote(string, pos):
+    start = int(pos[0]) == 0 or string[pos[0] - 1:pos[0]] == " "
+    end = int(pos[1]) == len(string) or string[pos[1]:pos[1] + 1] == " "
+    return start and end
+
+
 def find_strings(string, substrings):
-    return sorted(sum([substring(string, s) for s in substrings], start=[]))
-
-
-def highlight_string(string, substrings):
-    return highlight(string, find_strings(string, substrings))
-
-
-def is_emote(string, pos):
-    a = int(pos[0]) == 0 or string[pos[0] - 1:pos[0]] == " "
-    b = int(pos[1]) == len(string) or string[pos[1]:pos[1] + 1] == " "
-    return a and b
+    return sorted(
+        sum(
+            (_calc_indices(string, sub) for sub in substrings), start=[]
+        )
+    )
 
 
 if __name__ == "__main__":
-    positions = find_strings(sys.argv[1], *sys.argv[2:])
-    print(f"Strings found at positions: {positions}")
-    print(highlight(sys.argv[1], positions))
-    print(highlight_string(sys.argv[1], sys.argv[2:]))
+    import sys
+    print(
+        Highlighter(True, sys.argv[1], sys.argv[2:], [(0, 3)]).get_highlight()
+    )

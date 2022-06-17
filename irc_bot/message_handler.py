@@ -3,7 +3,7 @@ import threading
 from irc_bot.events import HandleEvent
 from tools.chat import CommandHandler
 from tools.Queue import Queue
-from tools.highlight_string import highlighter
+from tools.highlight_string import Highlighter
 from tools.highlight_string import find_strings
 
 
@@ -75,4 +75,4 @@ class MessageHandler:
             for (i, j) in emote_indices
         ]
 
-        return highlighter(True)(msg['msg'], indices=emote_indices)
+        return Highlighter(True, msg['msg'], indices=emote_indices).get_highlight()
