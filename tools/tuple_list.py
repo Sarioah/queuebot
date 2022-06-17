@@ -1,6 +1,7 @@
 #!/usr/bin/python3
+from random import choice
 
-class tList():
+class TupleList:
     """Implements a dict - like object that also maintains
     ordering of key: value pairs
 
@@ -14,25 +15,27 @@ class tList():
             self.data.append(item)
 
     def __str__(self):
-        msg = "tList contents:\n"
-        for k, v in self.data:
-            msg += "%s: \"%s\"\n" % (k, v)
-        return msg[:-1]
+        res = "\n".join(
+            f"{key}: \"{value}\""
+            for key, value in self.data
+        )
+        return f"TupleList contents:\n{res}"
 
     def __repr__(self):
-        msg = ""
-        for k, v in self.data:
-            msg += "(\"%s\", \"%s\"), " % (k, v)
-        return "tList(%s)" % msg[:-2]
+        res = ", ".join(
+            f"(\"{key}\", \"{value}\")"
+            for key, value in self.data
+        )
+        return f"TupleList({res})"
 
     def __bool__(self):
-        return True if self.data else False
+        return bool(self.data)
 
     def __contains__(self, key):
         return key.lower() in [
             k.lower()
             for (k, v) in self.data
-            ]
+        ]
 
     def __delitem__(self, key):
         del self.data[self.index(key)]
@@ -50,29 +53,30 @@ class tList():
                 k.lower(): v
                 for k, v in self.data
                 }[key.lower()]
+        return None
 
     def __setitem__(self, key, value):
         if key not in self:
             self.data.append((key, value))
         else:
-            for i, (k, v) in enumerate(self.data):
+            for i, (k, _) in enumerate(self.data):
                 if k.lower() == key.lower():
                     self.data[i] = (key, value)
                     break
 
     def __add__(self, other):
-        """Accepts another tList.
-        Values from second tList added to the first, any common values are
-        taken from the second tList"""
+        """Accepts another TupleList.
+        Values from second TupleList added to the first, any common values are
+        taken from the second TupleList"""
         res = self.copy()
         for (key, value) in other:
             res[key] = value
         return res
 
     def __sub__(self, other):
-        """Accepts another tList.
-        If the first tList contains keys present in the second, remove them"""
-        res = tList()
+        """Accepts another TupleList.
+        If the first TupleList contains keys present in the second, remove them"""
+        res = TupleList()
         for (key, value) in self:
             if key not in other:
                 res.append((key, value))
@@ -88,11 +92,11 @@ class tList():
         return self.data.append(item)
 
     def copy(self):
-        return tList(*self.data)
+        return TupleList(*self.data)
 
     def deprioritise(self, other=""):
         if not other:
-            other = tList()
+            other = TupleList()
         front = self - other
         back = self - front
         return front + back
@@ -101,15 +105,14 @@ class tList():
         return [
             k.lower()
             for (k, v) in self.data
-            ].index(key.lower())
+        ].index(key.lower())
 
     def random(self, other="", first=False):
         """Picks a key: value pair at random.
-        If another tList is provided, prefer to pick keys unique to
-        the first tList if possible"""
-        from random import choice
+        If another TupleList is provided, prefer to pick keys unique to
+        the first TupleList if possible"""
         if not other:
-            other = tList()
+            other = TupleList()
         pool = self - other
         if pool:
             repeat_pick = False
@@ -117,16 +120,13 @@ class tList():
             repeat_pick = True
             pool = self
         if first:
-            key, value = pool.data[0]
+            key, _ = pool.data[0]
         else:
-            key, value = choice(pool.data)
+            key, _ = choice(pool.data)
         return self.pop(self.index(key)), repeat_pick
 
     def pop(self, index):
         return self.data.pop(index)
 
     def serialise(self):
-        return [
-            (k, v)
-            for k, v in self.data
-            ]
+        return self.data
