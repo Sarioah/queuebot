@@ -1,52 +1,54 @@
 import os
 import json
-
-try:
-    import keyring
-except Exception:
-    pass
-
-from configparser import ConfigParser, ParsingError
-from tools.text import colourise as col
-from setuptools._vendor.packaging import version
 from urllib.request import urlopen
+from configparser import ConfigParser, ParsingError
+from setuptools._vendor.packaging import version
 
-defaults = {"bot_name": "********",
-            "channel": "********",
-            "bot_prefix": "!",
-            "muted": "False",
-            "logging": "False",
-            "startup_msg": "True"}
+import keyring
+
+from tools.text import colourise as col
+
+# pylint: disable=ungrouped-imports
+if os.name == "nt":
+    import keyring.backends.Windows
+    keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
+else:
+    import sagecipher.keyring
+    keyring.set_keyring(sagecipher.keyring.Keyring())
+# pylint: enable=ungrouped-imports
+
+
+defaults = {
+    "bot_name": "********",
+    "channel": "********",
+    "bot_prefix": "!",
+    "muted": "False",
+    "logging": "False",
+    "startup_msg": "True"
+}
 
 
 class BadOAuth(Exception):
     pass
 
 
-class password_handler():
-
+class PasswordHandler():
     def __init__(self, user):
-        global keyring
+        # global keyring
         self.user = user
-        if os.name == "nt":
-            import keyring.backends.Windows
-            keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
-        else:
-            import sagecipher.keyring
-            keyring.set_keyring(sagecipher.keyring.Keyring())
         while not self.get_password():
             self._no_passwd()
 
     def _no_passwd(self):
+        link = col("https://twitchapps.com/tmi:", "BLUE")
         print(
-                "Please log into twitch using your bot account, then visit "
-                "%s to generate an oauth code for the bot to login with. "
-                "Then paste it here and press enter.\n"
-                % (col("https://twitchapps.com/tmi", "BLUE"),)
-                )
+            "Please log into twitch using your bot account, then visit "
+            f"{link} to generate an oauth code for the bot to login with. "
+            "Then paste it here and press enter.\n"
+        )
         passwd = input(
-                "Input your oauth code, including the 'oauth:' at the front: "
-                )
+            "Input your oauth code, including the 'oauth:' at the front: "
+        )
         keyring.set_password("TMI", self.user, passwd)
 
     def get_password(self):
@@ -56,44 +58,46 @@ class password_handler():
         return keyring.delete_password("TMI", self.user)
 
 
-class configuration():
-
+class Configuration:
     def __init__(self, configfile):
-        self.c = ConfigParser()
+        self.config = ConfigParser()
         self.configfile = configfile
         try:
-            self.c.read(configfile)
-        except ParsingError:
-            self._config_bad()
-
-        if not self.c['DEFAULT']:
+            self.config.read(configfile)
+        except ParsingError as exc:
+            raise self._config_bad() from exc
+        # TODO: Giant if-elif and convoluted timing of raising / writing
+        # needs revising
+        if not self.config['DEFAULT']:
             res = self._config_empty(
                 "Configuration file not found, a default "
                 "configuration file has been written to"
-                )
-        elif any([
-                True for k in self.c['DEFAULT']
-                if self.c['DEFAULT'][k] == "********"]):
+            )
+        elif any(
+            True for k in self.config['DEFAULT']
+            if self.config['DEFAULT'][k] == "********"
+        ):
             res = self._config_empty("Default fields need to be filled out in")
-        elif any([
-                True for k in ("bot_name", "channel")
-                if k not in self.c['DEFAULT']]):
+        elif any(
+            True for k in ("bot_name", "channel")
+            if k not in self.config['DEFAULT']
+        ):
             res = self._config_empty("Fields missing in")
         else:
             res = ""
-        self._write_config()
+        self.write_config()
         if res:
             raise res
 
     def get_config(self):
-        return self.c['DEFAULT']
+        return self.config['DEFAULT']
 
-    def _write_config(self):
-        for k in defaults:
-            if k not in self.c['DEFAULT']:
-                self.c['DEFAULT'][k] = defaults[k]
-        with open(self.configfile, "w") as fd:
-            self.c.write(fd)
+    def write_config(self):
+        for key, value in defaults.items():
+            if key not in self.config['DEFAULT']:
+                self.config['DEFAULT'][key] = value
+        with open(self.configfile, "w", encoding="utf-8") as file_desc:
+            self.config.write(file_desc)
 
     def _config_empty(self, msg):
         res = (
@@ -121,30 +125,30 @@ class configuration():
     def _config_bad(self):
         res = (
             f"Config file '{col(self.configfile, 'YELLOW')}' "
-            "appears to be misformatted.\n Please correct the error or "
-            "delete the file, then restart the bot."
-            )
-        return Exception("\n".join(res))
+            "appears to be misformatted.\nPlease correct the error or "
+            "delete the file, then restart the bot.\n"
+        )
+        return Exception(res)
 
 
 def check_update(ver):
     try:
-        upstream = json.load(urlopen(
+        with urlopen(
             "https://api.github.com/repos/sarioah/queuebot/releases/latest",
             timeout=3
-            ))['name']
+        ) as url:
+            upstream = json.load(url)['name']
     except Exception:
         pass
     else:
         if version.parse(upstream) > version.parse(ver):
+            version_coloured = col(upstream, "BLUE")
+            link = col(
+                "https://github.com/Sarioah/queuebot/releases/latest",
+                "YELLOW"
+            )
             return (
-                "Updated bot found, version \"%s\".\n"
-                "Please visit %s to download the new bot"
-                % (
-                    col(upstream, 'BLUE'),
-                    col(
-                        'https://github.com/Sarioah/queuebot/releases/latest',
-                        'YELLOW'
-                        )
-                    )
-                )
+                f"Updated bot found, version \"{version_coloured}\".\n"
+                f"Please visit {link} to download the new bot"
+            )
+    return None
