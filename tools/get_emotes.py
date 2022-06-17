@@ -7,10 +7,10 @@ import aiohttp
 
 
 if (
-        sys.version_info[0] == 3
-        and sys.version_info[1] >= 8
-        and sys.platform.startswith("win")
-        ):
+    sys.version_info[0] == 3
+    and sys.version_info[1] >= 8
+    and sys.platform.startswith("win")
+):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
@@ -25,19 +25,18 @@ async def _get_ffz(channel='__ffz_global'):
         j = json.loads(
             await _get(
                 f"https://api.frankerfacez.com/v1/room/{channel}"
-                )
             )
+        )
         j = [
-            e['name']
-            for s in j['sets']
-            for e in j['sets'][s]['emoticons']
-            ]
+            emote['name']
+            for emote_set in j['sets']
+            for emote in j['sets'][emote_set]['emoticons']
+        ]
     except Exception:
         j = []
-    finally:
-        if channel != '__ffz_global':
-            channel += "__ffz"
-        return {channel: j}
+    if channel != '__ffz_global':
+        channel += "__ffz"
+    return {channel: j}
 
 
 async def _get_bttv(channel=''):
@@ -45,38 +44,38 @@ async def _get_bttv(channel=''):
         if not channel:
             channel = '__bttv_global'
             j = json.loads(
-                    await _get(
-                        "https://api.betterttv.net/3/cached/emotes/global"
-                        )
-                    )
-            j = [e['code'] for e in j]
+                await _get(
+                    "https://api.betterttv.net/3/cached/emotes/global"
+                )
+            )
+            j = [emote['code'] for emote in j]
         else:
-            c, channel = channel, channel + "__bttv"
-            id = json.loads(
-                    await _get(
-                        f"https://decapi.me/twitch/id/{c}"
-                        )
-                    )
+            twitch_channel, channel = channel, channel + "__bttv"
+            bttv_id = json.loads(
+                await _get(
+                    f"https://decapi.me/twitch/id/{twitch_channel}"
+                )
+            )
             j = json.loads(
-                    await _get(
-                        f"https://api.betterttv.net/3/cached/users/twitch/{id}"
-                        )
-                    )
+                await _get(
+                    "https://api.betterttv.net/3/cached/users/twitch/"
+                    f"{bttv_id}"
+                )
+            )
             j = [
-                e['code']
-                for s in ('channelEmotes', 'sharedEmotes')
-                for e in j[s]
-                ]
+                emote['code']
+                for emote_set in ('channelEmotes', 'sharedEmotes')
+                for emote in j[emote_set]
+            ]
     except Exception:
         j = []
-    finally:
-        return {channel: j}
+    return {channel: j}
 
 
 async def _main(channels):
     tasks = [_get_ffz(), _get_bttv()]
-    for c in channels:
-        tasks += [_get_ffz(c), _get_bttv(c)]
+    for channel in channels:
+        tasks += [_get_ffz(channel), _get_bttv(channel)]
     return await asyncio.gather(*tasks)
 
 
@@ -90,5 +89,5 @@ def get_emotes(*channels):
 
 
 if __name__ == "__main__":
-    L = get_emotes(*sys.argv[1:])
-    print(L)
+    emotes = get_emotes(*sys.argv[1:])
+    print(emotes)
