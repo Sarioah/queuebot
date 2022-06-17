@@ -2,7 +2,7 @@ import threading
 
 from irc_bot.events import HandleEvent
 from tools.chat import CommandHandler
-from tools.Queue import Queue
+from tools.song_queue import SongQueue
 from tools.highlight_string import Highlighter
 from tools.highlight_string import find_strings
 
@@ -14,7 +14,7 @@ class MessageHandler:
         self.emotes = sum(emotes.values(), start=[])
         self.emote_indices_short = []
         self.commandhandler = CommandHandler()
-        self.song_queue = Queue(self.channel)
+        self.song_queue = SongQueue(self.channel)
         self.lock = threading.Lock()
         self.logging = bool(logging == "True")
         self.trunc = trunc
