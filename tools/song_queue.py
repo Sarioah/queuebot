@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-import sys
 import time
 
 from os import path
 from json import loads, dumps
-from traceback import format_exception
+from traceback import format_exc
 
 from tools.tuple_list import TupleList
 from tools.text import colourise as c
@@ -72,9 +71,9 @@ class BaseMethods:
     def testqueue(self, *_args):
         if path.exists('testdata.json'):
             try:
-                with open("testdata.json", "r", encoding="utf-8") as file_desc:
+                with open("testdata.json", "r", encoding="utf-8") as file_:
                     self.parent.testdata = [
-                        loads(file_desc.read())
+                        loads(file_.read())
                     ]
             except Exception:
                 return "Failed to load test data"
@@ -339,32 +338,27 @@ class SongQueue:
         self.save()
 
     def save(self):
-        with open(f"data/{self.channel}.json", "w", encoding="utf-8") as file_desc:
+        with open(f"data/{self.channel}.json", "w", encoding="utf-8") as file_:
             res = {}
             res["channel"] = self.channel
             res["isopen"] = self.isopen
             res["current"] = self.current
             res["entries"] = self.entries.serialise()
             res["picked"] = self.picked.serialise()
-            file_desc.write(dumps(res, indent=4))
+            file_.write(dumps(res, indent=4))
 
     def load(self, channel, *tuples):
         try:
-            with open(f"data/{channel}.json", "r", encoding="utf-8") as file_desc:
-                res = loads(file_desc.read())
+            with open(f"data/{channel}.json", "r", encoding="utf-8") as file_:
+                res = loads(file_.read())
                 self.channel = res["channel"]
                 self.isopen = res["isopen"]
                 self.current = res["current"]
                 self.entries = TupleList(*res["entries"])
                 self.picked = TupleList(*res["picked"])
         except Exception:
-            trace = ''.join(
-                format_exception(
-                    *sys.exc_info()
-                )
-            )
             print(c(
-                f"\n{trace}\n"
+                f"\n{format_exc()}\n"
                 "Failed to load saved queue, creating new one",
                 "GREY"
             ))
