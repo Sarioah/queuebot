@@ -96,8 +96,8 @@ class Configuration:
         for key, value in defaults.items():
             if key not in self.config['DEFAULT']:
                 self.config['DEFAULT'][key] = value
-        with open(self.configfile, "w", encoding="utf-8") as file_desc:
-            self.config.write(file_desc)
+        with open(self.configfile, "w", encoding="utf-8") as file_:
+            self.config.write(file_)
 
     def _config_empty(self, msg):
         res = (

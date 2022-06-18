@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "version = \"$(git describe --tags)\"" > tools/version.py
+echo "VERSION = \"$(git describe --tags)\"" > tools/version.py
