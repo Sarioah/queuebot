@@ -1,3 +1,7 @@
+"""
+MessageHandler that manages a SongQueue, selects methods based on a given message object,
+and generates responses by processing the message using the selected method
+"""
 import threading
 
 from irc_bot.events import HandleEvent
@@ -8,7 +12,24 @@ from tools.highlight_string import find_strings
 
 
 class MessageHandler:
+    """The main MessageHandler class"""
     def __init__(self, channel, sep, trunc, logging, emotes):
+        """
+        Create a MessageHandler
+
+        Args:
+            channel: the channel name to create the SongQueue against
+
+            sep: command separator, if a message starts with this string then the following word
+                shall be treated as a command
+
+            trunc: function used to truncate long messages
+
+            logging: whether to log all received messages to file
+
+            emotes: list of lists of strings that shall be treated as emotes, alongside the
+                emote designations listed in the message for native twitch emotes
+        """
         self.sep = sep
         self.channel = channel
         self.emotes = sum(emotes.values(), start=[])
@@ -20,6 +41,7 @@ class MessageHandler:
         self.trunc = trunc
 
     def handle_msg(self, chat_msg, msg_type="pubmsg"):
+        """Handle a given message"""
         if self.logging:
             with open("messages.log", "a", encoding="UTF-8") as file:
                 file.write(str(chat_msg) + "\n")
@@ -39,6 +61,10 @@ class MessageHandler:
         return HandleEvent(msg)(msg_type, self.handle_command)
 
     def handle_command(self, msg, words, tags):
+        """
+        Check a message for the command separator. If found, then search the SongQueue for an
+        appropriate method to process the message with
+        """
         if msg.startswith(self.sep):
             sender = tags['display-name']
             action = self.commandhandler.find_command(
@@ -57,6 +83,10 @@ class MessageHandler:
         return None
 
     def handle_emotes(self, msg):
+        """
+        Check a message to see if it contains any emote strings. If found, colourise the message
+        around each emote
+        """
         try:
             twitch_indices = [
                 (int(p.split('-')[0]), int(p.split('-')[1]) + 1)
