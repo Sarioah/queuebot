@@ -1,3 +1,6 @@
+"""
+Tools for dealing with chat based commands, text manipulation and output formatting
+"""
 import time
 
 from tools.text import colourise as col
@@ -41,6 +44,9 @@ class Commands:
 
 
 class CommandHandler:
+    """
+    Maps commands found in a chat message to methods attached to bot objects like a SongQueue
+    """
     def __init__(self):
         """Creates a CommandHandler object"""
         self.mthds = Commands(self)
@@ -81,6 +87,7 @@ class CommandHandler:
         return getattr(self.mthds, attr, None)
 
     def check_aliases(self, command):
+        """Check if a chat command matches an alias of a known method"""
         res = [
             k for k, v in self.aliases.items()
             if command in v
@@ -88,6 +95,7 @@ class CommandHandler:
         return (res[0] if res else command)
 
     def check_cooldowns(self, command):
+        """Check that a chat command is waiting for a cooldown to expire"""
         current = time.time()
         timeleft = current - self.cooldowns.get(command[1], 0) - command[2]
         if timeleft >= 0:
