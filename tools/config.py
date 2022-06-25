@@ -1,3 +1,9 @@
+"""
+Tools to handle configuration of the bot
+
+Includes classes for password and configuration objects that work across unix or windows systems
+"""
+
 import os
 import json
 from urllib.request import urlopen
@@ -29,10 +35,12 @@ defaults = {
 
 
 class BadOAuth(Exception):
-    pass
+    """Raise exception when a server rejects an oauth token"""
 
 
 class PasswordHandler():
+    """Handle storing and retrieving passwords"""
+
     def __init__(self, user):
         # global keyring
         self.user = user
@@ -40,6 +48,7 @@ class PasswordHandler():
             self._no_passwd()
 
     def _no_passwd(self):
+        """Prompt the user to enter the password tied to self.user"""
         link = col("https://twitchapps.com/tmi:", "BLUE")
         print(
             "Please log into twitch using your bot account, then visit "
@@ -52,14 +61,23 @@ class PasswordHandler():
         keyring.set_password("TMI", self.user, passwd)
 
     def get_password(self):
+        """Retrieve a password tied to self.user"""
         return keyring.get_password("TMI", self.user)
 
     def del_password(self):
+        """Delete the password tied to self.user"""
         return keyring.delete_password("TMI", self.user)
 
 
 class Configuration:
+    """Contain methods for handling configuration data"""
+
     def __init__(self, configfile):
+        """
+        Create a configuration object
+
+        configfile: name of the configuration file to load data from
+        """
         self.config = ConfigParser()
         self.configfile = configfile
         try:
@@ -90,9 +108,11 @@ class Configuration:
             raise res
 
     def get_config(self):
+        """Retrieve the dict containing the loaded configuration data"""
         return self.config['DEFAULT']
 
     def write_config(self):
+        """Write configuration data to self's configfile"""
         for key, value in defaults.items():
             if key not in self.config['DEFAULT']:
                 self.config['DEFAULT'][key] = value
@@ -100,6 +120,7 @@ class Configuration:
             self.config.write(file_)
 
     def _config_empty(self, msg):
+        """Return an exception if fields missing from self's config file"""
         res = (
             f"{msg} '{col(self.configfile, 'YELLOW')}'.\n"
             "Please open this file and fill out the relevant fields:\n"
@@ -123,6 +144,7 @@ class Configuration:
         return Exception(res)
 
     def _config_bad(self):
+        """Return an exception if self's config file could not be properly loaded"""
         res = (
             f"Config file '{col(self.configfile, 'YELLOW')}' "
             "appears to be misformatted.\nPlease correct the error or "
@@ -132,6 +154,10 @@ class Configuration:
 
 
 def check_update(ver):
+    """
+    Check for an updated version of the program
+    Silently ignore any errors allowing the program to move on
+    """
     try:
         with urlopen(
             "https://api.github.com/repos/sarioah/queuebot/releases/latest",
