@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+"""
+Retrieves emote strings from FrankerFaceZ and BTTV for the given channels
+"""
 import json
 import sys
 
@@ -80,6 +83,24 @@ async def _main(channels):
 
 
 def get_emotes(*channels):
+    """
+    Return a dict of lists of emote strings for the given channels
+
+    Lists can potentially be empty
+
+    Args:
+        channels: collects channel names
+
+    Example dict structure after calling get_emotes('channel1', 'channel2'):
+    {
+        '__ffz_global': ['Kappa', 'ManChicken', 'SomeEmote'],
+        '__bttv_global': ['LuL', 'SoSnowy'],
+        'channel1__ffz': ['channel1LUL', 'channel1Kappa'],
+        'channel1__bttv': ['channel1OMG'],
+        'channel2__ffz': [],
+        'channel2__bttv': ['channel2Emote', 'channel2LUL']
+    }
+    """
     res = {
         k: d[k]
         for d in asyncio.run(_main(channels))
