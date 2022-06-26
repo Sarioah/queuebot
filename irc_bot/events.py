@@ -56,13 +56,15 @@ class handle_event():
                 + col(self.msg, "GREY")
                 )
 
-    def on_usernotice(self, *a):
-        if 'system-msg' in self.tags:
+    def on_usernotice(self, *_args):
+        if self.tags.get("system-msg"):
             res = col(self.tags['system-msg'], "GREY")
-            print(
-                self.prefix + res
-                + f" - {self.msg or '<no msg>'}"
-                )
+        elif self.tags.get("display-name"):
+            res = col(self.tags['display-name'], "GREY")
+        print(
+            self.prefix + res
+            + f" - {self.msg or '<no msg>'}"
+        )
 
     def on_whisper(self, *a):
         print(
