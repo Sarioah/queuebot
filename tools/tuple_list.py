@@ -1,13 +1,20 @@
 #!/usr/bin/python3
+"""
+Manages a dict-like object that maintains ordering of key: value pairs
+"""
+
 from random import choice
 
+
 class TupleList:
-    """Implements a dict - like object that also maintains
+    """
+    Implements a dict - like object that also maintains
     ordering of key: value pairs
 
     Addressing by key is case - insensitive
 
-    Implements simple mathematical operators as set - like interactions"""
+    Implements simple mathematical operators as set - like interactions
+    """
     def __init__(self, *tuples):
         """key: value pairs should be passed in as a collection of tuples"""
         self.data = []
@@ -65,17 +72,21 @@ class TupleList:
                     break
 
     def __add__(self, other):
-        """Accepts another TupleList.
+        """
+        Accepts another TupleList.
         Values from second TupleList added to the first, any common values are
-        taken from the second TupleList"""
+        taken from the second TupleList
+        """
         res = self.copy()
         for (key, value) in other:
             res[key] = value
         return res
 
     def __sub__(self, other):
-        """Accepts another TupleList.
-        If the first TupleList contains keys present in the second, remove them"""
+        """
+        Accepts another TupleList.
+        If the first TupleList contains keys present in the second, remove them
+        """
         res = TupleList()
         for (key, value) in self:
             if key not in other:
@@ -89,12 +100,15 @@ class TupleList:
         return self - other
 
     def append(self, item):
+        """Append a tuple to the end of the TupleList"""
         return self.data.append(item)
 
     def copy(self):
+        """Create a new TupleList containing the same data as self"""
         return TupleList(*self.data)
 
     def deprioritise(self, other=""):
+        """Move the keys found in the other TupleList to the end of self"""
         if not other:
             other = TupleList()
         front = self - other
@@ -102,15 +116,18 @@ class TupleList:
         return front + back
 
     def index(self, key):
+        """Get the index of the given key"""
         return [
             k.lower()
             for (k, v) in self.data
         ].index(key.lower())
 
     def random(self, other="", first=False):
-        """Picks a key: value pair at random.
+        """
+        Picks a key: value pair at random.
         If another TupleList is provided, prefer to pick keys unique to
-        the first TupleList if possible"""
+        the first TupleList if possible
+        """
         if not other:
             other = TupleList()
         pool = self - other
@@ -126,7 +143,9 @@ class TupleList:
         return self.pop(self.index(key)), repeat_pick
 
     def pop(self, index):
+        """Remove the last tuple from self and return it"""
         return self.data.pop(index)
 
     def serialise(self):
+        """Return the list of tuples stored in self"""
         return self.data
