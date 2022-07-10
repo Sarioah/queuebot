@@ -1,5 +1,22 @@
-class Paginate:
+"""
+Tools for formatting / manipulating text
 
+Classes:
+    Paginate: Takes a string and returns a list of strings split to the specified
+              length. Optionally attempts to cut a the specified separator where possible
+
+Functions:
+    trim_bytes: Takes a string and splits it to the specified number of bytes.
+    colourise: Takes a string and a colour, returns the string with ANSI colour codes around it
+"""
+
+
+class Paginate:
+    """
+    Hold a long string and break it up into more manageable pages.
+
+    Supports indexing to return the given page number, or iterating through all pages
+    """
     def __init__(self, data, length, sep=""):
         self.sep = bytes(sep, encoding='utf-8')
         self.max_length = length - 15
@@ -24,11 +41,21 @@ class Paginate:
             yield page + self.suffix(i + 1)
 
     def suffix(self, page_num):
+        """Return the specified page of data, suffixed with the page number"""
         if len(self.data) > 1:
             return f" (page {page_num}/{len(self.data)})"
         return ""
 
     def process(self, data):
+        """
+        Process the given data into groupings of bytes
+
+        Arguments:
+            data: String of bytes
+
+        Returns:
+            List of strings of bytes
+        """
         if len(data) <= self.max_length:
             return [data]
         spacing = len(self.sep)
@@ -52,6 +79,16 @@ class Paginate:
 
 
 def trim_bytes(msg="", length=0):
+    """
+    Trim a string to the specified number of bytes
+
+    Arguments:
+        msg: Input string
+        length: Length to trim the input string to
+
+    Returns:
+        Trimmed version of the input string
+    """
     if msg:
         msg = bytes(msg, encoding='utf-8')
         while msg:
@@ -65,6 +102,16 @@ def trim_bytes(msg="", length=0):
 
 
 def colourise(string, colour):
+    """
+    Take a string and surround it with ANSI colour formatting codes
+
+    Arguments:
+        string: Input string
+        colour: Colour to format the input string with
+
+    Returns:
+        Formatted version of the input string
+    """
     colours = {
         "WHITE"  : "\033[0m",
         "GREY"   : "\033[30;1m",
