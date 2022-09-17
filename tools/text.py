@@ -41,7 +41,7 @@ class Paginate:
             yield page + self.suffix(i + 1)
 
     def suffix(self, page_num):
-        """Return the specified page of data, suffixed with the page number"""
+        """Return a page counter suffix if self contains more than a single page of data"""
         if len(self.data) > 1:
             return f" (page {page_num}/{len(self.data)})"
         return ""

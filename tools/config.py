@@ -140,7 +140,7 @@ class Configuration:
             f"     {col('startup_msg', 'GREEN')} : "
             "Send a message in chat when the bot has sucessfully connected\n"
             f"\nOnce these are filled in, restart the bot."
-            )
+        )
         return Exception(res)
 
     def _config_bad(self):
