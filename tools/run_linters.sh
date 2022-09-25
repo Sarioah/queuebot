@@ -2,26 +2,31 @@
 
 OPTS=""
 FILES=""
+EXCLUSIONS='./tests/*'
 
 function usage {
 	echo -e "\nUsage: ./$(basename $0) [-f FILE] [-th]" 2>&1
 	echo -e "\t-h       Shows help"
-	echo -e "\t-t       Enables checking for TODO entries"
-	echo -e "\t-f FILE  Checks only the specified file\n"
+	echo -e "\t-a       Search all files, including test modules"
+	echo -e "\t-f FILE  Checks only the specified file"
+	echo -e "\t-t       Enables checking for TODO entries\n"
 	exit
 }
 
 
-while getopts :f:ht arg; do
+while getopts :f:aht arg; do
 	case ${arg} in
 		h)
 			usage
 			;;
-		t)
-			OPTS="--enable=fixme"
+		a)
+			EXCLUSIONS=""
 			;;
 		f)
 			FILES="${OPTARG}"
+			;;
+		t)
+			OPTS="--enable=fixme"
 			;;
 		:)
 			echo "$0: Must supply an argument to -${OPTARG}" >&2
@@ -36,7 +41,7 @@ done
 
 echo -e "----------\n[32;1mSearching for .py files[0m...\n----------"
 if [ -z "$FILES" ]; then
-	FILES=$(find . -type f -iname '*.py' -not -path './tests/*')
+	FILES=$(find . -type f -iname '*.py' -not -path "${EXCLUSIONS}")
 fi
 echo "[30;1m${FILES}[0m"
 
