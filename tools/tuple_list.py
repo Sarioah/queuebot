@@ -59,7 +59,7 @@ class TupleList:
             return {
                 k.lower(): v
                 for k, v in self.data
-                }[key.lower()]
+            }[key.lower()]
         return None
 
     def __setitem__(self, key, value):

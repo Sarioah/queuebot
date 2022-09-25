@@ -105,7 +105,7 @@ def get_emotes(*channels):
         k: d[k]
         for d in asyncio.run(_main(channels))
         for k in d
-        }
+    }
     return res
 
 
