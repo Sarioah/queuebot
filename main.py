@@ -44,6 +44,7 @@ bg_bot = None
 message_handler = None
 password_handler = None
 
+
 def cmd(bot, msg):
     res_ = message_handler.handle_msg(msg)
     bot.send_command("send_msg", res_)
