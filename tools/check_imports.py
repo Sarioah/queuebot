@@ -5,9 +5,9 @@ import os
 import importlib
 
 modules = [
-        "colorama", "readchar", "irc",
-        "nuitka", "keyring", "aiohttp"
-        ]
+    "colorama", "readchar", "irc",
+    "nuitka", "keyring", "aiohttp"
+]
 if os.name == "nt":
     modules += ["win32api"]
 else:

@@ -122,7 +122,7 @@ class BaseMethods:
                 return (
                     "Test data loaded from file, do !queueconfirm within "
                     "10 seconds to overwrite the current queue entries"
-                    )
+                )
         else:
             return "No test data file found "
 
