@@ -151,6 +151,7 @@ disable=raw-checker-failed,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
+	fixme, # don't warn about TODO unless I ask for it
 	keyword-arg-before-vararg # stays disabled until PEP570 respected
 
 # Enable the message, report, category or checker with the given id(s). You can
