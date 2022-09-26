@@ -24,6 +24,7 @@ from json import loads, dumps
 from traceback import format_exc
 
 from tools.tuple_list import TupleList
+from tools.timed_list import TimedList
 from tools.text import colourise as c
 from tools.text import Paginate
 
@@ -284,10 +285,12 @@ class JBMethods(BaseMethods):
 
     def currententry(self, *_args):
         """List the last entry to be picked"""
-        if self.parent.current:
-            return (
-                f"Current player is {trunc(self.parent.current['user'], SINGLE_SONG_LENGTH)}"
-            )
+        if self.parent.currentusers:
+            res = "Currently picked users: " + " • ".join([
+                f"{index + 1}. {user}"
+                for (index, user) in enumerate(self.parent.currentusers)
+            ])
+            return trunc(res, SINGLE_SONG_LENGTH)
         return "No-one's been picked yet"
 
     def addentry(self, sender, /, *_args):
@@ -393,6 +396,7 @@ class JBMethods(BaseMethods):
                 user, entry
             )
             self.parent.picked.append((user, entry))
+            self.parent.currentusers.append(user)
             return (
                 f"Get ready to play, @{user}, you were picked from the "
                 f"queue{' again!' if repeat_pick else '!'}"
@@ -405,6 +409,7 @@ class SongQueue:
         self.channel = None
         self.isopen = None
         self.current = None
+        self.currentusers = None
         self.entries = None
         self.picked = None
         self.msg_limit = 499 - len(channel)
@@ -431,6 +436,7 @@ class SongQueue:
         self.channel = channel
         self.isopen = True
         self.current, self.entries, self.picked = {}, TupleList(*tuples), TupleList()
+        self.currentusers = TimedList(600)
         self.save()
 
     def save(self):
@@ -440,6 +446,7 @@ class SongQueue:
             res["channel"] = self.channel
             res["isopen"] = self.isopen
             res["current"] = self.current
+            res["currentusers"] = self.currentusers.serialise()
             res["entries"] = self.entries.serialise()
             res["picked"] = self.picked.serialise()
             file_.write(dumps(res, indent=4))
@@ -456,6 +463,7 @@ class SongQueue:
                 self.channel = res["channel"]
                 self.isopen = res["isopen"]
                 self.current = res["current"]
+                self.currentusers = TimedList(**res["currentusers"])
                 self.entries = TupleList(*res["entries"])
                 self.picked = TupleList(*res["picked"])
         except Exception:
