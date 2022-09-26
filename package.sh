@@ -1,5 +1,5 @@
 #!/bin/bash
-. ./tools/update\ version.sh
+. ./scripts/update\ version.sh
 
 python3 ./tools/check_imports.py
 
