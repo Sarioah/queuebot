@@ -1,5 +1,5 @@
 @ECHO OFF
-call ".\tools\update version.bat"
+call ".\scripts\update version.bat"
 
 py .\tools\check_imports.py
 if %ERRORLEVEL% GTR 0 exit

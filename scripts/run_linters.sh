@@ -5,7 +5,7 @@ FILES=""
 EXCLUSIONS='./tests/*'
 
 function usage {
-	echo -e "\nUsage: ./$(basename $0) [-f FILE] [-th]" 2>&1
+	echo -e "\nUsage: ./$(basename $0) [-hat] [-f FILE]" 2>&1
 	echo -e "\t-h       Shows help"
 	echo -e "\t-a       Search all files, including test modules"
 	echo -e "\t-f FILE  Checks only the specified file"
