@@ -283,14 +283,17 @@ class JBMethods(BaseMethods):
         self.parent.isopen = True
         return "Priority queue is now open"
 
-    def currententry(self, *_args):
-        """List the last entry to be picked"""
+    def currententry(self, _, page=1, /, *_args):
+        """
+        Lists the users picked for the current party
+        List expires after ten minutes
+        """
         if self.parent.currentusers:
             res = "Currently picked users: " + " • ".join([
                 f"{index + 1}. {user}"
                 for (index, user) in enumerate(self.parent.currentusers)
             ])
-            return trunc(res, SINGLE_SONG_LENGTH)
+            return Paginate(res, self.parent.msg_limit, " • ")[page]
         return "No-one's been picked yet"
 
     def addentry(self, sender, /, *_args):
