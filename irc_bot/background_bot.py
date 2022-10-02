@@ -29,6 +29,7 @@ class BackgroundBot:
         - an exception queue to pass critical / unhandled exceptions
           back out to the main program, in a thread-safe manner
     """
+
     def __init__(self, bot):
         """
         Create the bot and retain information about the bot's operation
@@ -49,6 +50,7 @@ class BackgroundBot:
         Catch exceptions if they reach this level, passing them back
         out through the exception queue
         """
+
         def _do_work():
             while True:
                 with self.lock:

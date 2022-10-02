@@ -7,7 +7,7 @@ from tools.text import colourise as col
 from tools.text import trim_bytes
 
 
-SERVER = 'irc.chat.twitch.tv'
+SERVER = "irc.chat.twitch.tv"
 PORT = 6667
 MSG_LIMIT = 499
 
@@ -17,13 +17,10 @@ class IrcBot(SingleServerIRCBot):
     IRC Client, accepts a MessageHandler that processes messages and
     generates appropriate responses where necessary
     """
-    def __init__(
-        self, username, password,
-        channel, muted, message_handler,
-        startup_msg, version
-    ):
+
+    def __init__(self, username, password, channel, muted, message_handler, startup_msg, version):
         """Create the bot. Password should be an 'oauth' token if using with Twitch' IRC api"""
-        self.channel = '#' + channel
+        self.channel = "#" + channel
         self.client = None
         self.joined = False
         self.muted = bool(muted.lower() == "true")
@@ -34,7 +31,8 @@ class IrcBot(SingleServerIRCBot):
 
         super().__init__(
             server_list=[(SERVER, PORT, password)],
-            nickname=username, realname=username,
+            nickname=username,
+            realname=username,
         )
         print(col("Initialising bot...", "GREY"))
         if self.muted:
@@ -42,14 +40,14 @@ class IrcBot(SingleServerIRCBot):
 
     def on_welcome(self, client, _msg):
         """Respond to a channel's welcome message with the client's capabilities"""
-        client.cap('REQ', ':twitch.tv/membership')
-        client.cap('REQ', ':twitch.tv/tags')
-        client.cap('REQ', ':twitch.tv/commands')
+        client.cap("REQ", ":twitch.tv/membership")
+        client.cap("REQ", ":twitch.tv/tags")
+        client.cap("REQ", ":twitch.tv/commands")
         client.join(self.channel)
 
         self.client = client
         self.joined = True
-        print(col(f"Welcomed into channel \"{self.channel[1:]}\"", "GREEN"))
+        print(col(f'Welcomed into channel "{self.channel[1:]}"', "GREEN"))
         if self.startup_msg:
             self.send_msg(f"Queuebot {self.version} started")
 

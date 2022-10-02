@@ -13,6 +13,7 @@ from tools.highlight_string import find_strings
 
 class MessageHandler:
     """The main MessageHandler class"""
+
     def __init__(self, channel, sep, trunc, logging, emotes):
         """
         Create a MessageHandler
@@ -48,15 +49,12 @@ class MessageHandler:
 
         msg = {}
         try:
-            msg['msg'] = chat_msg.arguments[0]
+            msg["msg"] = chat_msg.arguments[0]
         except IndexError:
-            msg['msg'] = ""
-        msg['words'] = msg['msg'].split(" ")
-        msg['tags'] = {
-            i['key']: i['value']
-            for i in chat_msg.tags
-        }
-        msg['msg'] = self.handle_emotes(msg)
+            msg["msg"] = ""
+        msg["words"] = msg["msg"].split(" ")
+        msg["tags"] = {i["key"]: i["value"] for i in chat_msg.tags}
+        msg["msg"] = self.handle_emotes(msg)
 
         return HandleEvent(msg)(msg_type, self.handle_command)
 
@@ -66,18 +64,13 @@ class MessageHandler:
         appropriate method to process the message with
         """
         if msg.startswith(self.sep):
-            sender = tags['display-name']
+            sender = tags["display-name"]
             action = self.commandhandler.find_command(
-                tags['badges'],
-                words[0][1:],
-                self.song_queue.mthds
+                tags["badges"], words[0][1:], self.song_queue.mthds
             )
             if action:
                 with self.lock:
-                    res = action(
-                        sender, " ".join(words[1:]),
-                        self.emote_indices_short
-                    )
+                    res = action(sender, " ".join(words[1:]), self.emote_indices_short)
                     self.song_queue.save()
                 return res
         return None
@@ -89,20 +82,17 @@ class MessageHandler:
         """
         try:
             twitch_indices = [
-                (int(p.split('-')[0]), int(p.split('-')[1]) + 1)
-                for t in msg['tags']['emotes'].split('/')
-                for p in t.split(':')[1].split(',')
+                (int(p.split("-")[0]), int(p.split("-")[1]) + 1)
+                for t in msg["tags"]["emotes"].split("/")
+                for p in t.split(":")[1].split(",")
             ]
         except Exception:
             twitch_indices = []
 
-        bttv_indices = find_strings(msg['msg'], self.emotes)
+        bttv_indices = find_strings(msg["msg"], self.emotes)
         emote_indices = list(set(bttv_indices + twitch_indices))
 
-        adjustment = len(msg['words'][0]) + 1
-        self.emote_indices_short = [
-            (i - adjustment, j - adjustment)
-            for (i, j) in emote_indices
-        ]
+        adjustment = len(msg["words"][0]) + 1
+        self.emote_indices_short = [(i - adjustment, j - adjustment) for (i, j) in emote_indices]
 
-        return Highlighter(True, msg['msg'], indices=emote_indices).get_highlight()
+        return Highlighter(True, msg["msg"], indices=emote_indices).get_highlight()

@@ -17,14 +17,12 @@ class Paginate:
 
     Supports indexing to return the given page number, or iterating through all pages
     """
+
     def __init__(self, data, length, sep=""):
-        self.sep = bytes(sep, encoding='utf-8')
+        self.sep = bytes(sep, encoding="utf-8")
         self.max_length = length - 15
-        bytes_ = self.process(bytes(data, encoding='utf-8'))
-        self.data = [
-            str(page, encoding='utf-8')
-            for page in bytes_
-        ]
+        bytes_ = self.process(bytes(data, encoding="utf-8"))
+        self.data = [str(page, encoding="utf-8") for page in bytes_]
 
     def __getitem__(self, page_num=0):
         try:
@@ -59,7 +57,7 @@ class Paginate:
         if len(data) <= self.max_length:
             return [data]
         spacing = len(self.sep)
-        prefix = data[:self.max_length]
+        prefix = data[: self.max_length]
         try:
             cut = prefix.rindex(self.sep)
         except ValueError:
@@ -67,15 +65,15 @@ class Paginate:
             while current_length:
                 try:
                     # byte representation of ellipses char
-                    front = (data[:current_length - 3] + b'\xe2\x80\xa6')
-                    back = data[current_length - 3:]
-                    _ = [str(e, encoding='utf-8') for e in (front, back)]
+                    front = data[: current_length - 3] + b"\xe2\x80\xa6"
+                    back = data[current_length - 3 :]
+                    _ = [str(e, encoding="utf-8") for e in (front, back)]
                 except ValueError:
                     current_length -= 1
                 else:
                     return [front] + self.process(back)
         else:
-            return [data[:cut]] + self.process(data[cut + spacing:])
+            return [data[:cut]] + self.process(data[cut + spacing :])
 
 
 def trim_bytes(msg="", length=0):
@@ -90,10 +88,10 @@ def trim_bytes(msg="", length=0):
         Trimmed version of the input string
     """
     if msg:
-        msg = bytes(msg, encoding='utf-8')
+        msg = bytes(msg, encoding="utf-8")
         while msg:
             try:
-                msg = str(msg[:length], encoding='utf-8')
+                msg = str(msg[:length], encoding="utf-8")
             except ValueError:
                 length -= 1
             else:
@@ -113,23 +111,19 @@ def colourise(string, colour):
         Formatted version of the input string
     """
     colours = {
-        "WHITE"  : "\033[0m",
-        "GREY"   : "\033[30;1m",
-        "RED"    : "\033[31;1m",
-        "GREEN"  : "\033[32;1m",
-        "YELLOW" : "\033[33;1m",
-        "BLUE"   : "\033[34;1m",
-        "PURPLE" : "\033[35;1m",
-        "CYAN"   : "\033[36;1m"
+        "WHITE": "\033[0m",
+        "GREY": "\033[30;1m",
+        "RED": "\033[31;1m",
+        "GREEN": "\033[32;1m",
+        "YELLOW": "\033[33;1m",
+        "BLUE": "\033[34;1m",
+        "PURPLE": "\033[35;1m",
+        "CYAN": "\033[36;1m",
     }
 
     try:
         if string:
             string = string.replace("\33[0m", colours[colour])
-        return (
-            f"{colours[colour]}"
-            f"{string}"
-            f"{colours['WHITE']}"
-        )
+        return f"{colours[colour]}{string}{colours['WHITE']}"
     except KeyError as exc:
-        raise KeyError(f"Colour \"{colour}\" invalid") from exc
+        raise KeyError(f'Colour "{colour}" invalid') from exc

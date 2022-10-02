@@ -4,10 +4,7 @@ import sys
 import os
 import importlib
 
-modules = [
-    "colorama", "readchar", "irc",
-    "nuitka", "keyring", "aiohttp"
-]
+modules = ["colorama", "readchar", "irc", "nuitka", "keyring", "aiohttp"]
 if os.name == "nt":
     modules += ["win32api"]
 else:
@@ -25,15 +22,9 @@ def check_module(module):
 
 
 if __name__ == "__main__":
-    failures = [
-        module for module in modules
-        if not check_module(module)
-    ]
+    failures = [module for module in modules if not check_module(module)]
     if failures:
         if "win32api" in failures:
             failures[failures.index("win32api")] = "pywin32"
-        print(
-            f"Module(s) \"{', '.join(failures)}\" not found, "
-            + "please install via pip"
-        )
+        print(f"Module(s) \"{', '.join(failures)}\" not found, please install via pip")
         sys.exit(1)

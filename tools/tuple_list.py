@@ -15,6 +15,7 @@ class TupleList:
 
     Implements simple mathematical operators as set - like interactions
     """
+
     def __init__(self, *tuples):
         """key: value pairs should be passed in as a collection of tuples"""
         self.data = []
@@ -22,27 +23,18 @@ class TupleList:
             self.data.append(item)
 
     def __str__(self):
-        res = "\n".join(
-            f"{key}: \"{value}\""
-            for key, value in self.data
-        )
+        res = "\n".join(f'{key}: "{value}"' for key, value in self.data)
         return f"TupleList contents:\n{res}"
 
     def __repr__(self):
-        res = ", ".join(
-            f"(\"{key}\", \"{value}\")"
-            for key, value in self.data
-        )
+        res = ", ".join(f'("{key}", "{value}")' for key, value in self.data)
         return f"TupleList({res})"
 
     def __bool__(self):
         return bool(self.data)
 
     def __contains__(self, key):
-        return key.lower() in [
-            k.lower()
-            for (k, v) in self.data
-        ]
+        return key.lower() in [k.lower() for (k, v) in self.data]
 
     def __delitem__(self, key):
         del self.data[self.index(key)]
@@ -56,10 +48,7 @@ class TupleList:
 
     def __getitem__(self, key):
         if key.lower() in self:
-            return {
-                k.lower(): v
-                for k, v in self.data
-            }[key.lower()]
+            return {k.lower(): v for k, v in self.data}[key.lower()]
         return None
 
     def __setitem__(self, key, value):
@@ -117,10 +106,7 @@ class TupleList:
 
     def index(self, key):
         """Get the index of the given key"""
-        return [
-            k.lower()
-            for (k, v) in self.data
-        ].index(key.lower())
+        return [k.lower() for (k, v) in self.data].index(key.lower())
 
     def random(self, other="", first=False):
         """

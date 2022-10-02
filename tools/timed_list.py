@@ -4,11 +4,12 @@ Manages a list object, that erases its list content after a specified time
 from time import time
 
 
-class TimedList():
+class TimedList:
     """
     Implements a TimedList that erases its content if no writes occur within
     the specified delay
     """
+
     default_delay = 600
 
     def __init__(self, delay=None, **kwargs):

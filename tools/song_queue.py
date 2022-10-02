@@ -35,6 +35,7 @@ MULTI_SONG_LENGTH = 50  # (for lists)
 
 class BaseMethods:
     """Contain methods common to all types of queues"""
+
     def __init__(self, parent):
         self.parent = parent
 
@@ -110,12 +111,10 @@ class BaseMethods:
             ]
         ]
         """
-        if path.exists('testdata.json'):
+        if path.exists("testdata.json"):
             try:
                 with open("testdata.json", "r", encoding="utf-8") as file_:
-                    self.parent.testdata = [
-                        loads(file_.read())
-                    ]
+                    self.parent.testdata = [loads(file_.read())]
             except Exception:
                 return "Failed to load test data"
             else:
@@ -130,6 +129,7 @@ class BaseMethods:
 
 class JDMethods(BaseMethods):
     """Contain methods used to manipulate Just Dance / random queues"""
+
     def jbqueue(self, *_args):
         """Change queue into Jackbox / priority mode"""
         self.parent.mthds = JBMethods(self.parent)
@@ -164,10 +164,7 @@ class JDMethods(BaseMethods):
         if not entry:
             return f"@{sender} please write a song name after !sr"
 
-        emote_indices = list({
-            i for j in emote_indices
-            for i in j
-        })
+        emote_indices = list({i for j in emote_indices for i in j})
 
         if len(entry) in emote_indices:
             entry += " "
@@ -178,10 +175,10 @@ class JDMethods(BaseMethods):
         self.parent.entries[sender] = entry
         if oldentry:
             return (
-                f"{sender}'s song changed from \"{trunc(oldentry, SINGLE_SONG_LENGTH // 2)}\" "
-                f"to \"{trunc(entry, SINGLE_SONG_LENGTH // 2)}\""
+                f'{sender}\'s song changed from "{trunc(oldentry, SINGLE_SONG_LENGTH // 2)}" '
+                f'to "{trunc(entry, SINGLE_SONG_LENGTH // 2)}"'
             )
-        return f"Added \"{trunc(entry, SINGLE_SONG_LENGTH)}\" to the queue for {sender}"
+        return f'Added "{trunc(entry, SINGLE_SONG_LENGTH)}" to the queue for {sender}'
 
     def removeentry(self, _, index, /, *_args):
         """Remove the sender's entry from the queue"""
@@ -192,7 +189,7 @@ class JDMethods(BaseMethods):
         except IndexError:
             return "Specified song doesn't exist"
         else:
-            return f"Removed \"{trunc(entry, SINGLE_SONG_LENGTH)}\" from the queue"
+            return f'Removed "{trunc(entry, SINGLE_SONG_LENGTH)}" from the queue'
 
     def status(self, sender, /, *_args):
         """
@@ -211,7 +208,7 @@ class JDMethods(BaseMethods):
         if self.parent.entries[sender]:
             msg += (
                 f" • {sender} your song is "
-                f"\"{trunc(self.parent.entries[sender], SINGLE_SONG_LENGTH)}\""
+                f'"{trunc(self.parent.entries[sender], SINGLE_SONG_LENGTH)}"'
             )
         return msg
 
@@ -221,7 +218,7 @@ class JDMethods(BaseMethods):
             return "Queue is empty"
         msg = "List of songs in the queue: "
         for i, (_user, song) in enumerate(self.parent.entries):
-            msg += f"{i + 1}. \"{trunc(song, MULTI_SONG_LENGTH)}\" • "
+            msg += f'{i + 1}. "{trunc(song, MULTI_SONG_LENGTH)}" • '
         return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
     def picked(self, _, page=1, /, *_args):
@@ -230,7 +227,7 @@ class JDMethods(BaseMethods):
             return "Nothing's been played yet"
         msg = "Songs already played: "
         for _user, song in self.parent.picked:
-            msg += f"\"{trunc(song, MULTI_SONG_LENGTH)}\", "
+            msg += f'"{trunc(song, MULTI_SONG_LENGTH)}", '
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection=0, /, *_args):
@@ -247,9 +244,7 @@ class JDMethods(BaseMethods):
                 user, song = self.parent.entries.pop(int(selection) - 1)
                 repeat_pick = user in self.parent.picked
             else:
-                (user, song), repeat_pick = (
-                    self.parent.entries.random(self.parent.picked)
-                )
+                (user, song), repeat_pick = self.parent.entries.random(self.parent.picked)
         except ValueError:
             return "Please specify a song number"
         except IndexError as exc:
@@ -257,18 +252,17 @@ class JDMethods(BaseMethods):
                 return "No such song"
             return "Queue is empty"
         else:
-            self.parent.current["user"], self.parent.current["entry"] = (
-                user, song
-            )
+            self.parent.current["user"], self.parent.current["entry"] = (user, song)
             self.parent.picked.append((user, song))
             return (
                 f"{user} was picked{' again' if repeat_pick else ''}, "
-                f"their song was \"{trunc(song, SINGLE_SONG_LENGTH)}\""
+                f'their song was "{trunc(song, SINGLE_SONG_LENGTH)}"'
             )
 
 
 class JBMethods(BaseMethods):
     """Contains methods used to manipulate Jackbox / priority queues"""
+
     def jbqueue(self, *_args):
         """Change queue to Jackbox / priority mode"""
         return "Queue is already in Jackbox mode"
@@ -289,10 +283,9 @@ class JBMethods(BaseMethods):
         List expires after ten minutes
         """
         if self.parent.currentusers:
-            res = "Currently picked users: " + " • ".join([
-                f"{index + 1}. {user}"
-                for (index, user) in enumerate(self.parent.currentusers)
-            ])
+            res = "Currently picked users: " + " • ".join(
+                [f"{index + 1}. {user}" for (index, user) in enumerate(self.parent.currentusers)]
+            )
             return Paginate(res, self.parent.msg_limit, " • ")[page]
         return "No-one's been picked yet"
 
@@ -313,9 +306,7 @@ class JBMethods(BaseMethods):
             )
         else:
             self.parent.entries[sender] = sender
-            self.parent.entries = self.parent.entries.deprioritise(
-                self.parent.picked
-            )
+            self.parent.entries = self.parent.entries.deprioritise(self.parent.picked)
             msg = (
                 f"Added {sender} to the queue at position "
                 f"{self.parent.entries.index(sender) + 1}"
@@ -385,8 +376,8 @@ class JBMethods(BaseMethods):
                 user, entry = self.parent.entries.pop(int(selection) - 1)
                 repeat_pick = user in self.parent.picked
             else:
-                (user, entry), repeat_pick = (
-                    self.parent.entries.random(self.parent.picked, first=True)
+                (user, entry), repeat_pick = self.parent.entries.random(
+                    self.parent.picked, first=True
                 )
         except ValueError:
             return "Please specify a user number"
@@ -395,9 +386,7 @@ class JBMethods(BaseMethods):
                 return "No such user"
             return "Queue is empty"
         else:
-            self.parent.current["user"], self.parent.current["entry"] = (
-                user, entry
-            )
+            self.parent.current["user"], self.parent.current["entry"] = (user, entry)
             self.parent.picked.append((user, entry))
             self.parent.currentusers.append(user)
             return (
@@ -408,6 +397,7 @@ class JBMethods(BaseMethods):
 
 class SongQueue:
     """Main class to hold all data relating to a request queue"""
+
     def __init__(self, channel, *tuples):
         self.channel = None
         self.isopen = None
@@ -470,11 +460,7 @@ class SongQueue:
                 self.entries = TupleList(*res["entries"])
                 self.picked = TupleList(*res["picked"])
         except Exception:
-            print(c(
-                f"\n{format_exc()}\n"
-                "Failed to load saved queue, creating new one",
-                "GREY"
-            ))
+            print(c(f"\n{format_exc()}\nFailed to load saved queue, creating new one", "GREY"))
             self.new(channel, *tuples)
 
 
@@ -489,4 +475,4 @@ def trunc(msg, length):
     Returns:
         the truncated string, ending in the ellipses character if truncation occurred
     """
-    return msg if len(msg) <= length else msg[:length - 1] + "…"
+    return msg if len(msg) <= length else msg[: length - 1] + "…"
