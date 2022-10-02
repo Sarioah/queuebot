@@ -30,9 +30,7 @@ class TestTimedList(unittest.TestCase):
         self.t_l = timed_list.TimedList(**{"delay": DELAY})
         self.load_data()
         self.test_assign()
-        self.t_l = timed_list.TimedList(**{
-            "data": DATA, "delay": DELAY, "time": 1
-        })
+        self.t_l = timed_list.TimedList(**{"data": DATA, "delay": DELAY, "time": 1})
         assert self.t_l.data == []
 
     def test_assign(self, delay=DELAY):

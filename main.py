@@ -83,12 +83,13 @@ def setup_bot(*args):
         sys.exit()
 
     channel = args[1].lower() if len(args) > 1 else config["channel"].lower()
-    bot_name = config['bot_name'].lower()
+    bot_name = config["bot_name"].lower()
 
     if os.name == "nt":
         # TODO: Put this somewhere else
         # pylint: disable=import-error,import-outside-toplevel
         import win32api
+
         win32api.SetConsoleCtrlHandler(close, True)
         win32api.SetConsoleTitle(
             f"Sari queuebot {VERSION} acting as "
@@ -102,13 +103,16 @@ def setup_bot(*args):
     emotes = get_emotes(channel)
     global message_handler
     message_handler = MessageHandler(
-        channel, config['bot_prefix'],
-        trunc, config['logging'], emotes
+        channel, config["bot_prefix"], trunc, config["logging"], emotes
     )
     irc_bot = IrcBot(
-        bot_name, password_handler.get_password(), channel,
-        config['muted'], message_handler.handle_msg,
-        config['startup_msg'], VERSION
+        bot_name,
+        password_handler.get_password(),
+        channel,
+        config["muted"],
+        message_handler.handle_msg,
+        config["startup_msg"],
+        VERSION,
     )
     global bg_bot
     bg_bot = BackgroundBot(irc_bot)
@@ -132,17 +136,12 @@ except BadOAuth as exc:
         res = "oauth token is invalid"
     elif str(exc) == "Improperly formatted auth":
         res = "oauth token is improperly formatted"
-    print(col(
-        res + ", please restart the bot and paste in a new token", "RED"
-    ))
+    print(col(res + ", please restart the bot and paste in a new token", "RED"))
     password_handler.del_password()
     error_status.set_errored(exc)
 except Exception as exc:
     trace = format_exc()
-    msg = (col(
-        "Bot has encountered a problem and needs to close. Error is as follows:",
-        "RED"
-    ))
+    msg = col("Bot has encountered a problem and needs to close. Error is as follows:", "RED")
     print(f"{msg}\n{trace}")
 
     with open("last error.log", "w", encoding="utf-8") as file_:

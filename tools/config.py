@@ -17,9 +17,11 @@ from tools.text import colourise as col
 # pylint: disable=ungrouped-imports
 if os.name == "nt":
     import keyring.backends.Windows
+
     keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
 else:
     import sagecipher.keyring
+
     keyring.set_keyring(sagecipher.keyring.Keyring())
 # pylint: enable=ungrouped-imports
 
@@ -30,7 +32,7 @@ defaults = {
     "bot_prefix": "!",
     "muted": "False",
     "logging": "False",
-    "startup_msg": "True"
+    "startup_msg": "True",
 }
 
 
@@ -38,7 +40,7 @@ class BadOAuth(Exception):
     """Raise exception when a server rejects an oauth token"""
 
 
-class PasswordHandler():
+class PasswordHandler:
     """Handle storing and retrieving passwords"""
 
     def __init__(self, user):
@@ -55,9 +57,7 @@ class PasswordHandler():
             f"{link} to generate an oauth code for the bot to login with. "
             "Then paste it here and press enter.\n"
         )
-        passwd = input(
-            "Input your oauth code, including the 'oauth:' at the front: "
-        )
+        passwd = input("Input your oauth code, including the 'oauth:' at the front: ")
         keyring.set_password("TMI", self.user, passwd)
 
     def get_password(self):
@@ -86,20 +86,13 @@ class Configuration:
             raise self._config_bad() from exc
         # TODO: Giant if-elif and convoluted timing of raising / writing
         # needs revising
-        if not self.config['DEFAULT']:
+        if not self.config["DEFAULT"]:
             res = self._config_empty(
-                "Configuration file not found, a default "
-                "configuration file has been written to"
+                "Configuration file not found, a default configuration file has been written to"
             )
-        elif any(
-            True for k in self.config['DEFAULT']
-            if self.config['DEFAULT'][k] == "********"
-        ):
+        elif any(True for k in self.config["DEFAULT"] if self.config["DEFAULT"][k] == "********"):
             res = self._config_empty("Default fields need to be filled out in")
-        elif any(
-            True for k in ("bot_name", "channel")
-            if k not in self.config['DEFAULT']
-        ):
+        elif any(True for k in ("bot_name", "channel") if k not in self.config["DEFAULT"]):
             res = self._config_empty("Fields missing in")
         else:
             res = ""
@@ -109,13 +102,13 @@ class Configuration:
 
     def get_config(self):
         """Retrieve the dict containing the loaded configuration data"""
-        return self.config['DEFAULT']
+        return self.config["DEFAULT"]
 
     def write_config(self):
         """Write configuration data to self's configfile"""
         for key, value in defaults.items():
-            if key not in self.config['DEFAULT']:
-                self.config['DEFAULT'][key] = value
+            if key not in self.config["DEFAULT"]:
+                self.config["DEFAULT"][key] = value
         with open(self.configfile, "w", encoding="utf-8") as file_:
             self.config.write(file_)
 
@@ -160,21 +153,17 @@ def check_update(ver):
     """
     try:
         with urlopen(
-            "https://api.github.com/repos/sarioah/queuebot/releases/latest",
-            timeout=3
+            "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
         ) as url:
-            upstream = json.load(url)['name']
+            upstream = json.load(url)["name"]
     except Exception:
         pass
     else:
         if version.parse(upstream) > version.parse(ver):
             version_coloured = col(upstream, "BLUE")
-            link = col(
-                "https://github.com/Sarioah/queuebot/releases/latest",
-                "YELLOW"
-            )
+            link = col("https://github.com/Sarioah/queuebot/releases/latest", "YELLOW")
             return (
-                f"Updated bot found, version \"{version_coloured}\".\n"
+                f'Updated bot found, version "{version_coloured}".\n'
                 f"Please visit {link} to download the new bot"
             )
     return None

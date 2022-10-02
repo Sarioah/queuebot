@@ -19,13 +19,14 @@ class HandleEvent:
     """
     Hold the message itself, then call with the type and callback, returning the response
     """
+
     def __init__(self, msg):
         """
         Create the event with the message
         """
-        self.msg = msg['msg']
-        self.words = msg['words']
-        self.tags = msg['tags']
+        self.msg = msg["msg"]
+        self.words = msg["words"]
+        self.tags = msg["tags"]
 
         prefix = f"{datetime.now():[%m-%d %H:%M:%S] }"
         self.prefix = col(prefix, "GREY")
@@ -57,10 +58,7 @@ class HandleEvent:
         """
         Used for /me actions
         """
-        print(
-            self.prefix
-            + col(f"{self.tags['display-name']}: {self.msg}", "CYAN")
-        )
+        print(self.prefix + col(f"{self.tags['display-name']}: {self.msg}", "CYAN"))
 
     def on_pubnotice(self, *_args):
         """
@@ -68,10 +66,7 @@ class HandleEvent:
             - hosts, hosts going offline
             - non-fatal error messages like messages sent too fast, suspended channels
         """
-        print(
-            self.prefix
-            + col(self.msg, "GREY")
-        )
+        print(self.prefix + col(self.msg, "GREY"))
 
     def on_privnotice(self, *_args):
         """
@@ -79,13 +74,10 @@ class HandleEvent:
         """
         if self.msg in (
             "Improperly formatted auth",
-            "Login authentication failed"
+            "Login authentication failed",
         ):
             raise BadOAuth(self.msg)
-        print(
-            self.prefix
-            + col(self.msg, "GREY")
-        )
+        print(self.prefix + col(self.msg, "GREY"))
 
     def on_usernotice(self, *_args):
         """
@@ -95,22 +87,13 @@ class HandleEvent:
             - raids
         """
         if self.tags.get("system-msg"):
-            res = col(self.tags['system-msg'], "GREY")
+            res = col(self.tags["system-msg"], "GREY")
         elif self.tags.get("display-name"):
-            res = col(self.tags['display-name'], "GREY")
-        print(
-            self.prefix + res
-            + f" - {self.msg or '<no msg>'}"
-        )
+            res = col(self.tags["display-name"], "GREY")
+        print(self.prefix + res + f" - {self.msg or '<no msg>'}")
 
     def on_whisper(self, *_args):
         """
         Used for whispers
         """
-        print(
-            self.prefix
-            + col(
-                f"Whisper from {self.tags['display-name']}: {self.msg}",
-                "GREY"
-            )
-        )
+        print(self.prefix + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))
