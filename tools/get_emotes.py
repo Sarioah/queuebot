@@ -68,7 +68,6 @@ async def _main(channels):
         tasks += [_get_ffz(channel), _get_bttv(channel)]
     return await asyncio.gather(*tasks)
 
-from typing import Callable
 
 def get_emotes(*channels):
     """
