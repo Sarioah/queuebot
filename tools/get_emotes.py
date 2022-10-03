@@ -29,7 +29,9 @@ async def _get_ffz(channel="__ffz_global"):
     try:
         j = json.loads(await _get(f"https://api.frankerfacez.com/v1/room/{channel}"))
         j = [
-            emote["name"] for emote_set in j["sets"] for emote in j["sets"][emote_set]["emoticons"]
+            emote["name"]
+            for set_name, emote_set in j["sets"].items()
+            for emote in emote_set["emoticons"]
         ]
     except Exception:
         j = []
@@ -48,7 +50,7 @@ async def _get_bttv(channel=""):
             twitch_channel, channel = channel, channel + "__bttv"
             bttv_id = json.loads(await _get(f"https://decapi.me/twitch/id/{twitch_channel}"))
             j = json.loads(
-                await _get("https://api.betterttv.net/3/cached/users/twitch/" f"{bttv_id}")
+                await _get(f"https://api.betterttv.net/3/cached/users/twitch/{bttv_id}")
             )
             j = [
                 emote["code"]
@@ -66,6 +68,7 @@ async def _main(channels):
         tasks += [_get_ffz(channel), _get_bttv(channel)]
     return await asyncio.gather(*tasks)
 
+from typing import Callable
 
 def get_emotes(*channels):
     """
@@ -86,10 +89,9 @@ def get_emotes(*channels):
         'channel2__bttv': ['channel2Emote', 'channel2LUL']
     }
     """
-    res = {k: d[k] for d in asyncio.run(_main(channels)) for k in d}
-    return res
+    return {k: v for d in asyncio.run(_main(channels)) for k, v in d.items()}
 
 
 if __name__ == "__main__":
     emotes = get_emotes(*sys.argv[1:])
-    print(emotes)
+    print(json.dumps(emotes, indent=4))
