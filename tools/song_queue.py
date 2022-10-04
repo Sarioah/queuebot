@@ -268,7 +268,7 @@ class JDMethods(BaseMethods):
             the search string
         """
         for index, (user, song) in enumerate(self.parent):
-            if song.lower().find(search) != -1:
+            if song.casefold().find(search) != -1:
                 return (
                     f'{user} requested "{trunc(song, SINGLE_SONG_LENGTH)}" '
                     f"at position {index+1}"
@@ -284,7 +284,7 @@ class JDMethods(BaseMethods):
         """
         search = search.replace("@", "")
         for index, (user, song) in enumerate(self.parent):
-            if user.lower().find(search.lower()) != -1:
+            if user.casefold().find(search.casefold()) != -1:
                 return (
                     f'{user}\'s song is "{trunc(song, SINGLE_SONG_LENGTH)}", '
                     f'at position {index + 1}"'

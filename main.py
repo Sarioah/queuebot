@@ -82,8 +82,8 @@ def setup_bot(*args):
         error_status.set_errored(exc_)
         sys.exit()
 
-    channel = args[1].lower() if len(args) > 1 else config["channel"].lower()
-    bot_name = config["bot_name"].lower()
+    channel = args[1].casefold() if len(args) > 1 else config["channel"].casefold()
+    bot_name = config["bot_name"].casefold()
 
     if os.name == "nt":
         # TODO: Put this somewhere else

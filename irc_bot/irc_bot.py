@@ -23,8 +23,8 @@ class IrcBot(SingleServerIRCBot):
         self.channel = "#" + channel
         self.client = None
         self.joined = False
-        self.muted = bool(muted.lower() == "true")
-        self.startup_msg = bool(startup_msg.lower() == "true")
+        self.muted = bool(muted.casefold() == "true")
+        self.startup_msg = bool(startup_msg.casefold() == "true")
         self.message_handler = message_handler
         self.message_limit = MSG_LIMIT - len(channel)
         self.version = version
