@@ -34,7 +34,7 @@ class TupleList:
         return bool(self.data)
 
     def __contains__(self, key):
-        return key.lower() in [k.lower() for (k, v) in self.data]
+        return key.casefold() in [k.casefold() for (k, v) in self.data]
 
     def __delitem__(self, key):
         del self.data[self.index(key)]
@@ -47,8 +47,8 @@ class TupleList:
             yield i
 
     def __getitem__(self, key):
-        if key.lower() in self:
-            return {k.lower(): v for k, v in self.data}[key.lower()]
+        if key.casefold() in self:
+            return {k.casefold(): v for k, v in self.data}[key.casefold()]
         return None
 
     def __setitem__(self, key, value):
@@ -56,7 +56,7 @@ class TupleList:
             self.data.append((key, value))
         else:
             for i, (k, _) in enumerate(self.data):
-                if k.lower() == key.lower():
+                if k.casefold() == key.casefold():
                     self.data[i] = (key, value)
                     break
 
@@ -106,7 +106,7 @@ class TupleList:
 
     def index(self, key):
         """Get the index of the given key"""
-        return [k.lower() for (k, v) in self.data].index(key.lower())
+        return [k.casefold() for (k, v) in self.data].index(key.casefold())
 
     def random(self, other="", first=False):
         """

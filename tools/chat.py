@@ -102,7 +102,7 @@ class CommandHandler:
         If the command is a moderator command, check that the badges
         contain an appropriate moderator - level badge
         """
-        request = self.check_aliases(request.lower())
+        request = self.check_aliases(request.casefold())
         command = self.commands.get(request, None)
         if command and self.check_cooldowns(command):
             for obj in (self,) + alternatives:
