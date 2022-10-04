@@ -57,6 +57,8 @@ class CommandHandler:
             "played": ("e", "picked", 3),
             "pick": ("m", "pickentry", 1),
             "help": ("e", "help", 10),
+            "whichsong": ("e", "lookupentry", 3),
+            "whichuser": ("e", "lookupuser", 3),
             "listaliases": ("e", "listaliases", 10),
             "testqueue": ("m", "testqueue", 10),
             "queueconfirm": ("m", "queueconfirm", 0),
@@ -69,6 +71,8 @@ class CommandHandler:
             "removesong": ("removeentry",),
             "currentsong": ("currentuser", "currentusers"),
             "testqueue": ("queuetest",),
+            "whichsong": ("queuesong",),
+            "whichuser": ("queueuser",),
             "queueconfirm": ("confirmqueue",),
         }
 

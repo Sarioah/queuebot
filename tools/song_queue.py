@@ -259,6 +259,38 @@ class JDMethods(BaseMethods):
                 f'their song was "{trunc(song, SINGLE_SONG_LENGTH)}"'
             )
 
+    def lookupentry(self, _, search="", /, *_args):
+        """
+        Search queue for the given song
+
+        :param search: search string to look for
+        :returns: string containing the first username whose song contains
+            the search string
+        """
+        for index, (user, song) in enumerate(self.parent):
+            if song.lower().find(search) != -1:
+                return (
+                    f'{user} requested "{trunc(song, SINGLE_SONG_LENGTH)}" '
+                    f"at position {index+1}"
+                )
+        return f'Song "{search}" not found in the queue'
+
+    def lookupuser(self, _, search="", /, *_args):
+        """
+        Search queue for the given user
+
+        :param search: user to look for
+        :returns: string containing the user's song, if found in the queue
+        """
+        search = search.replace("@", "")
+        for index, (user, song) in enumerate(self.parent):
+            if user.lower().find(search.lower()) != -1:
+                return (
+                    f'{user}\'s song is "{trunc(song, SINGLE_SONG_LENGTH)}", '
+                    f'at position {index + 1}"'
+                )
+        return f"{search} is not in the queue"
+
 
 class JBMethods(BaseMethods):
     """Contains methods used to manipulate Jackbox / priority queues"""
@@ -299,7 +331,7 @@ class JBMethods(BaseMethods):
         """
         if not self.parent:
             return f"Sorry {sender}, the queue is closed"
-        if sender in self.parent.entries:
+        if sender in self.parent:
             msg = (
                 f"@{sender} you are already in the queue at position "
                 f"{self.parent.entries.index(sender) + 1}"
