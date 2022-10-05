@@ -1,4 +1,4 @@
-"""Handle packaging the queuebot into a standalone executable file"""
+"""Handle packaging the queuebot into a standalone executable file."""
 
 import os
 
@@ -36,6 +36,12 @@ PARAMETERS = {
     ],
 }
 
-print("Running build tool...")
-update_version()
-call([PYTHON, "-m", "nuitka"] + PARAMETERS["base"] + PARAMETERS[PLATFORM])
+
+def _build():
+    print("Running build tool...")
+    update_version()
+    call([PYTHON, "-m", "nuitka"] + PARAMETERS["base"] + PARAMETERS[PLATFORM])
+
+
+if __name__ == "__main__":
+    _build()
