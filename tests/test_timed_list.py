@@ -1,3 +1,10 @@
+"""
+Tools for testing a TimedList.
+
+Classes:
+    TestTimedList: test how the list behaves over time
+"""
+# pylint: disable=missing-function-docstring
 import unittest
 from time import sleep
 
@@ -9,6 +16,12 @@ DATA = [1, 2, 3]
 
 
 class TestTimedList(unittest.TestCase):
+    """
+    Test how the list behaves over time.
+
+    Ensure that the list wipes its data after the correct
+    time delay has elapsed.
+    """
     def setUp(self):
         self.t_l = timed_list.TimedList(delay=DELAY)
         self.load_data()
@@ -71,7 +84,7 @@ class TestTimedList(unittest.TestCase):
 
     def test_getitem(self):
         for (index, _) in enumerate(DATA):
-            assert DATA[index] == self.t_l[index]
+            assert DATA[index] == self.t_l[index]  # pylint: disable=unnecessary-list-index-lookup
 
     def test_contains(self):
         for item in DATA:
