@@ -78,7 +78,10 @@ def process_args():
     Returns:
         Namespace holding the results of parsing the script arguments
     """
-    parser = argparse.ArgumentParser(description="Linter script", add_help=True)
+    parser = argparse.ArgumentParser(
+        description="Linter script combining black, pylint, flake8, darglint and pydocstyle",
+        add_help=True,
+    )
     parser.add_argument(
         dest="filenames",
         metavar="filename",
