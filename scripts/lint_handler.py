@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-Script to help co-ordinate linters and their options
-"""
+"""Script to help co-ordinate linters and their options."""
 
 import os
 import argparse
@@ -13,11 +11,16 @@ from .script_tools import valid_command
 
 def fmt_heading(heading):
     """
-    Format a string as a heading, colouring it and
-    spacing it above and below with lines
+    Format a string as a heading.
 
-    :param heading: string to format
-    :returns: formatted string
+    Add colour to the provided string, then add coloured
+    lines above and below to help the heading stand out
+
+    Args:
+        heading (str): string to format
+
+    Returns:
+        formatted string containing the full heading
     """
     col01 = "\33[36;2m"
     col02 = "\33[36;1m"
@@ -27,18 +30,22 @@ def fmt_heading(heading):
     return f"{lines}\n{col02}{heading}...{reset}\n{lines}"
 
 
-def valid_file(path):
+def valid_file(path, exclusions):
     """
-    Checks if a filepath is one we care about
+    Check if a filepath is one we care about.
 
     Must be a .py file, must not be part of the exclusions list
 
-    :param path: path to the file
-    :returns: True if file is valid
+    Args:
+        path (str): path to the file
+        exclusions (str): prefix representing paths to discard
+
+    Returns:
+        True if file is valid
     """
     if any(
         [
-            path.startswith(SETTINGS["exclusions"]),
+            path.startswith(exclusions),
             os.path.splitext(path)[1] != ".py",
         ]
     ):
@@ -46,25 +53,30 @@ def valid_file(path):
     return True
 
 
-def find_files():
+def find_files(exclusions):
     """
-    Search current directory and subdirectories for files
+    Search current directory and subdirectories for files.
 
-    :returns: list of file paths for discovered files
+    Args:
+        exclusions (str): path prefix representing files to ignore
+
+    Returns:
+        list of file paths for discovered files
     """
     return [
         path
         for entry in os.walk("./")
         for filename in entry[2]
-        if valid_file((path := os.path.join(entry[0], filename)))
+        if valid_file((path := os.path.join(entry[0], filename)), exclusions)
     ]
 
 
 def process_args():
     """
-    Set up the ArgumentParser with the desired switches / parameters
+    Set up the ArgumentParser with the desired switches / parameters.
 
-    :returns Namespace: holds the results of parsing the script arguments
+    Returns:
+        Namespace holding the results of parsing the script arguments
     """
     parser = argparse.ArgumentParser(description="Linter script", add_help=True)
     parser.add_argument(
@@ -88,36 +100,75 @@ def process_args():
         help="allow black to write its changes back to file",
     )
     parser.add_argument(
+        "-d",
+        "--darglint",
+        dest="darglint",
+        action="store_true",
+        help="check docstrings for proper documentation of paramaters / return values",
+    )
+    parser.add_argument(
+        "-s",
+        "--docstrings",
+        dest="docstrings",
+        action="store_true",
+        help="check docstrings more stringently for appropriate formatting",
+    )
+    parser.add_argument(
         "-t",
         "--todo",
         dest="enable_todo",
         action="store_true",
-        help="enables checking for TODO entries",
+        help="check code for TODO entries",
     )
     return parser.parse_args()
 
 
-if __name__ == "__main__":
-    ARGS = process_args()
-    PYTHON = "py" if valid_command("py --version") else "python3"
-    SETTINGS = {
-        "exclusions": "-" if ARGS.all_files else "./tests/",
-        "black_opts": "--line-length 99"
-        if ARGS.black_write
-        else "--line-length 99 --diff --color",
-        "pylint_opts": "--enable=fixme" if ARGS.enable_todo else "",
+def process_settings(_args):
+    """
+    Transform arguments recieved from parser into options usable by the linting tools.
+
+    Args:
+        _args (Namespace): command line switches from argparser
+
+    Returns:
+        settings (dict): options dict
+    """
+    _settings = {
+        "exclusions": "./tests/",
+        "black_opts": "--line-length 99 --diff --color",
+        "flake_opts": "--extend-ignore=",
+        "pylint_opts": "",
     }
 
+    if _args.all_files:
+        _settings["exclusions"] = "-"
+    if _args.black_write:
+        _settings["black_opts"] = "--line-length 99"
+    if not _args.darglint:
+        _settings["flake_opts"] += ",DAR"
+    if not _args.docstrings:
+        _settings["flake_opts"] += ",D1,D2,D3,D4"
+    if _args.enable_todo:
+        _settings["pylint_opts"] = "--enable=fixme"
+
+    return _settings
+
+
+if __name__ == "__main__":
+    args = process_args()
+    PYTHON = "py" if valid_command("py --version") else "python3"
+    settings = process_settings(args)
+
     print(fmt_heading("Searching for .py files"))
-    FILES = ARGS.filenames or find_files()
-    for _file in FILES:
+    files = args.filenames or find_files(settings["exclusions"])
+    for _file in files:
         print(f"\33[30;1m{_file}\33[0m")
 
     print(fmt_heading("Running black"))
-    call([PYTHON, "-m", "black"] + SETTINGS["black_opts"].split() + FILES)
+    call([PYTHON, "-m", "black"] + settings["black_opts"].split() + files)
 
     print(fmt_heading("Running pylint"))
-    call([PYTHON, "-m", "pylint"] + SETTINGS["pylint_opts"].split() + FILES)
+    call([PYTHON, "-m", "pylint"] + settings["pylint_opts"].split() + files)
 
     print(fmt_heading("Running flake8"))
-    call([PYTHON, "-m", "flake8"] + FILES)
+    call([PYTHON, "-m", "flake8"] + settings["flake_opts"].split() + files)
