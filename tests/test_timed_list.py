@@ -1,8 +1,7 @@
-"""
-Tools for testing a TimedList.
+"""Tools for testing a TimedList.
 
 Classes:
-    TestTimedList: test how the list behaves over time
+    TestTimedList: Test how the list behaves over time.
 """
 # pylint: disable=missing-function-docstring
 import unittest
@@ -16,12 +15,12 @@ DATA = [1, 2, 3]
 
 
 class TestTimedList(unittest.TestCase):
-    """
-    Test how the list behaves over time.
+    """Test how the list behaves over time.
 
     Ensure that the list wipes its data after the correct
     time delay has elapsed.
     """
+
     def setUp(self):
         self.t_l = timed_list.TimedList(delay=DELAY)
         self.load_data()

@@ -1,5 +1,6 @@
 [flake8]
 max-line-length = 99
+max-doc-length = 79
 extend-select = E, F, W, C
 ignore = E203, E241, W503
 docstring-style = google
