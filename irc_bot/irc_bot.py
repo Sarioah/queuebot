@@ -1,6 +1,10 @@
+"""Wrap / reimplement an IRC client to suit Twitch' TMI.
+
+Classes:
+    IrcBot: IRC client, capable of responding automatically to various messages
+        in the channel.
 """
-Wraps / reimplements an IRC client
-"""
+
 from irc.bot import SingleServerIRCBot
 
 from tools.text import colourise as col
@@ -13,18 +17,26 @@ MSG_LIMIT = 499
 
 
 class IrcBot(SingleServerIRCBot):
-    """
-    IRC Client, accepts a MessageHandler that processes messages and
-    generates appropriate responses where necessary
-    """
+    """IRC Client class."""
 
     def __init__(self, username, password, channel, muted, message_handler, startup_msg, version):
-        """Create the bot. Password should be an 'oauth' token if using with Twitch' IRC api"""
+        """Create the bot.
+
+        Args:
+            username: Username for the bot to post messages as.
+            password: OAuth token for use with Twitch' TMI.
+            channel: Channel name to join, without the "twitch.tv/" in front.
+            muted: True if the bot should not speak.
+            message_handler: Class used to process messages.
+            startup_msg: True if the bot should announce its presence after it
+                has finished initialising.
+            version: Bot version number.
+        """
         self.channel = "#" + channel
         self.client = None
         self.joined = False
-        self.muted = bool(muted.casefold() == "true")
-        self.startup_msg = bool(startup_msg.casefold() == "true")
+        self.muted = muted.casefold() == "true"
+        self.startup_msg = startup_msg.casefold() == "true"
         self.message_handler = message_handler
         self.message_limit = MSG_LIMIT - len(channel)
         self.version = version
@@ -39,7 +51,14 @@ class IrcBot(SingleServerIRCBot):
             print(col("Bot is muted", "RED"))
 
     def on_welcome(self, client, _msg):
-        """Respond to a channel's welcome message with the client's capabilities"""
+        """Handle a channel's welcome message.
+
+        Respond with the client's capabilities.
+
+        Args:
+            client (irc.client.ServerConnection):
+                Connection instance for the bot to use when sending data.
+        """
         client.cap("REQ", ":twitch.tv/membership")
         client.cap("REQ", ":twitch.tv/tags")
         client.cap("REQ", ":twitch.tv/commands")
@@ -52,59 +71,91 @@ class IrcBot(SingleServerIRCBot):
             self.send_msg(f"Queuebot {self.version} started")
 
     def on_pubmsg(self, _client, msg):
-        """Respond to messages posted in the channel"""
+        """Respond to messages posted in the channel.
+
+        Args:
+            msg: Message string sent by the server.
+        """
         self.send_msg(self.message_handler(msg, "pubmsg"))
 
     def on_pubnotice(self, _client, msg):
-        """Respond to pubnotices in the channel"""
+        """Respond to pubnotices in the channel.
+
+        Args:
+            msg: Message string sent by the server.
+        """
         self.message_handler(msg, "pubnotice")
 
     def on_privnotice(self, _client, msg):
-        """Respond to privnotices in the channel"""
+        """Respond to privnotices in the channel.
+
+        Args:
+            msg: Message string sent by the server.
+        """
         self.message_handler(msg, "privnotice")
 
     def on_usernotice(self, _client, msg):
-        """Respond to usernotices in the channel"""
+        """Respond to usernotices in the channel.
+
+        Args:
+            msg: Message string sent by the server.
+        """
         self.message_handler(msg, "usernotice")
 
     def on_whisper(self, _client, msg):
-        """Respond to whispers to the user"""
+        """Respond to whispers to the user.
+
+        Args:
+            msg: Message string sent by the server.
+        """
         self.message_handler(msg, "whisper")
 
     def on_action(self, _client, msg):
-        """Respond to actions posted in the channel"""
+        """Respond to actions posted in the channel.
+
+        Args:
+            msg: Message string sent by the server.
+        """
         self.message_handler(msg, "action")
 
     def on_join(self, _client, _msg):
-        """Additional behaviour called when joining the channel"""
+        """Additional behaviour called when joining the channel."""
 
     def on_leave(self, _client, _msg):
-        """Additional behaviour called when parting from a channel"""
+        """Additional behaviour called when parting from a channel."""
 
     def on_error(self, _client, _msg):
-        """Handle error sent from the server"""
+        """Handle errors sent from the server."""
         print(col("Error", "RED"))
 
     def on_disconnect(self, _client, _msg):
-        """Additional behaviour called on server disconnect"""
+        """Additional behaviour called on server disconnect."""
         self.joined = False
         print(col("Disconnect...", "RED"))
 
     def connected(self):
-        """Return whether the bot is connected to its server"""
+        """Return whether the bot is connected to its server.
+
+        Returns:
+            True if bot is connected to its server
+        """
         return self.connection.is_connected()
 
     def start_bot(self):
-        """Connect the bot to its server"""
+        """Connect the bot to its server."""
         print(col("Bot starting...", "GREY"))
         self._connect()
 
     def poll(self):
-        """Handle any events the reactor has queued up since the last poll"""
+        """Handle any events the reactor has queued up since the last poll."""
         self.reactor.process_once()
 
     def send_msg(self, msg):
-        """Post a message to the connected channel"""
+        """Post a message to the connected channel.
+
+        Args:
+            msg: Message string that the bot should send to the server.
+        """
         msg, _ = trim_bytes(msg, self.message_limit)
 
         if msg:

@@ -1,10 +1,10 @@
 """
-Tools for handling events produced by an IRC bot
+Tools for handling events produced by an IRC bot.
 
 Classes:
-    HandleEvent: given a message, message type and callback,
-    process the message using the callback then format the response
-    appropriately
+    HandleEvent: Given a message, message type and callback,
+        process the message using the callback then format the response
+        appropriately.
 """
 # TODO: Refactor, creating with the message then calling with
 # the message type / callback is just silly
@@ -16,13 +16,17 @@ from tools.config import BadOAuth
 
 
 class HandleEvent:
-    """
-    Hold the message itself, then call with the type and callback, returning the response
+    """Process an IRC event.
+
+    Hold the message itself, then call with the type and callback, returning
+    the response.
     """
 
     def __init__(self, msg):
-        """
-        Create the event with the message
+        """Create the event with the message.
+
+        Args:
+            msg: Msg object received from IRC.
         """
         self.msg = msg["msg"]
         self.words = msg["words"]
@@ -32,8 +36,17 @@ class HandleEvent:
         self.prefix = col(prefix, "GREY")
 
     def __call__(self, msg_type, callback):
-        """
-        Call the approriate method based on the message type
+        """Call the approriate method based on the message type.
+
+        Args:
+            msg_type: String representing the type of message this is, and thus
+                what type of handler to invoke.
+            callback: Function that should be called once the response message
+                has been formatted. Msg_types that only print to console don't
+                typically use this.
+
+        Returns:
+            action: method used to process and respond to the message
         """
         try:
             action = getattr(self, "on_" + msg_type)
@@ -43,8 +56,13 @@ class HandleEvent:
             return action(callback)
 
     def on_pubmsg(self, callback):
-        """
-        Used for most user-based messages
+        """Process most user-based messages.
+
+        Args:
+            callback: Function used to process the formatted message.
+
+        Returns:
+            Result of the callback function
         """
         print(
             self.prefix
@@ -55,22 +73,38 @@ class HandleEvent:
         return callback(self.msg, self.words, self.tags)
 
     def on_action(self, *_args):
-        """
-        Used for /me actions
+        """Process /me actions.
+
+        Args:
+            _args: Ignore extra positional arguments.
         """
         print(self.prefix + col(f"{self.tags['display-name']}: {self.msg}", "CYAN"))
 
     def on_pubnotice(self, *_args):
         """
-        Used for user - focused system messages, including:
+        Process user - focused system messages.
+
+        On Twitch this includes:
             - hosts, hosts going offline
-            - non-fatal error messages like messages sent too fast, suspended channels
+            - non-fatal error messages like messages sent too fast, suspended
+              channels
+
+        Args:
+            _args: Ignore extra positional arguments.
         """
         print(self.prefix + col(self.msg, "GREY"))
 
     def on_privnotice(self, *_args):
         """
-        Used for fatal error messages, usually for improper client configuration
+        Process fatal error messages.
+
+        Usually sent in response to improper client configuration.
+
+        Args:
+            _args: Ignore extra positional arguments.
+
+        Raises:
+            BadOAuth: Raise exception if the server rejects our configuration.
         """
         if self.msg in (
             "Improperly formatted auth",
@@ -81,10 +115,15 @@ class HandleEvent:
 
     def on_usernotice(self, *_args):
         """
-        Used for general system anouncements, including:
+        Process general system anouncements.
+
+        On Twitch this includes:
             - subs
             - /announcements
             - raids
+
+        Args:
+            _args: Ignore extra positional arguments.
         """
         if self.tags.get("system-msg"):
             res = col(self.tags["system-msg"], "GREY")
@@ -93,7 +132,9 @@ class HandleEvent:
         print(self.prefix + res + f" - {self.msg or '<no msg>'}")
 
     def on_whisper(self, *_args):
-        """
-        Used for whispers
+        """Process whispers.
+
+        Args:
+            _args: Ignore extra positional arguments.
         """
         print(self.prefix + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))

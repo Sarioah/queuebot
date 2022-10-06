@@ -8,10 +8,10 @@ def valid_command(command):
     Check if a command runs in the shell without error or timeout.
 
     Args:
-        command (str): command to attempt running
+        command (str): Command to attempt running.
 
     Returns:
-        True if command ran without issue
+        True if command ran without issue.
     """
     try:
         check_output(command, shell=True, stderr=STDOUT, timeout=0.1)

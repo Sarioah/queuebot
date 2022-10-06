@@ -1,14 +1,13 @@
-"""
-Provide classes to run a chat bot in a background thread
+"""Provide classes to run a chat bot in a background thread.
 
 This might be preferable to running the bot directly in the case where
 the program wants to use the foreground thread for other tasks.
 
 Classes:
-    BackgroundBot - The bot itself
+    BackgroundBot: The bot itself.
 
 Functions:
-    bgtask - Starts a bot thread, then returns the thread itself
+    background_task: Start a bot thread, then return the thread handle.
 """
 
 import time
@@ -19,8 +18,7 @@ from tools.text import colourise as col
 
 
 class BackgroundBot:
-    """
-    Create a bot that runs in the background
+    """Create a bot that runs in the background.
 
     Contains:
         - an IRC chat bot
@@ -31,9 +29,10 @@ class BackgroundBot:
     """
 
     def __init__(self, bot):
-        """
-        Create the bot and retain information about the bot's operation
-        'bot' expects an IRC bot implementing .poll, .reconnect etc.
+        """Create the bot and retain information about the bot's operation.
+
+        Args:
+            bot: Expects an IRC bot implementing .poll, .reconnect etc.
         """
         self.running = True
         self.connect_delay = 1
@@ -44,11 +43,14 @@ class BackgroundBot:
         self.thread = background_task(self)
 
     def run(self, exception_queue):
-        """
-        Monitor the bot's state, passing commands in
+        """Monitor the bot's state, passing it commands to execute.
 
         Catch exceptions if they reach this level, passing them back
-        out through the exception queue
+        out through the exception queue.
+
+        Args:
+            exception_queue: Threadsafe Queue object to pass Exceptions into,
+                for further processing 'upstream'.
         """
 
         def _do_work():
@@ -73,34 +75,33 @@ class BackgroundBot:
             exception_queue.put(exc)
 
     def mute(self):
-        """Mute the inner bot"""
+        """Mute the inner bot."""
         self.bot.muted = True
 
     def unmute(self):
-        """Unmute the inner bot"""
+        """Unmute the inner bot."""
         self.bot.muted = False
 
     def start(self):
-        """Start the inner bot"""
+        """Start the inner bot."""
         self.send_command("_connect")
 
     def stop(self):
-        """Stop the inner bot"""
+        """Stop the inner bot."""
         self.send_command("disconnect")
 
     def quit(self):
-        """Destroy the inner bot"""
+        """Destroy the inner bot."""
         with self.lock:
             self.running = False
         self.send_command("die")
 
     def reconnect(self):
-        """
-        Attempt to reconnect the inner bot to its server
+        """Attempt to reconnect the inner bot to its server.
 
         Wait progressively longer between reconnection attempts
         to avoid the bot spamming its server in the event a fault takes
-        a long time to resolve
+        a long time to resolve.
         """
         while not self.bot.connected():
             print(col("Bot is attempting reconnection...", "GREY"))
@@ -110,11 +111,20 @@ class BackgroundBot:
         self.connect_delay = 1
 
     def say(self, msg):
-        """Send a msg through the inner bot to its server"""
+        """Send a msg through the inner bot to its server.
+
+        Args:
+            msg: Message string to send.
+        """
         self.send_command("send_msg", msg)
 
     def send_command(self, command, *args):
-        """Send an arbitrary command through to the inner bot"""
+        """Send an arbitrary command through to the inner bot.
+
+        Args:
+            command: Command string to send.
+            args: Parameters given to the command.
+        """
         while self.command:
             time.sleep(0.05)
         with self.lock:
@@ -122,9 +132,13 @@ class BackgroundBot:
 
 
 def background_task(background_bot):
-    """
-    Create a BackgroundBot on a different thread then
-    return that thread
+    """Create a BackgroundBot on a different thread.
+
+    Args:
+        background_bot: Bot object to run in the other thread.
+
+    Returns:
+        bot_thread: Handle of the new thread to control the bot with.
     """
     bot_thread = Thread(target=background_bot.run, args=(background_bot.exception_queue,))
     bot_thread.start()
