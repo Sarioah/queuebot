@@ -14,13 +14,13 @@ def fmt_heading(heading):
     Format a string as a heading.
 
     Add colour to the provided string, then add coloured
-    lines above and below to help the heading stand out
+    lines above and below to help the heading stand out.
 
     Args:
-        heading (str): string to format
+        heading (str): String to format.
 
     Returns:
-        formatted string containing the full heading
+        Formatted string containing the full heading.
     """
     col01 = "\33[36;2m"
     col02 = "\33[36;1m"
@@ -34,14 +34,14 @@ def valid_file(path, exclusions):
     """
     Check if a filepath is one we care about.
 
-    Must be a .py file, must not be part of the exclusions list
+    Must be a .py file, must not be part of the exclusions list.
 
     Args:
-        path (str): path to the file
-        exclusions (str): prefix representing paths to discard
+        path (str): Path to the file.
+        exclusions (str): Prefix representing paths to discard.
 
     Returns:
-        True if file is valid
+        True if file is valid.
     """
     if any(
         [
@@ -58,10 +58,10 @@ def find_files(exclusions):
     Search current directory and subdirectories for files.
 
     Args:
-        exclusions (str): path prefix representing files to ignore
+        exclusions (str): Path prefix representing files to ignore.
 
     Returns:
-        list of file paths for discovered files
+        List of file paths for discovered files.
     """
     return [
         path
@@ -76,7 +76,7 @@ def process_args():
     Set up the ArgumentParser with the desired switches / parameters.
 
     Returns:
-        Namespace holding the results of parsing the script arguments
+        Namespace holding the results of parsing the script arguments.
     """
     parser = argparse.ArgumentParser(
         description="Linter script combining black, pylint, flake8, darglint and pydocstyle",
@@ -128,13 +128,13 @@ def process_args():
 
 def process_settings(_args):
     """
-    Transform arguments recieved from parser into options usable by the linting tools.
+    Transform parser arguments into options usable by the linter tools.
 
     Args:
-        _args (Namespace): command line switches from argparser
+        _args (Namespace): Command line switches from argparser.
 
     Returns:
-        settings (dict): options dict
+        settings (dict): Options dictionary.
     """
     _settings = {
         "exclusions": "./tests/",
