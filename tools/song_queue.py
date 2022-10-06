@@ -79,7 +79,7 @@ class BaseMethods:
         except AttributeError:
             return "Please specify a username"
         except ValueError:
-            return f"{user} is not in the queue"
+            return f'"{user}" is not in the queue'
         else:
             return f"Removed {user} from the queue"
 
@@ -289,7 +289,7 @@ class JDMethods(BaseMethods):
                     f'{user}\'s song is "{trunc(song, SINGLE_SONG_LENGTH)}", '
                     f'at position {index + 1}"'
                 )
-        return f"{search} is not in the queue"
+        return f'"{search}" is not in the queue'
 
 
 class JBMethods(BaseMethods):
