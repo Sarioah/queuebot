@@ -106,10 +106,10 @@ class IrcBot(SingleServerIRCBot):
     def send_msg(self, msg):
         """Post a message to the connected channel"""
         msg, _ = trim_bytes(msg, self.message_limit)
-        while msg.startswith(("!", ".", "/", "\\")):
-            msg = msg[1:]
 
         if msg:
+            while msg.startswith(("!", ".", "/", "\\")):
+                msg = msg[1:]
             colour = "RED" if self.muted else "YELLOW"
             print(col(msg, colour))
             if self.joined and not self.muted:
