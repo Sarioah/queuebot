@@ -19,3 +19,7 @@ def update_version():
     output += f'\nVERSION = "{version}"\n'
     with open("./tools/version.py", "w", encoding="utf-8") as _fd:
         _fd.write(output)
+
+
+if __name__ == "__main__":
+    update_version()
