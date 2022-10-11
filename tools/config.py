@@ -4,7 +4,7 @@ Tools to handle configuration of the bot
 Includes classes for password and configuration objects that work across unix or windows systems
 """
 
-import os
+import sys
 import json
 from urllib.request import urlopen
 from configparser import ConfigParser, ParsingError
@@ -15,14 +15,17 @@ import keyring
 from tools.text import colourise as col
 
 # pylint: disable=ungrouped-imports
-if os.name == "nt":
+if sys.platform == "win32":
     import keyring.backends.Windows
-
     keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
-else:
+elif sys.platform == "linux":
+    # will grab secrets from ssh-agent:
+    # . <(ssh-agent)
+    # ssh-add
     import sagecipher.keyring
-
     keyring.set_keyring(sagecipher.keyring.Keyring())
+else: # probably macOS
+    import keyring
 # pylint: enable=ungrouped-imports
 
 
