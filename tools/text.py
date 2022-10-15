@@ -1,30 +1,47 @@
-"""
-Tools for formatting / manipulating text
+"""Tools for formatting / manipulating text.
 
 Classes:
-    Paginate: Takes a string and returns a list of strings split to the specified
-              length. Optionally attempts to cut a the specified separator where possible
+    Paginate: Takes a string and returns a list of strings split to the
+        specified length. Optionally attempts to cut at the specified separator
+        where possible.
 
 Functions:
-    trim_bytes: Takes a string and splits it to the specified number of bytes.
-    colourise: Takes a string and a colour, returns the string with ANSI colour codes around it
+    trim_bytes: Take a string and splits it to the specified number of bytes.
+    colourise: Take a string and a colour, returns the string with ANSI colour
+        codes around it.
 """
 
 
 class Paginate:
-    """
-    Hold a long string and break it up into more manageable pages.
+    """Hold a long string and break it up into more manageable pages.
 
-    Supports indexing to return the given page number, or iterating through all pages
+    Supports indexing to return the given page number,
+    or iterating through all pages.
     """
 
     def __init__(self, data, length, sep=""):
+        """Create the Paginate.
+
+        Args:
+            data: Input string that may need to be broken up.
+            length: Maximum page length in bytes.
+            sep: Optional separator string. When breaking data into pages, we
+                will attempt to break near where these strings appear.
+        """
         self.sep = bytes(sep, encoding="utf-8")
         self.max_length = length - 15
         bytes_ = self.process(bytes(data, encoding="utf-8"))
         self.data = [str(page, encoding="utf-8") for page in bytes_]
 
     def __getitem__(self, page_num=0):
+        """Redirect subscript accesses to the paginated data.
+
+        Args:
+            page_num: Page of data to request, starts at 1.
+
+        Returns:
+            String of data contained in the requested page.
+        """
         try:
             res = self.data[int(page_num) - 1]
         except Exception:
@@ -32,27 +49,38 @@ class Paginate:
         return res + self.suffix(page_num)
 
     def __str__(self):
+        """Return the first page of data, formatted as string."""
         return self.data[0] + self.suffix(1)
 
     def __iter__(self):
+        """Iterate over the data pages."""
         for i, page in enumerate(self.data):
             yield page + self.suffix(i + 1)
 
     def suffix(self, page_num):
-        """Return a page counter suffix if self contains more than a single page of data"""
+        """Return a page counter suffix, e.g. "(page 1/6)".
+
+        Ignored if self contains less than a single page of data.
+
+        Args:
+            page_num: Which page of data to request.
+
+        Returns:
+            Formatted suffix if there are multiple pages, otherwise empty
+            string.
+        """
         if len(self.data) > 1:
             return f" (page {page_num}/{len(self.data)})"
         return ""
 
     def process(self, data):
-        """
-        Process the given data into groupings of bytes
+        """Process the given data into groupings of bytes.
 
-        Arguments:
-            data: String of bytes
+        Args:
+            data: String of bytes.
 
         Returns:
-            List of strings of bytes
+            List of strings of bytes.
         """
         if len(data) <= self.max_length:
             return [data]
@@ -77,10 +105,9 @@ class Paginate:
 
 
 def trim_bytes(msg="", length=0):
-    """
-    Trim a string to the specified number of bytes
+    """Trim a string to the specified number of bytes.
 
-    Arguments:
+    Args:
         msg: Input string
         length: Length to trim the input string to
 
@@ -100,15 +127,17 @@ def trim_bytes(msg="", length=0):
 
 
 def colourise(string, colour):
-    """
-    Take a string and surround it with ANSI colour formatting codes
+    """Take a string and surround it with ANSI colour formatting codes.
 
-    Arguments:
-        string: Input string
-        colour: Colour to format the input string with
+    Args:
+        string: Input string.
+        colour: Colour to format the input string with.
 
     Returns:
-        Formatted version of the input string
+        Formatted version of the input string.
+
+    Raises:
+        KeyError: If an invalid colour is specified.
     """
     colours = {
         "WHITE": "\033[0m",

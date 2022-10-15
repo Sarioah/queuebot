@@ -1,20 +1,22 @@
-"""
-Tools for dealing with chat based commands, text manipulation and output formatting
-"""
+"""Tools for chat based commands, text manipulation and output formatting."""
 import time
 
 from tools.text import colourise as col
 
 
 class Commands:
-    """Object holding generic commands that aren't bound methods elsewhere"""
+    """Object holding generic commands that aren't bound methods elsewhere."""
 
     def __init__(self, parent):
-        """Creates a Commands object"""
+        """Create a Commands object.
+
+        Args:
+            parent: Namespace to search through for additional commands.
+        """
         self.parent = parent
 
     def help(self, *_args):
-        """Lists available chat commands"""
+        """List available chat commands."""
         everyone = [k for k in self.parent.commands if self.parent.commands[k][0] == "e"]
         mods = [k for k in self.parent.commands if self.parent.commands[k][0] == "m"]
         return (
@@ -23,7 +25,7 @@ class Commands:
         )
 
     def listaliases(self, *_args):
-        """Lists available command aliases"""
+        """List available command aliases."""
         # TODO: Need to guard this and help against IRC msg limit
 
         return "Aliases: " + " • ".join(
@@ -33,12 +35,10 @@ class Commands:
 
 
 class CommandHandler:
-    """
-    Maps commands found in a chat message to methods attached to bot objects like a SongQueue
-    """
+    """Maps chat commands to methods bound to objects like a SongQueue."""
 
     def __init__(self):
-        """Creates a CommandHandler object"""
+        """Create a CommandHandler object."""
         self.mthds = Commands(self)
         self.commands = {
             "sr": ("e", "addentry", 0),
@@ -77,16 +77,32 @@ class CommandHandler:
         }
 
     def __getitem__(self, attr):
-        """Searches for a method maching the given request"""
+        """Search for a method maching the specified attribute name."""
         return getattr(self.mthds, attr, None)
 
     def check_aliases(self, command):
-        """Check if a chat command matches an alias of a known method"""
+        """Check if a chat command matches an alias of a known method.
+
+        Args:
+            command: Name of command to find alias' for.
+
+        Returns:
+            Command that matches the given alias, otherwise returns the
+                original search term.
+        """
         res = [key for key, value in self.aliases.items() if command in value]
         return res[0] if res else command
 
     def check_cooldowns(self, command):
-        """Check that a chat command is waiting for a cooldown to expire"""
+        """Check that a chat command is waiting for a cooldown to expire.
+
+        Args:
+            command: Command name to check.
+
+        Returns:
+            True if command's cooldown has already expired, otherwise prints a
+                message and returns False.
+        """
         current = time.time()
         timeleft = current - self.cooldowns.get(command[1], 0) - command[2]
         if timeleft >= 0:
@@ -96,12 +112,22 @@ class CommandHandler:
         return False
 
     def find_command(self, badges, request, *alternatives):
-        """
-        Attempts to find methods matching the commands dict
+        """Attempt to find a method present in the commands dictionary.
 
-        If the command is a moderator command, check that the badges
-        contain an appropriate moderator - level badge
+        If the command is a moderator command, check that the badges contain an
+        appropriate moderator - level badge.
+
+        Args:
+            badges: List of strings representing chat badges owned by the
+                chatter who sent the command.
+            request: Name of command to search for.
+            alternatives: Extra objects to look through for commands.
+
+        Returns:
+            Command name if command found, not on a cooldown and the chatter is
+            eligible to use it.
         """
+        # TODO: Revisit this again, as well as the convoluted Event class
         request = self.check_aliases(request.casefold())
         command = self.commands.get(request, None)
         if command and self.check_cooldowns(command):
@@ -116,7 +142,15 @@ class CommandHandler:
 
 
 def format_badges(tags):
-    """Checks a tags dict for roles and outputs coloured markers if found"""
+    """Check a tags dict for roles and outputs coloured markers if found.
+
+    Args:
+        tags: Dict containing metadata of a chat message.
+
+    Returns:
+        String formatted with coloured letters representing roles found in the
+        message tags.
+    """
     # TODO: roles as dict maybe, probably a comprehension to generate the
     # coloured suffix
     badges = tags["badges"]
@@ -134,7 +168,16 @@ def format_badges(tags):
 
 
 def role_check(badges, *roles):
-    """Processes a badges string for the given roles"""
+    """Process a badges string for the given roles.
+
+    Args:
+        badges: List of strings representing chat badges on a chat messsage.
+        roles: Roles to check for in the chat badges.
+
+    Returns:
+        True if at least one of the roles were found in the chat badges. If
+        roles tuple was empty, returns True if moderator level badges found.
+    """
     if not roles:
         roles = ["moderator", "broadcaster"]
     try:

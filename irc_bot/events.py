@@ -73,16 +73,11 @@ class HandleEvent:
         return callback(self.msg, self.words, self.tags)
 
     def on_action(self, *_args):
-        """Process /me actions.
-
-        Args:
-            _args: Ignore extra positional arguments.
-        """
+        """Process /me actions."""
         print(self.prefix + col(f"{self.tags['display-name']}: {self.msg}", "CYAN"))
 
     def on_pubnotice(self, *_args):
-        """
-        Process user - focused system messages.
+        """Process user - focused system messages.
 
         On Twitch this includes:
             - hosts, hosts going offline
@@ -90,18 +85,17 @@ class HandleEvent:
               channels
 
         Args:
-            _args: Ignore extra positional arguments.
+            _args: Ignore extra positional args.
         """
         print(self.prefix + col(self.msg, "GREY"))
 
     def on_privnotice(self, *_args):
-        """
-        Process fatal error messages.
+        """Process fatal error messages.
 
         Usually sent in response to improper client configuration.
 
         Args:
-            _args: Ignore extra positional arguments.
+            _args: Ignore extra positional args.
 
         Raises:
             BadOAuth: Raise exception if the server rejects our configuration.
@@ -114,8 +108,7 @@ class HandleEvent:
         print(self.prefix + col(self.msg, "GREY"))
 
     def on_usernotice(self, *_args):
-        """
-        Process general system anouncements.
+        """Process general system anouncements.
 
         On Twitch this includes:
             - subs
@@ -123,7 +116,7 @@ class HandleEvent:
             - raids
 
         Args:
-            _args: Ignore extra positional arguments.
+            _args: Ignore extra positional args.
         """
         if self.tags.get("system-msg"):
             res = col(self.tags["system-msg"], "GREY")
@@ -135,6 +128,6 @@ class HandleEvent:
         """Process whispers.
 
         Args:
-            _args: Ignore extra positional arguments.
+            _args: Ignore extra positional args.
         """
         print(self.prefix + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))

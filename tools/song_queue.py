@@ -1,6 +1,5 @@
 #!/usr/bin/python3
-"""
-Tools for managing a random or prioritised request queue
+"""Tools for managing a random or prioritised request queue.
 
 In Just Dance mode, the queue holds song choices, and picks users at random
 (prioritising users who haven't been picked before)
@@ -9,7 +8,8 @@ prioritising users who haven't been picked before)
 
 Classes:
     BaseMethods: Class containing methods to manipulate all types of queues
-    JDMethods: Class containing methods to manipulate Just Dance / random queues
+    JDMethods: Class containing methods to manipulate Just Dance / random
+        queues.
     JBMethods: Class containing methods to manipulate Jackbox / priority queues
     SongQueue: Class containing users / requests
 
@@ -34,34 +34,41 @@ MULTI_SONG_LENGTH = 50  # (for lists)
 
 
 class BaseMethods:
-    """Contain methods common to all types of queues"""
+    """Methods common to all types of queues."""
 
     def __init__(self, parent):
+        """Initialise object.
+
+        Args:
+            parent: Parent object containing the data most of these methods
+                operate on.
+        """
         self.parent = parent
 
     def __getitem__(self, key):
+        """Return method that matches the given key."""
         return getattr(self, key, None)
 
     def close(self, *_args):
-        """Close the queue, disallowing further entries"""
+        """Close the queue, disallowing further entries."""
         self.parent.isopen = False
         return "Queue is now closed"
 
     def clear(self, *_args):
-        """Remove all entries from the queue"""
+        """Remove all entries from the queue."""
         self.parent.current = {}
         self.parent.entries, self.parent.picked = TupleList(), TupleList()
         return "Queue has been cleared"
 
     def leave(self, sender, /, *_args):
-        """Remove the sender's request from the queue"""
+        """Remove the sender's request from the queue."""
         if sender in self.parent:
             del self.parent.entries[sender]
             return f"{sender}, you have left the queue"
         return f"{sender}, you weren't in the queue"
 
     def listusers(self, _, page=1, /, *_args):
-        """List all users who have a request in the queue"""
+        """List all users who have a request in the queue."""
         if not self.parent.entries:
             return "Queue is empty"
         msg = "List of users in the queue: "
@@ -70,7 +77,7 @@ class BaseMethods:
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def removeuser(self, _, user="", /, *_args):
-        """Remove the specified user from the queue"""
+        """Remove the specified user from the queue."""
         try:
             if user:
                 del self.parent.entries[user]
@@ -84,7 +91,16 @@ class BaseMethods:
             return f"Removed {user} from the queue"
 
     def queueconfirm(self, *_args):
-        """Confirm a prior "testqueue" command, then add the loaded data into the queue"""
+        """Confirm a prior "testqueue" command.
+
+        Adds the loaded data into the queue.
+
+        Args:
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string if data was loaded sucessfully, otherwise None.
+        """
         try:
             if time.time() - self.parent.testdata[1] < 10:
                 self.parent.entries = TupleList(*self.parent.testdata[0])
@@ -96,8 +112,10 @@ class BaseMethods:
         return None
 
     def testqueue(self, *_args):
-        """
-        Load testing data from "testdata.json", ready to be added with "queueconfirm"
+        """Load testing data from "testdata.json".
+
+        Queue remains untouched until the load is confirmed with
+        "queueconfirm".
 
         Example file contents:
         [
@@ -110,6 +128,12 @@ class BaseMethods:
                 "Test user 2's request"
             ]
         ]
+
+        Args:
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with result of the load operation.
         """
         if path.exists("testdata.json"):
             try:
@@ -128,24 +152,24 @@ class BaseMethods:
 
 
 class JDMethods(BaseMethods):
-    """Contain methods used to manipulate Just Dance / random queues"""
+    """Methods used to manipulate Just Dance / random queues."""
 
     def jbqueue(self, *_args):
-        """Change queue into Jackbox / priority mode"""
+        """Change queue into Jackbox / priority mode."""
         self.parent.mthds = JBMethods(self.parent)
         return "Queue is now in jackbox mode"
 
     def jdqueue(self, *_args):
-        """Change queue into Just Dance / random mode"""
+        """Change queue into Just Dance / random mode."""
         return "Queue is already in Just Dance mode"
 
     def open(self, *_args):
-        """Open the queue, allowing new entries to be added"""
+        """Open the queue, allowing new entries to be added."""
         self.parent.isopen = True
         return "Random queue is now open"
 
     def currententry(self, *_args):
-        """List the last entry that was picked"""
+        """List the last entry that was picked."""
         if self.parent.current:
             return (
                 f"Current song is \"{trunc(self.parent.current['entry'], SINGLE_SONG_LENGTH)}"
@@ -154,10 +178,21 @@ class JDMethods(BaseMethods):
         return "Nothing's been played yet"
 
     def addentry(self, sender, entry, emote_indices, /, *_args):
-        """
-        Add the sender's entry to the queue
+        """Add the sender's entry to the queue.
 
-        Blank entries not allowed in this mode
+        Blank entries not allowed in this mode. If the sender already had an
+        entry in the queue, then change their entry to the new one.
+
+        Args:
+            sender: Username that sent the command.
+            entry: Username's entry to add to the queue.
+            emote_indices: List of 2-tuples representing where in the entry any
+                emotes appear. Used to decide if a space needs to be added
+                before or after the entry.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with result of add / change operation.
         """
         if not self.parent:
             return f"Sorry {sender}, the queue is closed"
@@ -181,7 +216,7 @@ class JDMethods(BaseMethods):
         return f'Added "{trunc(entry, SINGLE_SONG_LENGTH)}" to the queue for {sender}'
 
     def removeentry(self, _, index, /, *_args):
-        """Remove the sender's entry from the queue"""
+        """Remove the sender's entry from the queue."""
         try:
             _user, entry = self.parent.entries.pop(int(index) - 1)
         except ValueError:
@@ -192,11 +227,17 @@ class JDMethods(BaseMethods):
             return f'Removed "{trunc(entry, SINGLE_SONG_LENGTH)}" from the queue'
 
     def status(self, sender, /, *_args):
-        """
-        List the status of the queue
+        """List the status of the queue.
 
         Shows whether the queue is open / closed, how many requests there are,
-        as well as the sender's current request (if applicable)
+        as well as the sender's current request (if applicable).
+
+        Args:
+            sender: Username that sent the command.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with the status of the queue.
         """
         msg = f"Random queue is {'open' if self.parent else 'closed'}"
 
@@ -213,7 +254,7 @@ class JDMethods(BaseMethods):
         return msg
 
     def listentries(self, _, page=1, /, *_args):
-        """List all entries currently in the queue"""
+        """List all entries currently in the queue."""
         if not self.parent.entries:
             return "Queue is empty"
         msg = "List of songs in the queue: "
@@ -222,7 +263,7 @@ class JDMethods(BaseMethods):
         return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
     def picked(self, _, page=1, /, *_args):
-        """List all entries that have been picked so far"""
+        """List all entries that have been picked so far."""
         if not self.parent.picked:
             return "Nothing's been played yet"
         msg = "Songs already played: "
@@ -231,13 +272,20 @@ class JDMethods(BaseMethods):
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection=0, /, *_args):
-        """
-        Pick an entry from the queue
+        """Pick an entry from the queue.
 
-        If a number is specified, pick that entry directly
+        If a number is specified, pick that entry directly. If no entry is
+        specified, pick an entry at random. Entries from users not in the
+        picked list are chosen first.
 
-        If no entry is specified, pick an entry at random. Entries from users not in the
-        picked list are chosen first
+        Args:
+            selection: Specified entry number to pick. If omitted, pick one
+                randomly.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with the user and their song if picked, otherwise a
+            message describing any issues with the specified selection.
         """
         try:
             if selection:
@@ -260,12 +308,15 @@ class JDMethods(BaseMethods):
             )
 
     def lookupentry(self, _, search="", /, *_args):
-        """
-        Search queue for the given song
+        """Search queue for the given song.
 
-        :param search: search string to look for
-        :returns: string containing the first username whose song contains
-            the search string
+        Args:
+            search: Search string to look for.
+            _args: Ignore extra positional args.
+
+        Returns:
+            String containing the first username whose song contains the search
+            string.
         """
         for index, (user, song) in enumerate(self.parent):
             if song.casefold().find(search) != -1:
@@ -276,11 +327,14 @@ class JDMethods(BaseMethods):
         return f'Song "{search}" not found in the queue'
 
     def lookupuser(self, _, search="", /, *_args):
-        """
-        Search queue for the given user
+        """Search queue for the given user.
 
-        :param search: user to look for
-        :returns: string containing the user's song, if found in the queue
+        Args:
+            search: User to look for.
+            _args: Ignore extra positional args.
+
+        Returns:
+            String containing the user's song, if found in the queue.
         """
         search = search.replace("@", "")
         for index, (user, song) in enumerate(self.parent):
@@ -293,26 +347,33 @@ class JDMethods(BaseMethods):
 
 
 class JBMethods(BaseMethods):
-    """Contains methods used to manipulate Jackbox / priority queues"""
+    """Methods used to manipulate Jackbox / priority queues."""
 
     def jbqueue(self, *_args):
-        """Change queue to Jackbox / priority mode"""
+        """Change queue to Jackbox / priority mode."""
         return "Queue is already in Jackbox mode"
 
     def jdqueue(self, *_args):
-        """Change queue to Just Dance / random mode"""
+        """Change queue to Just Dance / random mode."""
         self.parent.mthds = JDMethods(self.parent)
         return "Queue changed to Just Dance mode"
 
     def open(self, *_args):
-        """Open the queue, allowing new entries to be added"""
+        """Open the queue, allowing new entries to be added."""
         self.parent.isopen = True
         return "Priority queue is now open"
 
     def currententry(self, _, page=1, /, *_args):
-        """
-        Lists the users picked for the current party
-        List expires after ten minutes
+        """List the users picked for the current party.
+
+        List expires after ten minutes.
+
+        Args:
+            page: Page number of output to return.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with the current party, if it exists.
         """
         if self.parent.currentusers:
             res = "Currently picked users: " + " • ".join(
@@ -322,12 +383,18 @@ class JBMethods(BaseMethods):
         return "No-one's been picked yet"
 
     def addentry(self, sender, /, *_args):
-        """
-        Add the sender to the queue
+        """Add the sender to the queue.
 
-        if the sender has already been picked, insert their entry after any new users
+        if the sender has already been picked, insert their entry after any new
+        users. The request itself is set to the sender's name.
 
-        The request itself is set to the sender's name
+        Args:
+            sender: Username that sent the command.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with result of the add. Specifies the sender's
+            current position in the queue.
         """
         if not self.parent:
             return f"Sorry {sender}, the queue is closed"
@@ -346,7 +413,7 @@ class JBMethods(BaseMethods):
         return msg
 
     def removeentry(self, _, index, /, *_args):
-        """Remove the sender from the queue"""
+        """Remove the user at the specified position from the queue."""
         try:
             user, _entry = self.parent.entries.pop(int(index) - 1)
         except ValueError:
@@ -357,10 +424,17 @@ class JBMethods(BaseMethods):
             return f"Removed {user} from the queue"
 
     def status(self, sender="", /, *_args):
-        """
-        List the status of the queue
-        Shows whether the queue is open / closed, how many users there are,
-        as well as the sender's current position in the queue
+        """List the status of the queue.
+
+        Shows whether the queue is open / closed, how many users there are, as
+        well as the sender's current position in the queue.
+
+        Args:
+            sender: Username that sent the command.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with the status of the queue.
         """
         msg = f"Priority queue is {'open' if self.parent else 'closed'}"
 
@@ -378,7 +452,7 @@ class JBMethods(BaseMethods):
         return msg
 
     def listentries(self, _, page=1, /, *_args):
-        """List all users currently in the queue"""
+        """List all users currently in the queue."""
         if not self.parent.entries:
             return "Queue is empty"
         msg = "List of users in the queue: "
@@ -387,7 +461,7 @@ class JBMethods(BaseMethods):
         return Paginate(msg[:-3], self.parent.msg_limit, " • ")[page]
 
     def picked(self, _, page=1, /, *_args):
-        """List all users that have been picked so far"""
+        """List all users that have been picked so far."""
         if not self.parent.picked:
             return "No-one's been picked yet"
         msg = "Users already picked: "
@@ -396,12 +470,19 @@ class JBMethods(BaseMethods):
         return Paginate(msg[:-2], self.parent.msg_limit, ", ")[page]
 
     def pickentry(self, _, selection=0, /, *_args):
-        """
-        Pick a user from the queue
+        """Pick a user from the queue.
 
-        If a number is specified, pick that user specifically
+        If a number is specified, pick that user specifically. If no user is
+        specified, pick the first user in the queue.
 
-        If no user is specified, pick the first user in the queue
+        Args:
+            selection: Specified user number to pick. If omitted, pick the
+                first one.
+            _args: Ignore extra positional args.
+
+        Returns:
+            Message string with the picked user. Otherwise a message describing
+            any issues with the selection number.
         """
         try:
             if selection:
@@ -428,9 +509,15 @@ class JBMethods(BaseMethods):
 
 
 class SongQueue:
-    """Main class to hold all data relating to a request queue"""
+    """Data relating to a song / request queue."""
 
     def __init__(self, channel, *tuples):
+        """Initialise the SongQueue.
+
+        Args:
+            channel: Name of the channel the queue refers to.
+            tuples: Username, song pairs to insert into the queue
+        """
         self.channel = None
         self.isopen = None
         self.current = None
@@ -442,22 +529,32 @@ class SongQueue:
         self.load(channel, *tuples)
 
     def __bool__(self):
+        """Return if queue is open or not."""
         return self.isopen
 
     def __contains__(self, user):
+        """Return presence of user in the song queue."""
         return user in self.entries
 
     def __getitem__(self, attr):
+        """Return attribute that matches the given key."""
         return getattr(self, attr, None)
 
     def __iter__(self):
+        """Return iterator over the song queue."""
         return self.entries.__iter__()
 
     def __len__(self):
+        """Return length of the song queue."""
         return len(self.entries)
 
     def new(self, channel, *tuples):
-        """Create the queue from scratch"""
+        """Create a new SongQueue instead of loading existing data.
+
+        Args:
+            channel: Name of the channel the queue refers to.
+            tuples: Username, song pairs to insert into the queue.
+        """
         self.channel = channel
         self.isopen = True
         self.current, self.entries, self.picked = {}, TupleList(*tuples), TupleList()
@@ -465,7 +562,7 @@ class SongQueue:
         self.save()
 
     def save(self):
-        """Dump all queue data to a file in the data/ folder"""
+        """Dump all queue data to a file in the data/ folder."""
         with open(f"data/{self.channel}.json", "w", encoding="utf-8") as file_:
             res = {}
             res["channel"] = self.channel
@@ -477,10 +574,13 @@ class SongQueue:
             file_.write(dumps(res, indent=4))
 
     def load(self, channel, *tuples):
-        """
-        Load existing queue data from file
+        """Load existing queue data from file.
 
-        Create queue from scratch if data can't be loaded
+        Create queue from scratch if data can't be loaded.
+
+        Args:
+            channel: Name of the channel the queue refers to.
+            tuples: Username, song pairs to insert into the queue.
         """
         try:
             with open(f"data/{channel}.json", "r", encoding="utf-8") as file_:
@@ -497,14 +597,14 @@ class SongQueue:
 
 
 def trunc(msg, length):
-    """
-    Take a string and truncate it to the specfied length
+    """Take a string and truncate it to the specfied length.
 
-    Arguments:
-        msg: the input string
-        length: the length to truncate the input string to
+    Args:
+        msg: Input string.
+        length: Length to truncate the input string to.
 
     Returns:
-        the truncated string, ending in the ellipses character if truncation occurred
+        Truncated string, ending in the ellipses character if truncation
+        occurred.
     """
     return msg if len(msg) <= length else msg[: length - 1] + "…"
