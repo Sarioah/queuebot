@@ -111,11 +111,7 @@ class BackgroundBot:
         self.connect_delay = 1
 
     def say(self, msg):
-        """Send a msg through the inner bot to its server.
-
-        Args:
-            msg: Message string to send.
-        """
+        """Send a msg through the inner bot to its server."""
         self.send_command("send_msg", msg)
 
     def send_command(self, command, *args):

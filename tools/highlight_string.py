@@ -1,24 +1,25 @@
-"""
-Tools to highlight a string with colour.
+"""Tools to highlight a string with colour.
 
 Classes:
-    Highlighter: take a string and return a version with ANSI colour codes inserted
+    Highlighter: Take a string and return a version with ANSI colour codes
+        inserted.
 
 Functions:
-    find_strings: take a string and a list of substrings, then return a list of position
-                  2-tuples describing where the substrings are found in the string
+    find_strings: Take a string and a list of substrings, then return a list of
+        position 2-tuples describing where the substrings are found in the
+        string.
 """
 
 
 class Highlighter:
-    """
-    Take a string, emote mode flag, list of substrings and list of position indices to highlight
-    then return the highlighted string.
+    """Main highlighter class.
+
+    Take a string, emote mode flag, list of substrings and list of position
+    indices to highlight then return the highlighted string.
 
     Methods:
-        get_highlight: return the highlighted string
-
-        get_string: return the original string without highlighting
+        get_highlight: Return the highlighted string.
+        get_string: Return the original string without highlighting.
     """
 
     def __init__(self, emote=False, string="", substrings=None, indices=None):
@@ -26,14 +27,13 @@ class Highlighter:
         Create the Highlighter object.
 
         Args:
-            emote: flag to treat the positions as "emotes", i.e. only highlight if the positions
-                   correspond to word boundaries
-
-            string: the input string to highlight
-
-            substrings: list of strings to search for and highlight in the input string
-
-            indices: list of position 2-tuples to directly highlight in the input string
+            emote: Flag to treat the positions as "emotes", i.e. only highlight
+                if the positions correspond to word boundaries.
+            string: The input string to highlight.
+            substrings: List of strings to search for and highlight in the
+                input string.
+            indices: List of position 2-tuples to directly highlight in the
+                input string.
         """
         self.string = string
         substrings = substrings if substrings is not None else []
@@ -53,16 +53,18 @@ class Highlighter:
 
 
 def _highlight(string, positions):
-    """
-    Take a string and a list of position tuples, then return the string with ANSI colour
-    codes inserted at each position.
+    """Return string highlighted at the given positions.
+
+    Take a string and a list of position tuples, then return the string with
+    ANSI colour codes inserted at each position.
 
     Args:
-        string: the string to highlight
+        string: The string to highlight.
+        positions: List or tuple with he positions to insert ANSI colour codes
+            around.
 
-        positions: the positions to insert ANSI colour codes around
-
-    Return the string with ANSI colour codes inserted
+    Returns:
+        The string with ANSI colour codes inserted.
     """
     exploded_string = list(string)
     # Walk the exploded string in reverse, so that each insertion doesn't
@@ -74,15 +76,15 @@ def _highlight(string, positions):
 
 
 def _calc_indices(string, search, padding=0):
-    """
-    Take a string and search it recursively for the given substring.
+    """Take a string and search it recursively for the given substring.
 
     Args:
-        string: the string to search in
+        string: String to search in.
+        search: Substring to search for.
+        padding: Offset to add to the returned position indices.
 
-        search: the substring to search for
-
-    Return a list of position 2-tuples for each position the substring is found at.
+    Returns:
+        List of position 2-tuples for each position the substring is found at.
     """
     length = len(search)
     try:
@@ -94,15 +96,14 @@ def _calc_indices(string, search, padding=0):
 
 
 def _is_emote(string, pos):
-    """
-    Check the string at the given position for word boundaries.
+    """Check the string at the given position for word boundaries.
 
     Args:
-        string: the string to search within
+        string: String to search within.
+        pos: 2-tuple with the positions to check.
 
-        pos: 2-tuple with the positions to check
-
-    Return True if the position fully describes an entire word.
+    Returns:
+        True if the position fully describes an entire word.
     """
     start = int(pos[0]) == 0 or string[pos[0] - 1 : pos[0]] == " "
     end = int(pos[1]) == len(string) or string[pos[1] : pos[1] + 1] == " "
@@ -110,15 +111,14 @@ def _is_emote(string, pos):
 
 
 def find_strings(string, substrings):
-    """
-    Search the given string for occurences of the substrings.
+    """Search the given string for occurences of the substrings.
 
     Args:
-        string: the string to search
+        string: String to search.
+        substrings: List of strings to search the string for.
 
-        substrings: list of strings to search the string for
-
-    Return a list of position 2-tuples for every occurence of a substring
+    Returns:
+        List of position 2-tuples for every occurence of a substring.
     """
     return sorted(sum((_calc_indices(string, sub) for sub in substrings), start=[]))
 

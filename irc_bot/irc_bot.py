@@ -71,51 +71,27 @@ class IrcBot(SingleServerIRCBot):
             self.send_msg(f"Queuebot {self.version} started")
 
     def on_pubmsg(self, _client, msg):
-        """Respond to messages posted in the channel.
-
-        Args:
-            msg: Message string sent by the server.
-        """
+        """Respond to messages posted in the channel."""
         self.send_msg(self.message_handler(msg, "pubmsg"))
 
     def on_pubnotice(self, _client, msg):
-        """Respond to pubnotices in the channel.
-
-        Args:
-            msg: Message string sent by the server.
-        """
+        """Respond to pubnotices in the channel."""
         self.message_handler(msg, "pubnotice")
 
     def on_privnotice(self, _client, msg):
-        """Respond to privnotices in the channel.
-
-        Args:
-            msg: Message string sent by the server.
-        """
+        """Respond to privnotices in the channel."""
         self.message_handler(msg, "privnotice")
 
     def on_usernotice(self, _client, msg):
-        """Respond to usernotices in the channel.
-
-        Args:
-            msg: Message string sent by the server.
-        """
+        """Respond to usernotices in the channel."""
         self.message_handler(msg, "usernotice")
 
     def on_whisper(self, _client, msg):
-        """Respond to whispers to the user.
-
-        Args:
-            msg: Message string sent by the server.
-        """
+        """Respond to whispers to the user."""
         self.message_handler(msg, "whisper")
 
     def on_action(self, _client, msg):
-        """Respond to actions posted in the channel.
-
-        Args:
-            msg: Message string sent by the server.
-        """
+        """Respond to actions posted in the channel."""
         self.message_handler(msg, "action")
 
     def on_join(self, _client, _msg):
@@ -134,11 +110,7 @@ class IrcBot(SingleServerIRCBot):
         print(col("Disconnect...", "RED"))
 
     def connected(self):
-        """Return whether the bot is connected to its server.
-
-        Returns:
-            True if bot is connected to its server
-        """
+        """Return True if the bot is connected to its server."""
         return self.connection.is_connected()
 
     def start_bot(self):
@@ -151,11 +123,7 @@ class IrcBot(SingleServerIRCBot):
         self.reactor.process_once()
 
     def send_msg(self, msg):
-        """Post a message to the connected channel.
-
-        Args:
-            msg: Message string that the bot should send to the server.
-        """
+        """Post the given message to the connected channel."""
         msg, _ = trim_bytes(msg, self.message_limit)
 
         if msg:

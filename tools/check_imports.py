@@ -1,5 +1,5 @@
-"""Checks to ensure the system has the right modules installed to run the bot"""
-# TODO: Replace with a venv or other similar semi-automatic dependency handling strategy
+"""Check to ensure the system has the expected modules / packages installed."""
+# TODO: Replace with a venv or other similar semi-automatic dependency handler
 import sys
 import os
 import importlib
@@ -12,7 +12,7 @@ else:
 
 
 def check_module(module):
-    """Attempt to import a module, return True if module imports without error"""
+    """Check if a module can be imported without error."""
     try:
         importlib.import_module(module)
     except ModuleNotFoundError:

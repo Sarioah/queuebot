@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-Retrieves emote strings from FrankerFaceZ and BTTV for the given channels
-"""
+"""Retrieve emote strings from FrankerFaceZ and BTTV for the given channels."""
 import json
 import sys
 
@@ -70,13 +68,9 @@ async def _main(channels):
 
 
 def get_emotes(*channels):
-    """
-    Return a dict of lists of emote strings for the given channels
+    """Return a dict of lists of emote strings for the given channels.
 
-    Lists can potentially be empty
-
-    Args:
-        channels: collects channel names
+    Lists can potentially be empty.
 
     Example dict structure after calling get_emotes('channel1', 'channel2'):
     {
@@ -87,6 +81,12 @@ def get_emotes(*channels):
         'channel2__ffz': [],
         'channel2__bttv': ['channel2Emote', 'channel2LUL']
     }
+
+    Args:
+        channels: Collects channel names.
+
+    Returns:
+        dict[list[str]]: Dict of Lists of emote strings grouped by channel.
     """
     return {k: v for d in asyncio.run(_main(channels)) for k, v in d.items()}
 

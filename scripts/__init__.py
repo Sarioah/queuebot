@@ -1,5 +1,4 @@
-"""
-Tools for managing bot scripts.
+"""Tools for managing bot scripts.
 
 Modules:
     lint_handler: Co-ordinate linters and their options.
