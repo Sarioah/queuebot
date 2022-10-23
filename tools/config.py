@@ -16,6 +16,8 @@ Exceptions:
 
 import sys
 import json
+import contextlib
+
 from urllib.request import urlopen
 from configparser import ConfigParser, ParsingError
 from setuptools._vendor.packaging import version
@@ -199,14 +201,11 @@ def check_update(ver):
     Returns:
         Empty string, or string with info about a newer bot version.
     """
-    try:
+    with contextlib.suppress(Exception):
         with urlopen(
             "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
         ) as url:
             upstream = json.load(url)["name"]
-    except Exception:
-        pass
-    else:
         if version.parse(upstream) > version.parse(ver):
             version_coloured = col(upstream, "BLUE")
             link = col("https://github.com/Sarioah/queuebot/releases/latest", "YELLOW")
