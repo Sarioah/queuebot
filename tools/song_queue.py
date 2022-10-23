@@ -18,6 +18,7 @@ Functions:
 """
 
 import time
+import contextlib
 
 from os import path
 from json import loads, dumps
@@ -101,14 +102,12 @@ class BaseMethods:
         Returns:
             Message string if data was loaded sucessfully, otherwise None.
         """
-        try:
+        with contextlib.suppress(AttributeError):
             if time.time() - self.parent.testdata[1] < 10:
                 self.parent.entries = TupleList(*self.parent.testdata[0])
                 del self.parent.testdata
                 return "Test data loaded into queue"
             del self.parent.testdata
-        except AttributeError:
-            pass
         return None
 
     def testqueue(self, *_args):
