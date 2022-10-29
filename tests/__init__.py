@@ -1,6 +1,5 @@
-"""Modules for testing the queuebot.
+"""Packages and modules for testing the queuebot.
 
-Modules:
-    test_timed_list: Test the timed list, verifying that it correctly wipes its
-        data.
+Packages:
+    tools: Test the tool modules used in the queuebot.
 """
