@@ -43,48 +43,49 @@ class TestTimedList(unittest.TestCase):
         self.load_data()
         self.test_assign()
         self.t_l = timed_list.TimedList(**{"data": DATA, "delay": DELAY, "time": 1})
-        assert self.t_l.data == []
+        self.assertListEqual(self.t_l.data, [])
 
     def test_assign(self, delay=DELAY):
-        assert self.t_l.get() == DATA
+        self.assertListEqual(self.t_l.get(), DATA)
         sleep(delay / 2)
-        assert self.t_l.get() == DATA
+        self.assertListEqual(self.t_l.get(), DATA)
         sleep(delay / 2)
-        assert self.t_l.get() == []
+        self.assertListEqual(self.t_l.get(), [])
 
     def test_get(self):
-        assert self.t_l.data == self.t_l.get()
+        self.assertEqual(self.t_l.data, self.t_l.get())
 
     def test_serialise(self):
         res = self.t_l.serialise()
-        assert "time" in res
+        self.assertIn("time", res)
         del res["time"]
-        assert res == {"data": [1, 2, 3], "delay": DELAY}
+        self.assertEqual(res, {"data": [1, 2, 3], "delay": DELAY})
 
     def test_bool(self):
-        assert bool(self.t_l) is True
+        self.assertTrue(self.t_l)
         sleep(DELAY)
-        assert bool(self.t_l) is False
+        self.assertFalse(self.t_l)
 
     def test_len(self):
-        assert len(DATA) == len(self.t_l)
+        self.assertEqual(len(DATA), len(self.t_l))
         sleep(DELAY)
-        assert len(self.t_l) == 0
+        self.assertEqual(len(self.t_l), 0)
 
     def test_append(self):
         self.t_l.append(max(DATA) + 1)
-        assert self.t_l.data == DATA + [max(DATA) + 1]
+        self.assertListEqual(self.t_l.data, DATA + [max(DATA) + 1])
         sleep(DELAY)
-        assert self.t_l.data == []
+        self.assertListEqual(self.t_l.data, [])
 
     def test_iter(self):
-        for (value, expected) in zip(DATA, self.t_l):
-            assert value == expected
+        self.assertCountEqual(self.t_l, DATA)
 
     def test_getitem(self):
         for (index, _) in enumerate(DATA):
-            assert DATA[index] == self.t_l[index]  # pylint: disable=unnecessary-list-index-lookup
+            # pylint: disable=unnecessary-list-index-lookup
+            self.assertEqual(DATA[index], self.t_l[index])
+            # pylint: enable=unnecessary-list-index-lookup
 
     def test_contains(self):
         for item in DATA:
-            assert item in self.t_l
+            self.assertIn(item, self.t_l)
