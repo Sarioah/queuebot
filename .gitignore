@@ -8,6 +8,7 @@
 ***.bak
 ***.json
 ***~
+.coverage
 .config*
 sari_queuebot
 data/
