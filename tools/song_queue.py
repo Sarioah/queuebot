@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 """Tools for managing a random or prioritised request queue.
 
-In Just Dance mode, the queue holds song choices, and picks users at random
-(prioritising users who haven't been picked before)
-In Jackbox mode, the queue holds usernames, and picks users FIFO (also
-prioritising users who haven't been picked before)
+In Just Dance / random mode, the queue holds song choices, and picks users at
+random (prioritising users who haven't been picked before)
+In Jackbox / priority mode, the queue holds usernames, and picks users FIFO
+(also prioritising users who haven't been picked before)
 
 Classes:
     BaseMethods: Class containing methods to manipulate all types of queues
@@ -45,6 +45,7 @@ class BaseMethods:
                 operate on.
         """
         self.parent = parent
+        self.exclusions = []
 
     def __getitem__(self, key):
         """Return method that matches the given key."""
@@ -57,7 +58,7 @@ class BaseMethods:
 
     def clear(self, *_args):
         """Remove all entries from the queue."""
-        self.parent.current = {}
+        self.parent.current, self.parent.currentusers = {}, TimedList(600)
         self.parent.entries, self.parent.picked = TupleList(), TupleList()
         return "Queue has been cleared"
 
@@ -153,19 +154,30 @@ class BaseMethods:
 class JDMethods(BaseMethods):
     """Methods used to manipulate Just Dance / random queues."""
 
+    def __init__(self, parent):
+        """Initialise object.
+
+        Args:
+            parent: Parent object containing the data most of these methods
+                operate on.
+        """
+        super().__init__(parent)
+        self.exclusions = ["join"]
+        self.parent.mode = "random"
+
     def jbqueue(self, *_args):
         """Change queue into Jackbox / priority mode."""
         self.parent.mthds = JBMethods(self.parent)
-        return "Queue is now in jackbox mode"
+        return "Queue is now in priority / user queue mode"
 
     def jdqueue(self, *_args):
-        """Change queue into Just Dance / random mode."""
-        return "Queue is already in Just Dance mode"
+        """Change queue into Just Dance / random song mode."""
+        return "Queue is already in random song mode"
 
     def open(self, *_args):
         """Open the queue, allowing new entries to be added."""
         self.parent.isopen = True
-        return "Random queue is now open"
+        return "Random song queue is now open, type !sr <song name> to join!"
 
     def currententry(self, *_args):
         """List the last entry that was picked."""
@@ -174,7 +186,7 @@ class JDMethods(BaseMethods):
                 f"Current song is \"{trunc(self.parent.current['entry'], SINGLE_SONG_LENGTH)}"
                 f"\", requested by {self.parent.current['user']}"
             )
-        return "Nothing's been played yet"
+        return "Nothing's been picked yet"
 
     def addentry(self, sender, entry, emote_indices, /, *_args):
         """Add the sender's entry to the queue.
@@ -348,19 +360,30 @@ class JDMethods(BaseMethods):
 class JBMethods(BaseMethods):
     """Methods used to manipulate Jackbox / priority queues."""
 
+    def __init__(self, parent):
+        """Initialise object.
+
+        Args:
+            parent: Parent object containing the data most of these methods
+                operate on.
+        """
+        super().__init__(parent)
+        self.exclusions = ["sr", "removesong"]
+        self.parent.mode = "priority"
+
     def jbqueue(self, *_args):
         """Change queue to Jackbox / priority mode."""
-        return "Queue is already in Jackbox mode"
+        return "Queue is already in priority / user queue mode"
 
     def jdqueue(self, *_args):
         """Change queue to Just Dance / random mode."""
         self.parent.mthds = JDMethods(self.parent)
-        return "Queue changed to Just Dance mode"
+        return "Queue changed to random song mode"
 
     def open(self, *_args):
         """Open the queue, allowing new entries to be added."""
         self.parent.isopen = True
-        return "Priority queue is now open"
+        return "Priority queue is now open, type !join to join!"
 
     def currententry(self, _, page=1, /, *_args):
         """List the users picked for the current party.
@@ -523,8 +546,9 @@ class SongQueue:
         self.currentusers = None
         self.entries = None
         self.picked = None
+        self.mode = None
         self.msg_limit = 499 - len(channel)
-        self.mthds = JDMethods(self)
+        self.mthds = None
         self.load(channel, *tuples)
 
     def __bool__(self):
@@ -556,6 +580,7 @@ class SongQueue:
         """
         self.channel = channel
         self.isopen = True
+        self.mthds = JDMethods(self)
         self.current, self.entries, self.picked = {}, TupleList(*tuples), TupleList()
         self.currentusers = TimedList(600)
         self.save()
@@ -567,6 +592,7 @@ class SongQueue:
             res["channel"] = self.channel
             res["isopen"] = self.isopen
             res["current"] = self.current
+            res["mode"] = self.mode
             res["currentusers"] = self.currentusers.serialise()
             res["entries"] = self.entries.serialise()
             res["picked"] = self.picked.serialise()
@@ -590,6 +616,10 @@ class SongQueue:
                 self.currentusers = TimedList(**res["currentusers"])
                 self.entries = TupleList(*res["entries"])
                 self.picked = TupleList(*res["picked"])
+                if res["mode"] == "random":
+                    self.mthds = JDMethods(self)
+                else:
+                    self.mthds = JBMethods(self)
         except Exception:
             print(c(f"\n{format_exc()}\nFailed to load saved queue, creating new one", "GREY"))
             self.new(channel, *tuples)
