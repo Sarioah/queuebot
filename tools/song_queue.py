@@ -162,7 +162,15 @@ class JDMethods(BaseMethods):
                 operate on.
         """
         super().__init__(parent)
-        self.exclusions = ["join"]
+        self.exclusions = [
+            "join",
+            "clearparty",
+            "cleargroup",
+            "clearusers",
+            "currentparty",
+            "currentgroup",
+            "currentusers",
+        ]
         self.parent.mode = "random"
 
     def jbqueue(self, *_args):
@@ -384,6 +392,11 @@ class JBMethods(BaseMethods):
         """Open the queue, allowing new entries to be added."""
         self.parent.isopen = True
         return "Priority queue is now open, type !join to join!"
+
+    def clearparty(self, *_args):
+        """Clear the current user party."""
+        self.parent.currentusers = TimedList(600)
+        return "Current user party has been cleared"
 
     def currententry(self, _, page=1, /, *_args):
         """List the users picked for the current party.
