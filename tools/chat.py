@@ -73,6 +73,8 @@ class CommandHandler:
             "testqueue": ("queuetest",),
             "whichsong": ("queuesong",),
             "whichuser": ("queueuser",),
+            "jbqueue": ("priorityqueue",),
+            "jdqueue": ("randomqueue",),
             "queueconfirm": ("confirmqueue",),
         }
 
@@ -117,6 +119,9 @@ class CommandHandler:
         If the command is a moderator command, check that the badges contain an
         appropriate moderator - level badge.
 
+        Command handling objects can define command / request names to ignore
+        as a list in an "exclusions" attribute.
+
         Args:
             badges: List of strings representing chat badges owned by the
                 chatter who sent the command.
@@ -128,10 +133,14 @@ class CommandHandler:
             eligible to use it.
         """
         # TODO: Revisit this again, as well as the convoluted Event class
-        request = self.check_aliases(request.casefold())
-        command = self.commands.get(request, None)
+        command_name = self.check_aliases(request.casefold())
+
+        command = self.commands.get(command_name, None)
         if command and self.check_cooldowns(command):
             for obj in (self,) + alternatives:
+                exclusions = getattr(obj, "exclusions", [])
+                if request.casefold() in exclusions:
+                    return None
                 mthd = obj[command[1]]
                 if mthd:
                     if command[0] == "m":
