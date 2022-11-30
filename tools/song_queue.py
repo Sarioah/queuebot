@@ -165,11 +165,12 @@ class JDMethods(BaseMethods):
         self.exclusions = [
             "join",
             "clearparty",
-            "cleargroup",
-            "clearusers",
             "currentparty",
             "currentgroup",
+            "currentuser",
             "currentusers",
+            "whichsong",
+            "whichuser",
         ]
         self.parent.mode = "random"
 
