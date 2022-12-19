@@ -169,8 +169,6 @@ class JDMethods(BaseMethods):
             "currentgroup",
             "currentuser",
             "currentusers",
-            "whichsong",
-            "whichuser",
         ]
         self.parent.mode = "random"
 
@@ -339,7 +337,7 @@ class JDMethods(BaseMethods):
             string.
         """
         for index, (user, song) in enumerate(self.parent):
-            if song.casefold().find(search) != -1:
+            if song.casefold().find(search.casefold()) != -1:
                 return (
                     f'{user} requested "{trunc(song, SINGLE_SONG_LENGTH)}" '
                     f"at position {index+1}"
@@ -377,7 +375,12 @@ class JBMethods(BaseMethods):
                 operate on.
         """
         super().__init__(parent)
-        self.exclusions = ["sr", "removesong"]
+        self.exclusions = [
+            "sr",
+            "removesong",
+            "whichsong",
+            "whichuser",
+        ]
         self.parent.mode = "priority"
 
     def jbqueue(self, *_args):
