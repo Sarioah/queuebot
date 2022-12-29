@@ -141,18 +141,18 @@ class CommandHandler:
         """
         # TODO: Revisit this again, as well as the convoluted Event class
         command_name = self.check_aliases(request.casefold())
-
         command = self.commands.get(command_name, None)
+
         if command and self.check_cooldowns(command):
             for obj in (self,) + alternatives:
                 exclusions = getattr(obj, "exclusions", [])
-                if request.casefold() in exclusions:
-                    return None
-                mthd = obj[command[1]]
-                if mthd:
-                    if command[0] == "m":
-                        if role_check(badges):
-                            return mthd
+                if all(
+                    (
+                        request.casefold() not in exclusions,
+                        mthd := obj[command[1]],
+                        command[0] == "e" or command[0] == "m" and role_check(badges),
+                    )
+                ):
                     return mthd
         return None
 
