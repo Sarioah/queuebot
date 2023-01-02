@@ -18,8 +18,8 @@ class TupleList:
             tuples: Collection of 2-tuples representing key: value pairs.
         """
         self.data = []
-        for item in tuples:
-            self.data.append(item)
+        for k, v in tuples:
+            self.data.append((k, v))
 
     def __str__(self):
         """Return contents of list as a string."""
@@ -120,6 +120,10 @@ class TupleList:
         """Return result of an in-place subtraction."""
         return self - other
 
+    def __eq__(self, other):
+        """Return equality between two TupleLists."""
+        return repr(self) == repr(other)
+
     def append(self, item):
         """Append a tuple to the end of the TupleList."""
         return self.data.append(item)
@@ -128,9 +132,9 @@ class TupleList:
         """Return a new TupleList containing the same data as self."""
         return TupleList(*self.data)
 
-    def deprioritise(self, other=""):
+    def deprioritise(self, other=None):
         """Move the keys found in the other TupleList to the end of self."""
-        if not other:
+        if other is None:
             other = TupleList()
         front = self - other
         back = self - front
@@ -178,4 +182,4 @@ class TupleList:
 
     def serialise(self):
         """Return the list of tuples stored in self."""
-        return self.data
+        return self.data.copy()
