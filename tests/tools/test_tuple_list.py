@@ -131,10 +131,11 @@ class TestTupleList(unittest.TestCase):
         unpicked_keys = [key for key, _value in self.split_data[0]]
         picked_keys = [key for key, _value in self.split_data[1]]
         all_keys = [key for key, _value in DATA]
+
         front_length = len(DATA) // 2
         back_length = len(DATA) - front_length
 
-        for _ in range(len(DATA) // 2):
+        for _ in range(front_length):
             (key, value), picked = self.t_l.random(self.back)
             self.assertFalse(picked)
             self.assertIn(key, unpicked_keys)
@@ -145,7 +146,7 @@ class TestTupleList(unittest.TestCase):
             self.assertIn(key, picked_keys)
 
         self.load_data()
-        for _ in range(len(DATA)):
+        for _ in range(front_length + back_length):
             (key, value), picked = self.t_l.random()
             self.assertFalse(picked)
             self.assertIn(key, all_keys)

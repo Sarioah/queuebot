@@ -18,8 +18,8 @@ class TupleList:
             tuples: Collection of 2-tuples representing key: value pairs.
         """
         self.data = []
-        for k, v in tuples:
-            self.data.append((k, v))
+        for key, value in tuples:
+            self.data.append((key, value))
 
     def __str__(self):
         """Return contents of list as a string."""
