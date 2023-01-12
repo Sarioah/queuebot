@@ -5,4 +5,6 @@ Modules:
         data.
     test_tuple_list: Test the TupleList, verifying that it holds and presents
         the expected data.
+    test_text.py: Test the Paginate class and other functions in the text
+        module.
 """
