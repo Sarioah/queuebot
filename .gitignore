@@ -6,11 +6,11 @@
 ***.ini
 ***.old
 ***.bak
-***.json
 ***~
 .coverage
 .config*
 sari_queuebot
+testdata.json
 data/
 Resources/
 tools/version.py
