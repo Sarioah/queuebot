@@ -9,8 +9,8 @@ from time import sleep
 
 from tools import timed_list
 
-DELAY = 0.25
-DEFAULT_DELAY = 0.5
+DELAY = 0.01
+DEFAULT_DELAY = 0.02
 DATA = [1, 2, 3]
 
 
