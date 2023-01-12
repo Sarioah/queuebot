@@ -12,6 +12,9 @@ Functions:
 """
 
 
+ENCODING = "UTF-8"
+
+
 class Paginate:
     """Hold a long string and break it up into more manageable pages.
 
@@ -28,10 +31,9 @@ class Paginate:
             sep: Optional separator string. When breaking data into pages, we
                 will attempt to break near where these strings appear.
         """
-        self.sep = bytes(sep, encoding="utf-8")
-        self.max_length = length - 15
-        bytes_ = self.process(bytes(data, encoding="utf-8"))
-        self.data = [str(page, encoding="utf-8") for page in bytes_]
+        self.sep = to_bytes(sep)
+        bytes_, self.max_length = self._process_data(data, length)
+        self.data = [to_string(page) for page in bytes_]
 
     def __getitem__(self, page_num=0):
         """Redirect subscript accesses to the paginated data.
@@ -43,53 +45,50 @@ class Paginate:
             String of data contained in the requested page.
         """
         try:
-            res = self.data[int(page_num) - 1]
+            page_num = int(page_num)
+            page_number = page_num - 1 if page_num > 0 else page_num
+            res = self.data[page_number]
         except Exception:
-            res, page_num = self.data[0], 1
-        return res + self.suffix(page_num)
+            res = self.data[0]
+        return res
 
     def __str__(self):
         """Return the first page of data, formatted as string."""
-        return self.data[0] + self.suffix(1)
+        return self.data[0]
 
     def __iter__(self):
         """Iterate over the data pages."""
-        for i, page in enumerate(self.data):
-            yield page + self.suffix(i + 1)
+        return iter(self.data)
 
-    def suffix(self, page_num):
-        """Return a page counter suffix, e.g. "(page 1/6)".
+    def _add_suffixes(self, data):
+        """Append page suffixes to each element of the given sequence."""
+        length = len(data)
+        if length <= 1:
+            return data
+        return [
+            to_bytes(f"{to_string(string)} (page {index + 1}/{length})")
+            for index, string in enumerate(data)
+        ]
 
-        Ignored if self contains less than a single page of data.
-
-        Args:
-            page_num: Which page of data to request.
-
-        Returns:
-            Formatted suffix if there are multiple pages, otherwise empty
-            string.
-        """
-        if len(self.data) > 1:
-            return f" (page {page_num}/{len(self.data)})"
-        return ""
-
-    def process(self, data):
+    def _split_bytes(self, data, max_length):
         """Process the given data into groupings of bytes.
 
         Args:
             data: String of bytes.
+            max_length: Maximum length that the byte strings are split into.
 
         Returns:
-            List of strings of bytes.
+            List of byte strings.
         """
-        if len(data) <= self.max_length:
+        if len(data) <= max_length:
             return [data]
         spacing = len(self.sep)
-        prefix = data[: self.max_length]
+        prefix = data[:max_length]
         try:
             cut = prefix.rindex(self.sep)
+            _ = str(prefix, encoding="utf-8")
         except ValueError:
-            current_length = self.max_length
+            current_length = max_length
             while current_length:
                 try:
                     # byte representation of ellipses char
@@ -99,9 +98,48 @@ class Paginate:
                 except ValueError:
                     current_length -= 1
                 else:
-                    return [front] + self.process(back)
+                    return [front] + self._split_bytes(back, max_length)
         else:
-            return [data[:cut]] + self.process(data[cut + spacing :])
+            return [data[:cut]] + self._split_bytes(data[cut + spacing :], max_length)
+
+    def _process_data(self, data, max_length):
+        """Take a given string and split it into smaller pages.
+
+        Args:
+            data: Input string to split up.
+            max_length: Maximum byte length of each page.
+
+        Returns:
+            List of byte strings representing the pages. May be a list
+            containing a single empty string if there was a problem splitting
+            the input string.
+        """
+        data = to_bytes(data)
+        for length in range(max_length, 1, -1):
+            try:
+                output = self._split_bytes(data, length)
+            except RecursionError:
+                output = [b""]
+            output = self._add_suffixes(output)
+            if all(len(string) < max_length for string in output):
+                return output, length
+        return [b""], 1
+
+
+def to_bytes(data):
+    """Convert the given string into byte representation."""
+    try:
+        return data.encode(ENCODING)
+    except AttributeError:
+        return b""
+
+
+def to_string(data):
+    """Convert the given byte sequence into string representation."""
+    try:
+        return data.decode(ENCODING)
+    except AttributeError:
+        return ""
 
 
 def trim_bytes(msg="", length=0):
@@ -115,13 +153,16 @@ def trim_bytes(msg="", length=0):
         Trimmed version of the input string
     """
     if msg:
-        msg = bytes(msg, encoding="utf-8")
+        msg = to_bytes(msg)
         while msg:
             try:
-                msg = str(msg[:length], encoding="utf-8")
+                msg = to_string(msg[:length])
             except ValueError:
                 length -= 1
             else:
+                # prevent optimisers from skipping this line and messing up
+                # coverage reporting using a useless function call
+                len("1")
                 break
     return (msg, length)
 
