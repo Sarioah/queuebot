@@ -1,0 +1,762 @@
+{
+  "inputs": {
+    "long string": "This string is annoyingly long.",
+    "long unicode string": "この.-.文 字列はう んざ りする.-.ほど 長いです。",
+    "very long string": "This is the string that never ends. It just keeps going and going and going forever. Sure would be great if we had a way to break up long blocks of text into more manageable pages for easier display.",
+    "colours": [
+      "WHITE",
+      "GREY",
+      "RED",
+      "GREEN",
+      "YELLOW",
+      "BLUE",
+      "PURPLE",
+      "CYAN"
+    ]
+  },
+  "expected results": {
+    "colourise": [
+      "\u001b[0mThis string is annoyingly long.\u001b[0m",
+      "\u001b[30;1mThis string is annoyingly long.\u001b[0m",
+      "\u001b[31;1mThis string is annoyingly long.\u001b[0m",
+      "\u001b[32;1mThis string is annoyingly long.\u001b[0m",
+      "\u001b[33;1mThis string is annoyingly long.\u001b[0m",
+      "\u001b[34;1mThis string is annoyingly long.\u001b[0m",
+      "\u001b[35;1mThis string is annoyingly long.\u001b[0m",
+      "\u001b[36;1mThis string is annoyingly long.\u001b[0m"
+    ],
+    "pages": {
+      "long string": [
+        "This is the string that never ends. It just keeps going and going and going forever (page 1/3)",
+        " Sure would be great if we had a way to break up long blocks of text into more manage… (page 2/3)",
+        "able pages for easier display. (page 3/3)"
+      ]
+    },
+    "iter": {
+      "long string": {
+        "no seperator": [
+          [
+            ""
+          ],
+          [
+            "This (page 1/8)",
+            " str (page 2/8)",
+            "ing  (page 3/8)",
+            "is a (page 4/8)",
+            "nnoy (page 5/8)",
+            "ingl (page 6/8)",
+            "y lo (page 7/8)",
+            "ng. (page 8/8)"
+          ],
+          [
+            "This  (page 1/7)",
+            "strin (page 2/7)",
+            "g is  (page 3/7)",
+            "annoy (page 4/7)",
+            "ingly (page 5/7)",
+            " long (page 6/7)",
+            ". (page 7/7)"
+          ],
+          [
+            "This s (page 1/6)",
+            "tring  (page 2/6)",
+            "is ann (page 3/6)",
+            "oyingl (page 4/6)",
+            "y long (page 5/6)",
+            ". (page 6/6)"
+          ],
+          [
+            "This st (page 1/5)",
+            "ring is (page 2/5)",
+            " annoyi (page 3/5)",
+            "ngly lo (page 4/5)",
+            "ng. (page 5/5)"
+          ],
+          [
+            "This str (page 1/4)",
+            "ing is a (page 2/4)",
+            "nnoyingl (page 3/4)",
+            "y long. (page 4/4)"
+          ],
+          [
+            "This stri (page 1/4)",
+            "ng is ann (page 2/4)",
+            "oyingly l (page 3/4)",
+            "ong. (page 4/4)"
+          ],
+          [
+            "This strin (page 1/4)",
+            "g is annoy (page 2/4)",
+            "ingly long (page 3/4)",
+            ". (page 4/4)"
+          ],
+          [
+            "This string (page 1/3)",
+            " is annoyin (page 2/3)",
+            "gly long. (page 3/3)"
+          ],
+          [
+            "This string  (page 1/3)",
+            "is annoyingl (page 2/3)",
+            "y long. (page 3/3)"
+          ],
+          [
+            "This string i (page 1/3)",
+            "s annoyingly  (page 2/3)",
+            "long. (page 3/3)"
+          ],
+          [
+            "This string is (page 1/3)",
+            " annoyingly lo (page 2/3)",
+            "ng. (page 3/3)"
+          ],
+          [
+            "This string is  (page 1/3)",
+            "annoyingly long (page 2/3)",
+            ". (page 3/3)"
+          ],
+          [
+            "This string is a (page 1/2)",
+            "nnoyingly long. (page 2/2)"
+          ],
+          [
+            "This string is an (page 1/2)",
+            "noyingly long. (page 2/2)"
+          ],
+          [
+            "This string is ann (page 1/2)",
+            "oyingly long. (page 2/2)"
+          ],
+          [
+            "This string is anno (page 1/2)",
+            "yingly long. (page 2/2)"
+          ],
+          [
+            "This string is annoyingly long."
+          ],
+          [
+            "This string is annoyingly long."
+          ],
+          [
+            "This string is annoyingly long."
+          ]
+        ],
+        "space": [
+          [
+            ""
+          ],
+          [
+            ""
+          ],
+          [
+            "This (page 1/9)",
+            "st… (page 2/9)",
+            "ring (page 3/9)",
+            "is (page 4/9)",
+            "an… (page 5/9)",
+            "no… (page 6/9)",
+            "yi… (page 7/9)",
+            "ngly (page 8/9)",
+            "long. (page 9/9)"
+          ],
+          [
+            "This (page 1/8)",
+            "str… (page 2/8)",
+            "ing (page 3/8)",
+            "is (page 4/8)",
+            "ann… (page 5/8)",
+            "oyi… (page 6/8)",
+            "ngly (page 7/8)",
+            "long. (page 8/8)"
+          ],
+          [
+            "This (page 1/6)",
+            "string (page 2/6)",
+            "is (page 3/6)",
+            "anno… (page 4/6)",
+            "yingly (page 5/6)",
+            "long. (page 6/6)"
+          ],
+          [
+            "This (page 1/6)",
+            "string (page 2/6)",
+            "is (page 3/6)",
+            "annoy… (page 4/6)",
+            "ingly (page 5/6)",
+            "long. (page 6/6)"
+          ],
+          [
+            "This (page 1/6)",
+            "string (page 2/6)",
+            "is (page 3/6)",
+            "annoyi… (page 4/6)",
+            "ngly (page 5/6)",
+            "long. (page 6/6)"
+          ],
+          [
+            "This (page 1/4)",
+            "string is (page 2/4)",
+            "annoyingly (page 3/4)",
+            "long. (page 4/4)"
+          ],
+          [
+            "This string (page 1/4)",
+            "is (page 2/4)",
+            "annoyingly (page 3/4)",
+            "long. (page 4/4)"
+          ],
+          [
+            "This string (page 1/4)",
+            "is (page 2/4)",
+            "annoyingly (page 3/4)",
+            "long. (page 4/4)"
+          ],
+          [
+            "This string (page 1/3)",
+            "is annoyingly (page 2/3)",
+            "long. (page 3/3)"
+          ],
+          [
+            "This string is (page 1/3)",
+            "annoyingly (page 2/3)",
+            "long. (page 3/3)"
+          ],
+          [
+            "This string is (page 1/3)",
+            "annoyingly (page 2/3)",
+            "long. (page 3/3)"
+          ],
+          [
+            "This string is (page 1/2)",
+            "annoyingly long. (page 2/2)"
+          ],
+          [
+            "This string is (page 1/2)",
+            "annoyingly long. (page 2/2)"
+          ],
+          [
+            "This string is (page 1/2)",
+            "annoyingly long. (page 2/2)"
+          ],
+          [
+            "This string is (page 1/2)",
+            "annoyingly long. (page 2/2)"
+          ],
+          [
+            "This string is annoyingly long."
+          ],
+          [
+            "This string is annoyingly long."
+          ],
+          [
+            "This string is annoyingly long."
+          ]
+        ]
+      },
+      "long unicode string": {
+        "no seperator": [
+          "この.-.文 字列はう… (page 1/3)",
+          "この.-.文 字列はう … (page 1/3)",
+          "この.-.文 字列はう … (page 1/3)",
+          "この.-.文 字列はう … (page 1/3)",
+          "この.-.文 字列はう ん… (page 1/3)",
+          "この.-.文 字列はう ん… (page 1/3)",
+          "この.-.文 字列はう ん… (page 1/3)",
+          "この.-.文 字列はう んざ… (page 1/2)",
+          "この.-.文 字列はう んざ … (page 1/2)",
+          "この.-.文 字列はう んざ … (page 1/2)",
+          "この.-.文 字列はう んざ … (page 1/2)",
+          "この.-.文 字列はう んざ り… (page 1/2)",
+          "この.-.文 字列はう んざ り… (page 1/2)",
+          "この.-.文 字列はう んざ り… (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする. (page 1/2)",
+          "この.-.文 字列はう んざ りする.- (page 1/2)",
+          "この.-.文 字列はう んざ りする.-. (page 1/2)",
+          "この.-.文 字列はう んざ りする.… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほ… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほ… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほ… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど… (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど … (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。",
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。"
+        ],
+        "space": [
+          "この.-.文 字列はう (page 1/3)",
+          "この.-.文 字列はう (page 1/3)",
+          "この.-.文 字列はう (page 1/3)",
+          "この.-.文 字列はう (page 1/3)",
+          "この.-.文 字列はう ん… (page 1/3)",
+          "この.-.文 字列はう ん… (page 1/3)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。",
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。"
+        ],
+        "long seperator": [
+          "この (page 1/4)",
+          "この.-.文 字列はう … (page 1/3)",
+          "この.-.文 字列はう … (page 1/3)",
+          "この (page 1/3)",
+          "この.-.文 字列はう ん… (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この (page 1/3)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする (page 1/2)",
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。",
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。"
+        ]
+      }
+    },
+    "trim bytes": {
+      "long string": [
+        [
+          "",
+          0
+        ],
+        [
+          "T",
+          1
+        ],
+        [
+          "Th",
+          2
+        ],
+        [
+          "Thi",
+          3
+        ],
+        [
+          "This",
+          4
+        ],
+        [
+          "This ",
+          5
+        ],
+        [
+          "This s",
+          6
+        ],
+        [
+          "This st",
+          7
+        ],
+        [
+          "This str",
+          8
+        ],
+        [
+          "This stri",
+          9
+        ],
+        [
+          "This strin",
+          10
+        ],
+        [
+          "This string",
+          11
+        ],
+        [
+          "This string ",
+          12
+        ],
+        [
+          "This string i",
+          13
+        ],
+        [
+          "This string is",
+          14
+        ],
+        [
+          "This string is ",
+          15
+        ],
+        [
+          "This string is a",
+          16
+        ],
+        [
+          "This string is an",
+          17
+        ],
+        [
+          "This string is ann",
+          18
+        ],
+        [
+          "This string is anno",
+          19
+        ],
+        [
+          "This string is annoy",
+          20
+        ],
+        [
+          "This string is annoyi",
+          21
+        ],
+        [
+          "This string is annoyin",
+          22
+        ],
+        [
+          "This string is annoying",
+          23
+        ],
+        [
+          "This string is annoyingl",
+          24
+        ],
+        [
+          "This string is annoyingly",
+          25
+        ],
+        [
+          "This string is annoyingly ",
+          26
+        ],
+        [
+          "This string is annoyingly l",
+          27
+        ],
+        [
+          "This string is annoyingly lo",
+          28
+        ],
+        [
+          "This string is annoyingly lon",
+          29
+        ],
+        [
+          "This string is annoyingly long",
+          30
+        ],
+        [
+          "This string is annoyingly long.",
+          31
+        ]
+      ],
+      "long unicode string": [
+        [
+          "",
+          0
+        ],
+        [
+          "",
+          0
+        ],
+        [
+          "",
+          0
+        ],
+        [
+          "こ",
+          3
+        ],
+        [
+          "こ",
+          3
+        ],
+        [
+          "こ",
+          3
+        ],
+        [
+          "この",
+          6
+        ],
+        [
+          "この.",
+          7
+        ],
+        [
+          "この.-",
+          8
+        ],
+        [
+          "この.-.",
+          9
+        ],
+        [
+          "この.-.",
+          9
+        ],
+        [
+          "この.-.",
+          9
+        ],
+        [
+          "この.-.文",
+          12
+        ],
+        [
+          "この.-.文 ",
+          13
+        ],
+        [
+          "この.-.文 ",
+          13
+        ],
+        [
+          "この.-.文 ",
+          13
+        ],
+        [
+          "この.-.文 字",
+          16
+        ],
+        [
+          "この.-.文 字",
+          16
+        ],
+        [
+          "この.-.文 字",
+          16
+        ],
+        [
+          "この.-.文 字列",
+          19
+        ],
+        [
+          "この.-.文 字列",
+          19
+        ],
+        [
+          "この.-.文 字列",
+          19
+        ],
+        [
+          "この.-.文 字列は",
+          22
+        ],
+        [
+          "この.-.文 字列は",
+          22
+        ],
+        [
+          "この.-.文 字列は",
+          22
+        ],
+        [
+          "この.-.文 字列はう",
+          25
+        ],
+        [
+          "この.-.文 字列はう ",
+          26
+        ],
+        [
+          "この.-.文 字列はう ",
+          26
+        ],
+        [
+          "この.-.文 字列はう ",
+          26
+        ],
+        [
+          "この.-.文 字列はう ん",
+          29
+        ],
+        [
+          "この.-.文 字列はう ん",
+          29
+        ],
+        [
+          "この.-.文 字列はう ん",
+          29
+        ],
+        [
+          "この.-.文 字列はう んざ",
+          32
+        ],
+        [
+          "この.-.文 字列はう んざ ",
+          33
+        ],
+        [
+          "この.-.文 字列はう んざ ",
+          33
+        ],
+        [
+          "この.-.文 字列はう んざ ",
+          33
+        ],
+        [
+          "この.-.文 字列はう んざ り",
+          36
+        ],
+        [
+          "この.-.文 字列はう んざ り",
+          36
+        ],
+        [
+          "この.-.文 字列はう んざ り",
+          36
+        ],
+        [
+          "この.-.文 字列はう んざ りす",
+          39
+        ],
+        [
+          "この.-.文 字列はう んざ りす",
+          39
+        ],
+        [
+          "この.-.文 字列はう んざ りす",
+          39
+        ],
+        [
+          "この.-.文 字列はう んざ りする",
+          42
+        ],
+        [
+          "この.-.文 字列はう んざ りする.",
+          43
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-",
+          44
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.",
+          45
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.",
+          45
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.",
+          45
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほ",
+          48
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほ",
+          48
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほ",
+          48
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど",
+          51
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど ",
+          52
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど ",
+          52
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど ",
+          52
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長",
+          55
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長",
+          55
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長",
+          55
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長い",
+          58
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長い",
+          58
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長い",
+          58
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いで",
+          61
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いで",
+          61
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いで",
+          61
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いです",
+          64
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いです",
+          64
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いです",
+          64
+        ],
+        [
+          "この.-.文 字列はう んざ りする.-.ほど 長いです。",
+          67
+        ]
+      ]
+    }
+  }
+}
