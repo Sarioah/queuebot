@@ -6,6 +6,7 @@
 ***.ini
 ***.old
 ***.bak
+***.txt
 ***~
 .coverage
 .config*

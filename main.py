@@ -18,7 +18,9 @@ from tools.config import PasswordHandler
 from tools.get_emotes import get_emotes
 
 try:
-    from tools.version import VERSION
+    version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
+    with open(version_filename) as _fd:
+        VERSION = _fd.readline().strip()
 except Exception:
     VERSION = "v0"
 
