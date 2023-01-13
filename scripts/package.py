@@ -18,6 +18,7 @@ PARAMETERS = {
         "--include-module=setuptools._vendor.ordered_set",
         "--include-module=setuptools._vendor.packaging.specifiers",
         "--include-package-data=jaraco.text",
+        "--include-data-file=version.txt=version.txt",
     ],
     "win": [
         "--mingw64",
