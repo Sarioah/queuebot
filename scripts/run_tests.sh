@@ -1,6 +1,6 @@
-#/bin/bash
+#!/bin/bash
 
-python3 -m coverage run --source=. -m unittest -v $@
+python3 -m coverage run --source=. -m unittest -v "$@"
 RESULT="$?"
 python3 -m coverage report -m
 if [ ${RESULT} = 0 ]; then

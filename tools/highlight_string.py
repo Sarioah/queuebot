@@ -23,8 +23,7 @@ class Highlighter:
     """
 
     def __init__(self, emote=False, string="", substrings=None, indices=None):
-        """
-        Create the Highlighter object.
+        """Create the Highlighter object.
 
         Args:
             emote: Flag to treat the positions as "emotes", i.e. only highlight
@@ -90,7 +89,7 @@ def _calc_indices(string, search, padding=0):
     try:
         position = string.index(search)
         start, end = padding + position, padding + position + length
-        return [(start, end)] + _calc_indices(string[position + length :], search, end)
+        return [(start, end), *_calc_indices(string[position + length :], search, end)]
     except ValueError:
         return []
 

@@ -14,15 +14,14 @@ Exceptions:
     BadOAuth: Raised when an OAuth token is rejected.
 """
 
-import sys
-import json
 import contextlib
-
-from urllib.request import urlopen
+import json
+import sys
 from configparser import ConfigParser, ParsingError
-from setuptools._vendor.packaging import version
+from urllib.request import urlopen
 
 import keyring
+from setuptools._vendor.packaging import version
 
 from tools.text import colourise as col
 
@@ -203,7 +202,7 @@ def check_update(ver):
     """
     with contextlib.suppress(Exception):
         with urlopen(
-            "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
+                "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
         ) as url:
             upstream = json.load(url)["name"]
         if version.parse(upstream) > version.parse(ver):
