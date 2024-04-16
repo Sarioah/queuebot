@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-import time
-import sys
 import os
+import sys
+import time
 from traceback import format_exc
 
 import colorama
@@ -11,11 +11,10 @@ from readchar import readchar
 from irc_bot.background_bot import BackgroundBot
 from irc_bot.irc_bot import IrcBot
 from irc_bot.message_handler import MessageHandler
-from tools.text import colourise as col
-from tools.song_queue import trunc
-from tools.config import Configuration, BadOAuth, check_update
-from tools.config import PasswordHandler
+from tools.config import BadOAuth, check_update, Configuration, PasswordHandler
 from tools.get_emotes import get_emotes
+from tools.song_queue import trunc
+from tools.text import colourise as col
 
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")

@@ -1,18 +1,18 @@
 #!/usr/bin/python3
 """Retrieve emote strings from FrankerFaceZ and BTTV for the given channels."""
+import asyncio
 import json
 import sys
 
-import asyncio
 import aiohttp
 
-
+MIN_VERSION = 3, 8
 if all(
-    [
-        sys.version_info[0] == 3,
-        sys.version_info[1] >= 8,
-        sys.platform.startswith("win"),
-    ]
+        [
+            sys.version_info[0] == MIN_VERSION[0],
+            sys.version_info[1] >= MIN_VERSION[1],
+            sys.platform.startswith("win"),
+        ]
 ):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
