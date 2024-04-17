@@ -5,13 +5,13 @@ Classes:
         methods based on a given message object, generates responses by
         processing the message using the selected method.
 """
+
 import threading
 
 from irc_bot.events import HandleEvent
 from tools.chat import CommandHandler
+from tools.highlight_string import find_strings, Highlighter
 from tools.song_queue import SongQueue
-from tools.highlight_string import Highlighter
-from tools.highlight_string import find_strings
 
 
 class MessageHandler:
@@ -32,9 +32,9 @@ class MessageHandler:
         """
         self.sep = sep
         self.channel = channel
-        self.emotes = sum(emotes.values(), start=[])
+        self.emotes = [emote for emote_list in emotes.values() for emote in emote_list]
         self.emote_indices_short = []
-        self.commandhandler = CommandHandler()
+        self.command_handler = CommandHandler()
         self.song_queue = SongQueue(self.channel)
         self.lock = threading.Lock()
         self.logging = bool(logging == "True")
@@ -65,6 +65,7 @@ class MessageHandler:
             msg["msg"] = ""
         msg["words"] = msg["msg"].split(" ")
         msg["tags"] = {i["key"]: i["value"] for i in chat_msg.tags}
+        # noinspection PyTypeChecker
         msg["msg"] = self.handle_emotes(msg)
 
         return HandleEvent(msg)(msg_type, self.handle_command)
@@ -86,7 +87,7 @@ class MessageHandler:
         """
         if msg.startswith(self.sep):
             sender = tags["display-name"]
-            action = self.commandhandler.find_command(
+            action = self.command_handler.find_command(
                 tags["badges"], words[0][1:], self.song_queue.mthds
             )
             if action:
@@ -96,7 +97,7 @@ class MessageHandler:
                 return res
         return None
 
-    def handle_emotes(self, msg):
+    def handle_emotes(self, msg: dict):
         """Check a message to see if it contains any emote strings.
 
         If found, colourise the message around each emote.
@@ -114,13 +115,15 @@ class MessageHandler:
                 for t in msg["tags"]["emotes"].split("/")
                 for p in t.split(":")[1].split(",")
             ]
-        except Exception:
+        except AttributeError:
             twitch_indices = []
 
         bttv_indices = find_strings(msg["msg"], self.emotes)
         emote_indices = list(set(bttv_indices + twitch_indices))
 
         adjustment = len(msg["words"][0]) + 1
-        self.emote_indices_short = [(i - adjustment, j - adjustment) for (i, j) in emote_indices]
+        self.emote_indices_short = [
+            (i - adjustment, j - adjustment) for (i, j) in emote_indices
+        ]
 
         return Highlighter(True, msg["msg"], indices=emote_indices).get_highlight()

@@ -1,10 +1,10 @@
-"""Tools for testing a TupleList
+"""Tools for testing a TupleList.
 
 Classes:
         TestTupleList: Test that the TupleList holds and returns the expected
             data.
 """
-# pylint: disable=missing-function-docstring
+
 import unittest
 
 from tools.tuple_list import TupleList
@@ -17,6 +17,7 @@ DATA = [
 ]
 
 
+# ruff: noqa: D102
 class TestTupleList(unittest.TestCase):
     """Test that the TupleList holds and returns the expected data."""
 
@@ -57,9 +58,7 @@ class TestTupleList(unittest.TestCase):
             self.assertEqual(value, expected_value)
 
     def test_repr(self):
-        # pylint:disable=eval-used
         new_t_l = eval(repr(self.t_l))
-        # pylint:enable=eval-used
         self.assertIs(TupleList, type(new_t_l))
         for key, value in DATA:
             self.assertEqual(value, new_t_l[key])

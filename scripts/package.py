@@ -38,6 +38,7 @@ PARAMETERS = {
 
 
 def build():
+    """Run nuitka with platform specific arguments to build the bot binary."""
     print("Running build tool...")
     update_version()
     call([PYTHON, "-m", "nuitka"] + PARAMETERS["base"] + PARAMETERS[PLATFORM])

@@ -1,14 +1,14 @@
 """Tools to handle configuration of the bot.
 
 Includes classes for password and configuration objects that work across unix
-or windows systems.
+or Windows systems.
 
 Classes:
     Configuration: Handle loading config data from a file.
     PasswordHandler: Handle loading and storing passwords.
 
 Functions:
-    check_update: Check for newer versions of the bot on github.
+    check_update: Check for newer versions of the bot on GitHub.
 
 Exceptions:
     BadOAuth: Raised when an OAuth token is rejected.
@@ -21,6 +21,8 @@ from configparser import ConfigParser, ParsingError
 from urllib.request import urlopen
 
 import keyring
+
+# noinspection PyProtectedMember,PyUnresolvedReferences
 from setuptools._vendor.packaging import version
 
 from tools.text import colourise as col
@@ -30,19 +32,19 @@ from tools.text import colourise as col
 # to require the following extra steps. MacOS binary support TBD, will likely
 # need a third case below.
 
-# pylint: disable=ungrouped-imports
 if sys.platform == "win32":
     import keyring.backends.Windows
 
     keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
 elif sys.platform == "linux":
-    # will grab secrets from ssh-agent:
-    # . <(ssh-agent)
-    # ssh-add
+    # will grab secrets from ssh-agent after using:
+    # :$ . <(ssh-agent)
+    # :$ ssh-add
+
+    # noinspection PyUnresolvedReferences,PyPackageRequirements
     import sagecipher.keyring
 
     keyring.set_keyring(sagecipher.keyring.Keyring())
-# pylint: enable=ungrouped-imports
 
 
 defaults = {
@@ -125,9 +127,15 @@ class Configuration:
             res = self._config_empty(
                 "Configuration file not found, a default configuration file has been written to"
             )
-        elif any(True for k in self.config["DEFAULT"] if self.config["DEFAULT"][k] == "********"):
+        elif any(
+            True
+            for k in self.config["DEFAULT"]
+            if self.config["DEFAULT"][k] == "********"
+        ):
             res = self._config_empty("Default fields need to be filled out in")
-        elif any(True for k in ("bot_name", "channel") if k not in self.config["DEFAULT"]):
+        elif any(
+            True for k in ("bot_name", "channel") if k not in self.config["DEFAULT"]
+        ):
             res = self._config_empty("Fields missing in")
         else:
             res = ""
@@ -174,7 +182,7 @@ class Configuration:
             "Saves each received chat message in "
             f"'{col('messages.log', 'YELLOW')}', useful for debugging\n"
             f"     {col('startup_msg', 'GREEN')} : "
-            "Send a message in chat when the bot has sucessfully connected\n"
+            "Send a message in chat when the bot has successfully connected\n"
             f"\nOnce these are filled in, restart the bot."
         )
         return Exception(res)
@@ -183,7 +191,7 @@ class Configuration:
         """Return an exception if config file could not be properly loaded."""
         res = (
             f"Config file '{col(self.configfile, 'YELLOW')}' "
-            "appears to be misformatted.\nPlease correct the error or "
+            "appears to be mis-formatted.\nPlease correct the error or "
             "delete the file, then restart the bot.\n"
         )
         return Exception(res)
@@ -202,7 +210,7 @@ def check_update(ver):
     """
     with contextlib.suppress(Exception):
         with urlopen(
-                "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
+            "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
         ) as url:
             upstream = json.load(url)["name"]
         if version.parse(upstream) > version.parse(ver):

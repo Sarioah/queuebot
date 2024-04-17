@@ -110,16 +110,16 @@ def _is_emote(string, pos):
 
 
 def find_strings(string, substrings):
-    """Search the given string for occurences of the substrings.
+    """Search the given string for occurrences of the substrings.
 
     Args:
         string: String to search.
         substrings: List of strings to search the string for.
 
     Returns:
-        List of position 2-tuples for every occurence of a substring.
+        List of position 2-tuples for every occurrence of a substring.
     """
-    return sorted(sum((_calc_indices(string, sub) for sub in substrings), start=[]))
+    return sorted(index for sub in substrings for index in _calc_indices(string, sub))
 
 
 if __name__ == "__main__":

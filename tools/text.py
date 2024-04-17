@@ -11,7 +11,6 @@ Functions:
         codes around it.
 """
 
-
 ENCODING = "UTF-8"
 
 
@@ -48,7 +47,7 @@ class Paginate:
             page_num = int(page_num)
             page_number = page_num - 1 if page_num > 0 else page_num
             res = self.data[page_number]
-        except Exception:
+        except (LookupError, ValueError):
             res = self.data[0]
         return res
 
@@ -60,7 +59,8 @@ class Paginate:
         """Iterate over the data pages."""
         return iter(self.data)
 
-    def _add_suffixes(self, data):
+    @staticmethod
+    def _add_suffixes(data):
         """Append page suffixes to each element of the given sequence."""
         length = len(data)
         if length <= 1:
@@ -98,9 +98,9 @@ class Paginate:
                 except ValueError:
                     current_length -= 1
                 else:
-                    return [front] + self._split_bytes(back, max_length)
+                    return [front, *self._split_bytes(back, max_length)]
         else:
-            return [data[:cut]] + self._split_bytes(data[cut + spacing :], max_length)
+            return [data[:cut], *self._split_bytes(data[cut + spacing :], max_length)]
 
     def _process_data(self, data, max_length):
         """Take a given string and split it into smaller pages.
@@ -110,7 +110,7 @@ class Paginate:
             max_length: Maximum byte length of each page.
 
         Returns:
-            List of byte strings representing the pages. May be a list
+            List of byte strings representing the pages. Can be a list
             containing a single empty string if there was a problem splitting
             the input string.
         """
@@ -164,7 +164,7 @@ def trim_bytes(msg="", length=0):
                 # coverage reporting using a useless function call
                 len("1")
                 break
-    return (msg, length)
+    return msg, length
 
 
 def colourise(string, colour):

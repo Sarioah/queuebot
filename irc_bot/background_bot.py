@@ -1,4 +1,4 @@
-"""Provide classes to run a chat bot in a background thread.
+"""Provide classes to run a chatbot in a background thread.
 
 This might be preferable to running the bot directly in the case where
 the program wants to use the foreground thread for other tasks.
@@ -13,7 +13,7 @@ Functions:
 import time
 
 from threading import Thread, Lock
-from queue import Queue as Q
+from queue import Queue
 from tools.text import colourise as col
 
 
@@ -21,9 +21,8 @@ class BackgroundBot:
     """Create a bot that runs in the background.
 
     Contains:
-        - an IRC chat bot
-        - a lock to use when writing commands for the IRC chat
-          bot to execute
+        - an IRC chatbot
+        - a lock to use when writing commands for the IRC chatbot to execute
         - an exception queue to pass critical / unhandled exceptions
           back out to the main program, in a thread-safe manner
     """
@@ -39,7 +38,7 @@ class BackgroundBot:
         self.command = []
         self.lock = Lock()
         self.bot = bot
-        self.exception_queue = Q()
+        self.exception_queue = Queue()
         self.thread = background_task(self)
 
     def run(self, exception_queue):
@@ -136,6 +135,8 @@ def background_task(background_bot):
     Returns:
         bot_thread: Handle of the new thread to control the bot with.
     """
-    bot_thread = Thread(target=background_bot.run, args=(background_bot.exception_queue,))
+    bot_thread = Thread(
+        target=background_bot.run, args=(background_bot.exception_queue,)
+    )
     bot_thread.start()
     return bot_thread

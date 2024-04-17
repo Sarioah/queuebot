@@ -2,7 +2,6 @@
 
 Modules:
     chat: Tools for chat based commands.
-    check_imports: Check to ensure the required packages are installed.
     config: Tools to handle configuration of the bot.
     get_emotes: Retrieve emote strings for the given channels.
     highlight_string: Tools to highlight a string with colour.

@@ -6,15 +6,29 @@ import sys
 
 import aiohttp
 
+from aiohttp.client_exceptions import ClientError
+from aiohttp.http_websocket import WebSocketError
+from aiohttp.streams import EofStream
+
 MIN_VERSION = 3, 8
 if all(
-        [
-            sys.version_info[0] == MIN_VERSION[0],
-            sys.version_info[1] >= MIN_VERSION[1],
-            sys.platform.startswith("win"),
-        ]
+    [
+        sys.version_info[0] == MIN_VERSION[0],
+        sys.version_info[1] >= MIN_VERSION[1],
+        sys.platform.startswith("win"),
+    ]
 ):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+IGNORABLE_IO_EXCEPTIONS = (
+    ClientError,
+    WebSocketError,
+    EofStream,
+    OSError,
+    ValueError,
+    AttributeError,
+    LookupError,
+)
 
 
 async def _get(url):
@@ -31,7 +45,7 @@ async def _get_ffz(channel="__ffz_global"):
             for set_name, emote_set in j["sets"].items()
             for emote in emote_set["emoticons"]
         ]
-    except Exception:
+    except IGNORABLE_IO_EXCEPTIONS:
         j = []
     if channel != "__ffz_global":
         channel += "__ffz"
@@ -42,11 +56,15 @@ async def _get_bttv(channel=""):
     try:
         if not channel:
             channel = "__bttv_global"
-            j = json.loads(await _get("https://api.betterttv.net/3/cached/emotes/global"))
+            j = json.loads(
+                await _get("https://api.betterttv.net/3/cached/emotes/global")
+            )
             j = [emote["code"] for emote in j]
         else:
             twitch_channel, channel = channel, channel + "__bttv"
-            bttv_id = json.loads(await _get(f"https://decapi.me/twitch/id/{twitch_channel}"))
+            bttv_id = json.loads(
+                await _get(f"https://decapi.me/twitch/id/{twitch_channel}")
+            )
             j = json.loads(
                 await _get(f"https://api.betterttv.net/3/cached/users/twitch/{bttv_id}")
             )
@@ -55,7 +73,7 @@ async def _get_bttv(channel=""):
                 for emote_set in ("channelEmotes", "sharedEmotes")
                 for emote in j[emote_set]
             ]
-    except Exception:
+    except IGNORABLE_IO_EXCEPTIONS:
         j = []
     return {channel: j}
 

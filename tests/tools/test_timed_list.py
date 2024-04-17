@@ -3,7 +3,7 @@
 Classes:
     TestTimedList: Test how the list behaves over time.
 """
-# pylint: disable=missing-function-docstring
+
 import unittest
 from time import sleep
 
@@ -14,6 +14,7 @@ DEFAULT_DELAY = 0.02
 DATA = [1, 2, 3]
 
 
+# ruff: noqa: D102
 class TestTimedList(unittest.TestCase):
     """Test how the list behaves over time.
 
@@ -73,7 +74,7 @@ class TestTimedList(unittest.TestCase):
 
     def test_append(self):
         self.t_l.append(max(DATA) + 1)
-        self.assertListEqual(self.t_l.data, DATA + [max(DATA) + 1])
+        self.assertListEqual(self.t_l.data, [*DATA, max(DATA) + 1])
         sleep(DELAY)
         self.assertListEqual(self.t_l.data, [])
 
@@ -81,10 +82,8 @@ class TestTimedList(unittest.TestCase):
         self.assertCountEqual(self.t_l, DATA)
 
     def test_getitem(self):
-        for (index, _) in enumerate(DATA):
-            # pylint: disable=unnecessary-list-index-lookup
+        for index, _ in enumerate(DATA):
             self.assertEqual(DATA[index], self.t_l[index])
-            # pylint: enable=unnecessary-list-index-lookup
 
     def test_contains(self):
         for item in DATA:

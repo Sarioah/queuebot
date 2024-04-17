@@ -7,9 +7,7 @@ Classes:
 
 from irc.bot import SingleServerIRCBot
 
-from tools.text import colourise as col
-from tools.text import trim_bytes
-
+from tools.text import colourise as col, trim_bytes
 
 SERVER = "irc.chat.twitch.tv"
 PORT = 6667
@@ -19,7 +17,9 @@ MSG_LIMIT = 499
 class IrcBot(SingleServerIRCBot):
     """IRC Client class."""
 
-    def __init__(self, username, password, channel, muted, message_handler, startup_msg, version):
+    def __init__(
+        self, username, password, channel, muted, message_handler, startup_msg, version
+    ):
         """Create the bot.
 
         Args:
@@ -56,8 +56,9 @@ class IrcBot(SingleServerIRCBot):
         Respond with the client's capabilities.
 
         Args:
-            client (irc.client.ServerConnection):
-                Connection instance for the bot to use when sending data.
+            _msg: client's message
+            client (irc.client.ServerConnection): Connection instance for the
+                bot to use when sending data.
         """
         client.cap("REQ", ":twitch.tv/membership")
         client.cap("REQ", ":twitch.tv/tags")
@@ -100,7 +101,8 @@ class IrcBot(SingleServerIRCBot):
     def on_leave(self, _client, _msg):
         """Additional behaviour called when parting from a channel."""
 
-    def on_error(self, _client, _msg):
+    @staticmethod
+    def on_error(_client, _msg):
         """Handle errors sent from the server."""
         print(col("Error", "RED"))
 
