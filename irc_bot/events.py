@@ -1,18 +1,18 @@
-"""
-Tools for handling events produced by an IRC bot.
+"""Tools for handling events produced by an IRC bot.
 
 Classes:
     HandleEvent: Given a message, message type and callback,
         process the message using the callback then format the response
         appropriately.
 """
+
 # TODO: Refactor, creating with the message then calling with
 # the message type / callback is just silly
 from datetime import datetime
 
 from tools.chat import format_badges
-from tools.text import colourise as col
 from tools.config import BadOAuth
+from tools.text import colourise as col
 
 
 class HandleEvent:
@@ -36,7 +36,7 @@ class HandleEvent:
         self.prefix = col(prefix, "GREY")
 
     def __call__(self, msg_type, callback):
-        """Call the approriate method based on the message type.
+        """Call the appropriate method based on the message type.
 
         Args:
             msg_type: String representing the type of message this is, and thus
@@ -108,7 +108,7 @@ class HandleEvent:
         print(self.prefix + col(self.msg, "GREY"))
 
     def on_usernotice(self, *_args):
-        """Process general system anouncements.
+        """Process general system announcements.
 
         On Twitch this includes:
             - subs
@@ -118,11 +118,13 @@ class HandleEvent:
         Args:
             _args: Ignore extra positional args.
         """
-        if self.tags.get("system-msg"):
-            res = col(self.tags["system-msg"], "GREY")
-        elif self.tags.get("display-name"):
-            res = col(self.tags["display-name"], "GREY")
-        print(self.prefix + res + f" - {self.msg or '<no msg>'}")
+        if tag := self.tags.get("system-msg"):
+            col_tag = col(tag, "GREY")
+        elif tag := self.tags.get("display-name"):
+            col_tag = col(tag, "GREY")
+        else:
+            col_tag = col("unknown msg type", "GREY")
+        print(f"{self.prefix}{col_tag} - {self.msg or '<no msg>'}")
 
     def on_whisper(self, *_args):
         """Process whispers.
@@ -130,4 +132,7 @@ class HandleEvent:
         Args:
             _args: Ignore extra positional args.
         """
-        print(self.prefix + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))
+        print(
+            self.prefix
+            + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY")
+        )

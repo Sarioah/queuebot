@@ -4,12 +4,11 @@ Classes:
     TestPaginate: Test that a Paginate properly breaks a string into pages.
     TestFunctions: Test the functions in the tools.text module.
 """
-# pylint:disable=missing-function-docstring
+
 import json
 import unittest
 
 import tools.text
-
 
 PAGE_LENGTH = 100
 STRING_LENGTH = 5
@@ -21,6 +20,7 @@ with open("tests/tools/text_testdata.json", encoding="UTF-8") as fd_:
     EXPECTED_RESULTS = testdata["expected results"]
 
 
+# ruff: noqa: D102
 class TestPaginate(unittest.TestCase):
     """Test that the Paginate object holds and returns the expected data."""
 
@@ -34,10 +34,14 @@ class TestPaginate(unittest.TestCase):
         for page_num, page in enumerate(EXPECTED_RESULTS["pages"]["long string"]):
             failure_msg = f"Test failed on page {page_num + 1}"
             self.assertEqual(self.pag[page_num + 1], page, failure_msg)
-        self.assertEqual(self.pag["bad index"], EXPECTED_RESULTS["pages"]["long string"][0])
+        self.assertEqual(
+            self.pag["bad index"], EXPECTED_RESULTS["pages"]["long string"][0]
+        )
 
     def test_iter(self):
-        self.assertSequenceEqual(list(self.pag), EXPECTED_RESULTS["pages"]["long string"])
+        self.assertSequenceEqual(
+            list(self.pag), EXPECTED_RESULTS["pages"]["long string"]
+        )
 
         def generate_first_pages(sep=""):
             return [
@@ -46,10 +50,12 @@ class TestPaginate(unittest.TestCase):
             ]
 
         self.assertSequenceEqual(
-            generate_first_pages(), EXPECTED_RESULTS["iter"]["long unicode string"]["no seperator"]
+            generate_first_pages(),
+            EXPECTED_RESULTS["iter"]["long unicode string"]["no seperator"],
         )
         self.assertSequenceEqual(
-            generate_first_pages(" "), EXPECTED_RESULTS["iter"]["long unicode string"]["space"]
+            generate_first_pages(" "),
+            EXPECTED_RESULTS["iter"]["long unicode string"]["space"],
         )
         self.assertSequenceEqual(
             generate_first_pages(".-."),
@@ -63,7 +69,8 @@ class TestPaginate(unittest.TestCase):
             ]
 
         self.assertSequenceEqual(
-            generate_all_pages(), EXPECTED_RESULTS["iter"]["long string"]["no seperator"]
+            generate_all_pages(),
+            EXPECTED_RESULTS["iter"]["long string"]["no seperator"],
         )
         self.assertSequenceEqual(
             generate_all_pages(" "), EXPECTED_RESULTS["iter"]["long string"]["space"]
@@ -87,20 +94,30 @@ class TestFunctions(unittest.TestCase):
         def generate_test_data(input_string):
             byte_length = len(tools.text.to_bytes(input_string))
             return [
-                tools.text.trim_bytes(input_string, length) for length in range(byte_length + 1)
+                tools.text.trim_bytes(input_string, length)
+                for length in range(byte_length + 1)
             ]
 
         self.assertSequenceEqual(
             generate_test_data(DATA["long string"]),
-            [tuple(element) for element in EXPECTED_RESULTS["trim bytes"]["long string"]],
+            [
+                tuple(element)
+                for element in EXPECTED_RESULTS["trim bytes"]["long string"]
+            ],
         )
         self.assertSequenceEqual(
             generate_test_data(DATA["long unicode string"]),
-            [tuple(element) for element in EXPECTED_RESULTS["trim bytes"]["long unicode string"]],
+            [
+                tuple(element)
+                for element in EXPECTED_RESULTS["trim bytes"]["long unicode string"]
+            ],
         )
 
     def test_colourise(self):
-        results = [tools.text.colourise(DATA["long string"], colour) for colour in DATA["colours"]]
+        results = [
+            tools.text.colourise(DATA["long string"], colour)
+            for colour in DATA["colours"]
+        ]
         self.assertSequenceEqual(results, EXPECTED_RESULTS["colourise"])
         with self.assertRaises(KeyError):
             tools.text.colourise(DATA["long string"], "bad colour")

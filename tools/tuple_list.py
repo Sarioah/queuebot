@@ -6,7 +6,7 @@ import random
 class TupleList:
     """A dict - like object that also maintains ordering of key: value pairs.
 
-    Addressing by key is case - insensitive
+    Addressing by key is case-insensitive
 
     Implements simple mathematical operators as set - like interactions
     """
@@ -90,7 +90,7 @@ class TupleList:
             Result of the addition, as a new TupleList.
         """
         res = self.copy()
-        for (key, value) in other:
+        for key, value in other:
             res[key] = value
         return res
 
@@ -107,7 +107,7 @@ class TupleList:
             Result of the subtraction, as a new TupleList.
         """
         res = TupleList()
-        for (key, value) in self:
+        for key, value in self:
             if key not in other:
                 res.append((key, value))
         return res

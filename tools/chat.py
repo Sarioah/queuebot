@@ -1,4 +1,5 @@
 """Tools for chat based commands, text manipulation and output formatting."""
+
 import time
 
 from tools.text import colourise as col
@@ -17,7 +18,9 @@ class Commands:
 
     def help(self, *_args):
         """List available chat commands."""
-        everyone = [k for k in self.parent.commands if self.parent.commands[k][0] == "e"]
+        everyone = [
+            k for k in self.parent.commands if self.parent.commands[k][0] == "e"
+        ]
         mods = [k for k in self.parent.commands if self.parent.commands[k][0] == "m"]
         return (
             f"Queuebot commands: \"{', '.join(everyone)}\" "
@@ -117,7 +120,12 @@ class CommandHandler:
         if timeleft >= 0:
             self.cooldowns[command[1]] = current
             return True
-        print(col(f"'{command[1]}' still on cooldown for {round(timeleft, 1) * -1}s", "GREY"))
+        print(
+            col(
+                f"'{command[1]}' still on cooldown for {round(timeleft, 1) * -1}s",
+                "GREY",
+            )
+        )
         return False
 
     def find_command(self, badges, request, *alternatives):
@@ -144,7 +152,7 @@ class CommandHandler:
         command = self.commands.get(command_name, None)
 
         if command and self.check_cooldowns(command):
-            for obj in (self,) + alternatives:
+            for obj in (self, *alternatives):
                 exclusions = getattr(obj, "exclusions", [])
                 if all(
                     (

@@ -20,7 +20,7 @@ try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
     with open(version_filename) as _fd:
         VERSION = _fd.readline().strip()
-except Exception:
+except OSError:
     VERSION = "v0"
 
 
@@ -88,7 +88,6 @@ def setup_bot(*args):
 
     if os.name == "nt":
         # TODO: Put this somewhere else
-        # pylint: disable=import-error,import-outside-toplevel
         import win32api
 
         win32api.SetConsoleCtrlHandler(close, True)
@@ -96,7 +95,6 @@ def setup_bot(*args):
             f"Sari queuebot {VERSION} acting as "
             + f"'{config['bot_name']}' in channel '{channel}'"
         )
-    # pylint: disable=import-error,import-outside-toplevel
 
     global password_handler
     password_handler = PasswordHandler(bot_name)
@@ -137,12 +135,16 @@ except BadOAuth as exc:
         res = "oauth token is invalid"
     elif str(exc) == "Improperly formatted auth":
         res = "oauth token is improperly formatted"
+    else:
+        res = str(exc)
     print(col(res + ", please restart the bot and paste in a new token", "RED"))
     password_handler.del_password()
     error_status.set_errored(exc)
 except Exception as exc:
     trace = format_exc()
-    msg = col("Bot has encountered a problem and needs to close. Error is as follows:", "RED")
+    msg = col(
+        "Bot has encountered a problem and needs to close. Error is as follows:", "RED"
+    )
     print(f"{msg}\n{trace}")
 
     with open("last error.log", "w", encoding="utf-8") as file_:

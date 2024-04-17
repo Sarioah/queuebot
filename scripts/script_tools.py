@@ -4,8 +4,7 @@ from subprocess import check_output, STDOUT, CalledProcessError, TimeoutExpired
 
 
 def valid_command(command):
-    """
-    Check if a command runs in the shell without error or timeout.
+    """Check if a command runs in the shell without error or timeout.
 
     Args:
         command (str): Command to attempt running.

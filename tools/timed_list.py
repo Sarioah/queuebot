@@ -1,4 +1,5 @@
 """Manages a list erases its content after a specified time delay."""
+
 from time import time
 
 
@@ -16,7 +17,7 @@ class TimedList:
         Args:
             delay: Time delay after which the list is cleared. Writes within
                 this period keep extending the life of the list's data.
-            kwargs: Collects arributes in a dict to apply to the newly created
+            kwargs: Collects attributes in a dict to apply to the newly created
                 list.
         """
         self.data = kwargs.get("data", [])
@@ -32,7 +33,7 @@ class TimedList:
         return len(self.data)
 
     def __iter__(self):
-        """Pass iter calls to lists's data.
+        """Pass iter calls to list's data.
 
         Yields:
             Elements taken from the list.

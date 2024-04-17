@@ -17,18 +17,15 @@ Functions:
     trunc: Take a string then truncate it to the specified length
 """
 
-import time
 import contextlib
-
+import time
+from json import dumps, loads
 from os import path
-from json import loads, dumps
 from traceback import format_exc
 
-from tools.tuple_list import TupleList
+from tools.text import colourise as c, Paginate
 from tools.timed_list import TimedList
-from tools.text import colourise as c
-from tools.text import Paginate
-
+from tools.tuple_list import TupleList
 
 SINGLE_SONG_LENGTH = 200
 MULTI_SONG_LENGTH = 50  # (for lists)
@@ -101,10 +98,11 @@ class BaseMethods:
             _args: Ignore extra positional args.
 
         Returns:
-            Message string if data was loaded sucessfully, otherwise None.
+            Message string if data was loaded successfully, otherwise None.
         """
+        max_age = 10
         with contextlib.suppress(AttributeError):
-            if time.time() - self.parent.testdata[1] < 10:
+            if time.time() - self.parent.testdata[1] < max_age:
                 self.parent.entries = TupleList(*self.parent.testdata[0])
                 del self.parent.testdata
                 return "Test data loaded into queue"
@@ -139,7 +137,7 @@ class BaseMethods:
             try:
                 with open("testdata.json", "r", encoding="utf-8") as file_:
                     self.parent.testdata = [loads(file_.read())]
-            except Exception:
+            except (OSError, ValueError):
                 return "Failed to load test data"
             else:
                 self.parent.testdata += [time.time()]
@@ -177,7 +175,8 @@ class JDMethods(BaseMethods):
         self.parent.mthds = JBMethods(self.parent)
         return "Queue is now in priority / user queue mode"
 
-    def jdqueue(self, *_args):
+    @staticmethod
+    def jdqueue(*_args):
         """Change queue into Just Dance / random song mode."""
         return "Queue is already in random song mode"
 
@@ -224,11 +223,11 @@ class JDMethods(BaseMethods):
         if 0 in emote_indices:
             entry = " " + entry
 
-        oldentry = self.parent.entries[sender]
+        old_entry = self.parent.entries[sender]
         self.parent.entries[sender] = entry
-        if oldentry:
+        if old_entry:
             return (
-                f'{sender}\'s song changed from "{trunc(oldentry, SINGLE_SONG_LENGTH // 2)}" '
+                f'{sender}\'s song changed from "{trunc(old_entry, SINGLE_SONG_LENGTH // 2)}" '
                 f'to "{trunc(entry, SINGLE_SONG_LENGTH // 2)}"'
             )
         return f'Added "{trunc(entry, SINGLE_SONG_LENGTH)}" to the queue for {sender}'
@@ -297,6 +296,7 @@ class JDMethods(BaseMethods):
         picked list are chosen first.
 
         Args:
+            _: Disregard sender
             selection: Specified entry number to pick. If omitted, pick one
                 randomly.
             _args: Ignore extra positional args.
@@ -310,7 +310,9 @@ class JDMethods(BaseMethods):
                 user, song = self.parent.entries.pop(int(selection) - 1)
                 repeat_pick = user in self.parent.picked
             else:
-                (user, song), repeat_pick = self.parent.entries.random(self.parent.picked)
+                (user, song), repeat_pick = self.parent.entries.random(
+                    self.parent.picked
+                )
         except ValueError:
             return "Please specify a song number"
         except IndexError as exc:
@@ -329,6 +331,7 @@ class JDMethods(BaseMethods):
         """Search queue for the given song.
 
         Args:
+            _: Disregard sender
             search: Search string to look for.
             _args: Ignore extra positional args.
 
@@ -348,6 +351,7 @@ class JDMethods(BaseMethods):
         """Search queue for the given user.
 
         Args:
+            _: Disregard sender
             search: User to look for.
             _args: Ignore extra positional args.
 
@@ -383,7 +387,8 @@ class JBMethods(BaseMethods):
         ]
         self.parent.mode = "priority"
 
-    def jbqueue(self, *_args):
+    @staticmethod
+    def jbqueue(*_args):
         """Change queue to Jackbox / priority mode."""
         return "Queue is already in priority / user queue mode"
 
@@ -408,6 +413,7 @@ class JBMethods(BaseMethods):
         List expires after ten minutes.
 
         Args:
+            _: Disregard sender
             page: Page number of output to return.
             _args: Ignore extra positional args.
 
@@ -416,7 +422,10 @@ class JBMethods(BaseMethods):
         """
         if self.parent.currentusers:
             res = "Currently picked users: " + " • ".join(
-                [f"{index + 1}. {user}" for (index, user) in enumerate(self.parent.currentusers)]
+                [
+                    f"{index + 1}. {user}"
+                    for (index, user) in enumerate(self.parent.currentusers)
+                ]
             )
             return Paginate(res, self.parent.msg_limit, " • ")[page]
         return "No-one's been picked yet"
@@ -515,13 +524,14 @@ class JBMethods(BaseMethods):
         specified, pick the first user in the queue.
 
         Args:
+            _: Disregard sender
             selection: Specified user number to pick. If omitted, pick the
                 first one.
             _args: Ignore extra positional args.
 
         Returns:
-            Message string with the picked user. Otherwise a message describing
-            any issues with the selection number.
+            Message string with the picked user. Otherwise, a message
+                describing any issues with the selection number.
         """
         try:
             if selection:
@@ -605,14 +615,15 @@ class SongQueue:
     def save(self):
         """Dump all queue data to a file in the data/ folder."""
         with open(f"data/{self.channel}.json", "w", encoding="utf-8") as file_:
-            res = {}
-            res["channel"] = self.channel
-            res["isopen"] = self.isopen
-            res["current"] = self.current
-            res["mode"] = self.mode
-            res["currentusers"] = self.currentusers.serialise()
-            res["entries"] = self.entries.serialise()
-            res["picked"] = self.picked.serialise()
+            res = {
+                "channel": self.channel,
+                "isopen": self.isopen,
+                "current": self.current,
+                "mode": self.mode,
+                "currentusers": self.currentusers.serialise(),
+                "entries": self.entries.serialise(),
+                "picked": self.picked.serialise(),
+            }
             file_.write(dumps(res, indent=4))
 
     def load(self, channel, *tuples):
@@ -637,13 +648,18 @@ class SongQueue:
                     self.mthds = JDMethods(self)
                 else:
                     self.mthds = JBMethods(self)
-        except Exception:
-            print(c(f"\n{format_exc()}\nFailed to load saved queue, creating new one", "GREY"))
+        except (OSError, ValueError, LookupError):
+            print(
+                c(
+                    f"\n{format_exc()}\nFailed to load saved queue, creating new one",
+                    "GREY",
+                )
+            )
             self.new(channel, *tuples)
 
 
 def trunc(msg, length):
-    """Take a string and truncate it to the specfied length.
+    """Take a string and truncate it to the specified length.
 
     Args:
         msg: Input string.
