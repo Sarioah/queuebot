@@ -1,9 +1,10 @@
 """Helper script to manage bot version number."""
 
+import os
 import subprocess
 
 
-def update_version():
+def update_version(path="."):
     """Generate file containing bot version number as per git.
 
     Check current bot version using git, then generate a file
@@ -25,10 +26,10 @@ def update_version():
     else:
         version = segments[0]
 
-    with open("./version.txt", "w", encoding="utf-8") as _fd:
+    with open(os.path.join(path, "version.txt"), "w", encoding="utf-8") as _fd:
         _fd.write(version)
     subprocess.call(f"poetry version {version}".split())
 
 
 if __name__ == "__main__":
-    update_version()
+    update_version("..")

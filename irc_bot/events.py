@@ -7,7 +7,7 @@ Classes:
 """
 
 # TODO: Refactor, creating with the message then calling with
-# the message type / callback is just silly
+# TODO: the message type / callback is just silly
 from datetime import datetime
 
 from tools.chat import format_badges

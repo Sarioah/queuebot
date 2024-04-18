@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "queuebot"
-version = "v1.4.11.dev10+gc0b2d9a"
+version = "v1.4.11.dev11+gdfd93cd"
 description = ""
 authors = ["Sarioah <3851003+Sarioah@users.noreply.github.com>"]
 readme = "README.md"
