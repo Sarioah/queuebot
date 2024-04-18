@@ -122,7 +122,7 @@ class Configuration:
         except ParsingError as exc:
             raise self._config_bad() from exc
         # TODO: Giant if-elif and convoluted timing of raising / writing
-        # needs revising
+        # TODO: needs revising
         if not self.config["DEFAULT"]:
             res = self._config_empty(
                 "Configuration file not found, a default configuration file has been written to"

@@ -176,7 +176,7 @@ def format_badges(tags):
         message tags.
     """
     # TODO: roles as dict maybe, probably a comprehension to generate the
-    # coloured suffix
+    # TODO: coloured suffix
     badges = tags["badges"]
     res = ""
     roles = [
