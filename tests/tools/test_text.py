@@ -1,10 +1,3 @@
-"""Tools for testing text tools.
-
-Classes:
-    TestPaginate: Test that a Paginate properly breaks a string into pages.
-    TestFunctions: Test the functions in the tools.text module.
-"""
-
 import json
 import unittest
 
@@ -20,9 +13,8 @@ with open("tests/tools/text_testdata.json", encoding="UTF-8") as fd_:
     EXPECTED_RESULTS = testdata["expected results"]
 
 
-# ruff: noqa: D102
+# ruff: noqa: D101, D102
 class TestPaginate(unittest.TestCase):
-    """Test that the Paginate object holds and returns the expected data."""
 
     def setUp(self):
         self.pag = tools.text.Paginate(DATA["very long string"], PAGE_LENGTH, SEPARATOR)

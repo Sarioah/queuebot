@@ -1,9 +1,3 @@
-"""Tools for testing a TimedList.
-
-Classes:
-    TestTimedList: Test how the list behaves over time.
-"""
-
 import unittest
 from time import sleep
 
@@ -14,13 +8,8 @@ DEFAULT_DELAY = 0.02
 DATA = [1, 2, 3]
 
 
-# ruff: noqa: D102
+# ruff: noqa: D101, D102
 class TestTimedList(unittest.TestCase):
-    """Test how the list behaves over time.
-
-    Ensure that the list wipes its data after the correct
-    time delay has elapsed.
-    """
 
     def setUp(self):
         self.t_l = timed_list.TimedList(delay=DELAY)

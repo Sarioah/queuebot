@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock, call, patch
 from tools import get_emotes
 
 
-# ruff: noqa: D102
-class TestGet(unittest.IsolatedAsyncioTestCase):
+# ruff: noqa: D101, D102
+class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
         self.mocked_url = "https://example.com"
