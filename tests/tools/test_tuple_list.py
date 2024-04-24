@@ -1,10 +1,3 @@
-"""Tools for testing a TupleList.
-
-Classes:
-        TestTupleList: Test that the TupleList holds and returns the expected
-            data.
-"""
-
 import unittest
 
 from tools.tuple_list import TupleList
@@ -17,10 +10,8 @@ DATA = [
 ]
 
 
-# ruff: noqa: D102
+# ruff: noqa: D101, D102
 class TestTupleList(unittest.TestCase):
-    """Test that the TupleList holds and returns the expected data."""
-
     def load_data(self):
         self.t_l = TupleList(*DATA)
         split = len(DATA) // 2
