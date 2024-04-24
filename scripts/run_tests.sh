@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ..
-poetry run python3 -m coverage run --source=. -m unittest -v "$@"
+poetry run python3 -m coverage run --source=. -m unittest "$@"
 RESULT="$?"
 poetry run python3 -m coverage report -m
 

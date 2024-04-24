@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "queuebot"
-version = "v1.4.11.dev11+gdfd93cd"
+version = "1.4.11.dev12+gb096864"
 description = ""
 authors = ["Sarioah <3851003+Sarioah@users.noreply.github.com>"]
 readme = "README.md"
@@ -20,6 +20,13 @@ irc = "^20.4.0"
 black = "^24.4.0"
 nuitka = "^2.1.5"
 coverage = "^7.4.4"
+
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain if non-runnable code isn't run:
+    "if __name__ == .__main__.:",
+]
 
 [build-system]
 requires = ["poetry-core"]

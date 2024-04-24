@@ -5,7 +5,6 @@ import json
 import sys
 
 import aiohttp
-
 from aiohttp.client_exceptions import ClientError
 from aiohttp.http_websocket import WebSocketError
 from aiohttp.streams import EofStream
@@ -28,13 +27,13 @@ IGNORABLE_IO_EXCEPTIONS = (
     ValueError,
     AttributeError,
     LookupError,
+    StopAsyncIteration,
 )
 
 
 async def _get(url):
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            return await resp.text()
+        return await (await session.get(url)).text()
 
 
 async def _get_ffz(channel="__ffz_global"):
@@ -78,14 +77,14 @@ async def _get_bttv(channel=""):
     return {channel: j}
 
 
-async def _main(channels):
+async def _main(channels=()):
     tasks = [_get_ffz(), _get_bttv()]
     for channel in channels:
         tasks += [_get_ffz(channel), _get_bttv(channel)]
     return await asyncio.gather(*tasks)
 
 
-def get_emotes(*channels):
+def get_emotes(*channels: str) -> dict[str, list]:
     """Return a dict of lists of emote strings for the given channels.
 
     Lists can potentially be empty.
@@ -104,7 +103,7 @@ def get_emotes(*channels):
         channels: Collects channel names.
 
     Returns:
-        dict[list[str]]: Dict of Lists of emote strings grouped by channel.
+        Dict of Lists of emote strings grouped by channel.
     """
     return {k: v for d in asyncio.run(_main(channels)) for k, v in d.items()}
 

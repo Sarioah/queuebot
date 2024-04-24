@@ -1,7 +1,7 @@
 @ECHO off
 
 cd ..
-poetry run py -m coverage run --source=. -m unittest discover -v %*
+poetry run py -m coverage run --source=. -m unittest discover %*
 SET /A err=%ERRORLEVEL%
 poetry run py -m coverage report -m
 
