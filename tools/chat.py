@@ -27,7 +27,7 @@ class Commands:
             + f"• Queuebot moderator commands: \"{', '.join(mods)}\""
         )
 
-    def listaliases(self, *_args):
+    def list_aliases(self, *_args):
         """List available command aliases."""
         # TODO: Need to guard this and help against IRC msg limit
 
@@ -63,7 +63,7 @@ class CommandHandler:
             "help": ("e", "help", 10),
             "whichsong": ("e", "lookupentry", 3),
             "whichuser": ("e", "lookupuser", 3),
-            "listaliases": ("e", "listaliases", 10),
+            "listaliases": ("e", "list_aliases", 10),
             "testqueue": ("m", "testqueue", 10),
             "queueconfirm": ("m", "queueconfirm", 0),
         }
@@ -157,11 +157,11 @@ class CommandHandler:
                 if all(
                     (
                         request.casefold() not in exclusions,
-                        mthd := obj[command[1]],
+                        method := obj[command[1]],
                         command[0] == "e" or command[0] == "m" and role_check(badges),
                     )
                 ):
-                    return mthd
+                    return method
         return None
 
 
