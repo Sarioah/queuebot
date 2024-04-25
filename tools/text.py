@@ -153,17 +153,10 @@ def trim_bytes(msg="", length=0):
         Trimmed version of the input string
     """
     if msg:
-        msg = to_bytes(msg)
-        while msg:
-            try:
-                msg = to_string(msg[:length])
-            except ValueError:
-                length -= 1
-            else:
-                # prevent optimisers from skipping this line and messing up
-                # coverage reporting using a useless function call
-                len("1")
-                break
+        try:
+            msg = to_string(to_bytes(msg)[:length])
+        except ValueError:
+            msg, length = trim_bytes(msg, length - 1)
     return msg, length
 
 
