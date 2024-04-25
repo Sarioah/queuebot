@@ -10,6 +10,11 @@ Functions:
         string.
 """
 
+from typing import Optional
+
+HIGHLIGHT_COLOUR = "\x1b[36;1m"
+RESET_STR = "\x1b[0m"
+
 
 class Highlighter:
     """Main highlighter class.
@@ -22,7 +27,13 @@ class Highlighter:
         get_string: Return the original string without highlighting.
     """
 
-    def __init__(self, emote=False, string="", substrings=None, indices=None):
+    def __init__(
+        self,
+        emote=False,
+        string="",
+        substrings: Optional[list[str]] = None,
+        indices: Optional[list[tuple]] = None,
+    ):
         """Create the Highlighter object.
 
         Args:
@@ -69,8 +80,8 @@ def _highlight(string, positions):
     # Walk the exploded string in reverse, so that each insertion doesn't
     # affect the position of subsequent insertions.
     for start, reset in sorted(positions, reverse=True):
-        exploded_string.insert(reset, "\33[0m")
-        exploded_string.insert(start, "\33[36;2m")
+        exploded_string.insert(reset, RESET_STR)
+        exploded_string.insert(start, HIGHLIGHT_COLOUR)
     return "".join(exploded_string)
 
 
@@ -86,15 +97,17 @@ def _calc_indices(string, search, padding=0):
         List of position 2-tuples for each position the substring is found at.
     """
     length = len(search)
+    if length < 1:
+        raise ValueError("Search string must have non-zero length")
     try:
         position = string.index(search)
         start, end = padding + position, padding + position + length
         return [(start, end), *_calc_indices(string[position + length :], search, end)]
-    except ValueError:
+    except (ValueError, RecursionError):
         return []
 
 
-def _is_emote(string, pos):
+def _is_emote(string: str, pos: tuple):
     """Check the string at the given position for word boundaries.
 
     Args:
@@ -102,11 +115,12 @@ def _is_emote(string, pos):
         pos: 2-tuple with the positions to check.
 
     Returns:
-        True if the position fully describes an entire word.
+        True if the position fully describes a single word.
     """
-    start = int(pos[0]) == 0 or string[pos[0] - 1 : pos[0]] == " "
-    end = int(pos[1]) == len(string) or string[pos[1] : pos[1] + 1] == " "
-    return start and end
+    start, end = pos
+    first_bound = int(start) == 0 or string[start - 1 : start] == " "
+    second_bound = int(end) == len(string) or string[end : end + 1] == " "
+    return all([first_bound, second_bound, start < end, " " not in string[start:end]])
 
 
 def find_strings(string, substrings):
