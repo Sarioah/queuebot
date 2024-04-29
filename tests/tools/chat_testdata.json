@@ -1,0 +1,62 @@
+{
+  "input": {
+    "format_badges": {
+      "no badge": {
+        "badges": ""
+      },
+      "unknown badge": {
+        "badges": "mystery,suspect"
+      },
+      "sub": {
+        "badges": "subscriber"
+      },
+      "sub_combined": {
+        "badges": "subscriber,premium"
+      },
+      "vip": {
+        "badges": "vip"
+      },
+      "mod": {
+        "badges": "moderator"
+      },
+      "broadcaster": {
+        "badges": "broadcaster"
+      },
+      "combined1": {
+        "badges": "broadcaster,moderator,vip,subscriber"
+      },
+      "combined2": {
+        "badges": "moderator,subscriber"
+      },
+      "combined3": {
+        "badges": "vip,subscriber"
+      }
+    },
+    "check_aliases": [
+      "join",
+      "currentuser",
+      "queuelist",
+      "clearusers"
+    ]
+  },
+  "expected_results": {
+    "format_badges": {
+      "no badge": "",
+      "unknown badge": "",
+      "sub": "\u001B[34;1mS\u001B[0m",
+      "sub_combined": "\u001B[34;1mS\u001B[0m",
+      "vip": "\u001B[35;1mV\u001B[0m",
+      "mod": "\u001B[32;1mM\u001B[0m",
+      "broadcaster": "\u001B[31;1mB\u001B[0m",
+      "combined1": "\u001B[31;1mB\u001B[0m\u001B[32;1mM\u001B[0m\u001B[35;1mV\u001B[0m\u001B[34;1mS\u001B[0m",
+      "combined2": "\u001B[32;1mM\u001B[0m\u001B[34;1mS\u001B[0m",
+      "combined3": "\u001B[35;1mV\u001B[0m\u001B[34;1mS\u001B[0m"
+    },
+    "check_aliases": [
+      "sr",
+      "currentsong",
+      "listqueue",
+      "clearparty"
+    ]
+  }
+}
