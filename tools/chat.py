@@ -19,9 +19,15 @@ class Commands:
     def help(self, *_args):
         """List available chat commands."""
         everyone = [
-            k for k in self.parent.commands if self.parent.commands[k][0] == "e"
+            k
+            for k, (permission, _, _) in self.parent.commands.items()
+            if permission == "e"
         ]
-        mods = [k for k in self.parent.commands if self.parent.commands[k][0] == "m"]
+        mods = [
+            k
+            for k, (permission, _, _) in self.parent.commands.items()
+            if permission == "m"
+        ]
         return (
             f"Queuebot commands: \"{', '.join(everyone)}\" "
             + f"• Queuebot moderator commands: \"{', '.join(mods)}\""
@@ -89,7 +95,7 @@ class CommandHandler:
         }
 
     def __getitem__(self, attr):
-        """Search for a method maching the specified attribute name."""
+        """Search for a method matching the specified attribute name."""
         return getattr(self.mthds, attr, None)
 
     def check_aliases(self, command):
@@ -115,6 +121,8 @@ class CommandHandler:
             True if command's cooldown has already expired, otherwise prints a
                 message and returns False.
         """
+        # TODO: fix cooldowns still being fired even if command is rejected
+        # TODO: upstream due to permissions
         current = time.time()
         timeleft = current - self.cooldowns.get(command[1], 0) - command[2]
         if timeleft >= 0:
@@ -138,8 +146,8 @@ class CommandHandler:
         as a list in an "exclusions" attribute.
 
         Args:
-            badges: List of strings representing chat badges owned by the
-                chatter who sent the command.
+            badges: String of comma separated chat badges owned by the chatter
+                who sent the command.
             request: Name of command to search for.
             alternatives: Extra objects to look through for commands.
 
@@ -175,20 +183,21 @@ def format_badges(tags):
         String formatted with coloured letters representing roles found in the
         message tags.
     """
-    # TODO: roles as dict maybe, probably a comprehension to generate the
-    # TODO: coloured suffix
     badges = tags["badges"]
-    res = ""
-    roles = [
-        ("RED", ("broadcaster",), "B"),
-        ("GREEN", ("moderator",), "M"),
-        ("BLUE", ("subscriber", "premium"), "S"),
-        ("PURPLE", ("vip",), "V"),
-    ]
+    roles = {
+        "broadcaster": {"colour": "RED", "tag": "B"},
+        "moderator": {"colour": "GREEN", "tag": "M"},
+        "vip": {"colour": "PURPLE", "tag": "V"},
+        "subscriber,premium": {"colour": "BLUE", "tag": "S"},
+    }
 
-    for role in roles:
-        res += col(role[2], role[0]) if role_check(badges, *role[1]) else ""
-    return res
+    return "".join(
+        [
+            col(role_data["tag"], role_data["colour"])
+            for role, role_data in roles.items()
+            if role_check(badges, *role.split(","))
+        ]
+    )
 
 
 def role_check(badges, *roles):
