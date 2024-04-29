@@ -31,12 +31,11 @@ from tools.text import colourise as col
 # from source, however that causes issues in the nuitka binaries. Those seem
 # to require the following extra steps. MacOS binary support TBD, will likely
 # need a third case below.
-
 if sys.platform == "win32":
     import keyring.backends.Windows
 
     keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
-elif sys.platform == "linux":
+elif sys.platform == "linux":  # pragma: no cover
     # will grab secrets from ssh-agent after using:
     # :$ . <(ssh-agent)
     # :$ ssh-add
@@ -47,7 +46,7 @@ elif sys.platform == "linux":
     keyring.set_keyring(sagecipher.keyring.Keyring())
 
 
-defaults = {
+DEFAULTS = {
     "bot_name": "********",
     "channel": "********",
     "bot_prefix": "!",
@@ -149,7 +148,7 @@ class Configuration:
 
     def write_config(self):
         """Write configuration data to self's configfile."""
-        for key, value in defaults.items():
+        for key, value in DEFAULTS.items():
             if key not in self.config["DEFAULT"]:
                 self.config["DEFAULT"][key] = value
         with open(self.configfile, "w", encoding="utf-8") as file_:
