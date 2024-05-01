@@ -62,7 +62,10 @@ class TimedList:
             Content of the requested attribute.
         """
         delay = object.__getattribute__(self, "delay")
-        if (now := time()) - object.__getattribute__(self, "time") > delay:
+        if (
+            attr == "data"
+            and (now := time()) - object.__getattribute__(self, "time") > delay
+        ):
             object.__setattr__(self, "time", now)
             object.__setattr__(self, "data", [])
         return object.__getattribute__(self, attr)
@@ -77,7 +80,8 @@ class TimedList:
             attr (str): Name of the attribute to write.
             value: Value to write to the given attribute.
         """
-        object.__setattr__(self, "time", time())
+        if attr == "data":
+            object.__setattr__(self, "time", time())
         object.__setattr__(self, attr, value)
 
     def append(self, value):
