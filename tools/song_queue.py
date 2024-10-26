@@ -16,12 +16,18 @@ Classes:
 Functions:
     trunc: Take a string then truncate it to the specified length
 """
-
+import asyncio
 import contextlib
 import time
+from asyncio import TimeoutError
 from json import dumps, loads
 from os import path
 from traceback import format_exc
+
+import aiohttp
+from aiohttp.client_exceptions import ClientError
+from aiohttp.http_websocket import WebSocketError
+from aiohttp.streams import EofStream
 
 from tools.text import colourise as c, Paginate
 from tools.timed_list import TimedList
@@ -109,8 +115,8 @@ class BaseMethods:
             del self.parent.testdata
         return None
 
-    def testqueue(self, *_args):
-        """Load testing data from "testdata.json".
+    def testqueue(self, _, url=None, *_args):
+        """Load testing data from testdata.json or an url provided as argument.
 
         Queue remains untouched until the load is confirmed with
         "queueconfirm".
@@ -128,25 +134,31 @@ class BaseMethods:
         ]
 
         Args:
+            url: Optional URL to load JSON queue data from
             _args: Ignore extra positional args.
 
         Returns:
             Message string with result of the load operation.
         """
-        if path.exists("testdata.json"):
+        if url:
+            try:
+                self.parent.testdata = [loads(_get(url))]
+            except ValueError as exc:
+                return f"Error parsing webpage response: {exc}"
+        elif path.exists("testdata.json"):
             try:
                 with open("testdata.json", "r", encoding="utf-8") as file_:
                     self.parent.testdata = [loads(file_.read())]
             except (OSError, ValueError):
-                return "Failed to load test data"
-            else:
-                self.parent.testdata += [time.time()]
-                return (
-                    "Test data loaded from file, do !queueconfirm within "
-                    "10 seconds to overwrite the current queue entries"
-                )
+                return "Failed to load test data from file"
         else:
-            return "No test data file found "
+            return "No test data found"
+
+        self.parent.testdata += [time.time()]
+        return (
+            "Test data loaded, do !queueconfirm within "
+            "10 seconds to overwrite the current queue entries"
+        )
 
 
 class JDMethods(BaseMethods):
@@ -670,3 +682,14 @@ def trunc(msg, length):
         occurred.
     """
     return msg if len(msg) <= length else msg[: length - 1] + "…"
+
+
+def _get(url):
+    async def runner(url):
+        try:
+            async with aiohttp.ClientSession(read_timeout=3) as session:
+                return await (await session.get(url)).text()
+        except (ClientError, WebSocketError, EofStream, TimeoutError) as exc:
+            raise ValueError(f"Error accessing webpage: {exc}")
+
+    return asyncio.run(runner(url))
