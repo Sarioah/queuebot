@@ -134,6 +134,7 @@ class BaseMethods:
         ]
 
         Args:
+            _: Disregard sender
             url: Optional URL to load JSON queue data from
             _args: Ignore extra positional args.
 

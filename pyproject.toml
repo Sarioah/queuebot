@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "queuebot"
-version = "1.4.11.dev18+g548a5c5"
+version = "1.4.11"
 description = ""
 authors = ["Sarioah <3851003+Sarioah@users.noreply.github.com>"]
 readme = "README.md"
@@ -11,9 +11,9 @@ python = "^3.11"
 keyring = "^25.1.0"
 colorama = "^0.4.6"
 readchar = "^4.0.6"
-aiohttp = "^3.9.4"
+aiohttp = "^3.13.3"
 pywin32 = "^306"
-irc = "^20.4.0"
+irc = "20.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
