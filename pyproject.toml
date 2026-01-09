@@ -1,25 +1,27 @@
 [tool.poetry]
 name = "queuebot"
-version = "1.4.11"
+version = "1.4.12"
 description = ""
 authors = ["Sarioah <3851003+Sarioah@users.noreply.github.com>"]
 readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
-keyring = "^25.1.0"
+python = "~3.12"
+keyring = "^25.7.0"
 colorama = "^0.4.6"
-readchar = "^4.0.6"
+readchar = "^4.2.1"
 aiohttp = "^3.13.3"
-pywin32 = "^306"
+pywin32 = "^311"
 irc = "20.4.0"
+setuptools = "^80.9.0"
+tempora = "~5.6"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.0"
-nuitka = "^2.1.5"
-coverage = "^7.4.4"
+black = "^25.12.0"
+nuitka = "^2.8.9"
+coverage = "^7.13.1"
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
