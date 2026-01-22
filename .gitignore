@@ -9,10 +9,12 @@
 ***.txt
 ***~
 .coverage
+.python-version
 .config*
 sari_queuebot
 testdata.json
 data/
+build/
 Resources/
 tools/version.py
 VERSION

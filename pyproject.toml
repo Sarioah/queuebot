@@ -1,35 +1,34 @@
-[tool.poetry]
+[project]
 name = "queuebot"
-version = "1.4.13"
+version = "1.4.14.dev1+g9efe9a8"
 description = ""
-authors = ["Sarioah <3851003+Sarioah@users.noreply.github.com>"]
+authors = [
+    { "name"= "Sarioah","email"= "3851003+Sarioah@users.noreply.github.com" }
+]
 readme = "README.md"
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "~3.12"
-keyring = "^25.7.0"
-colorama = "^0.4.6"
-readchar = "^4.2.1"
-aiohttp = "^3.13.3"
-pywin32 = "^311"
-irc = "20.4.0" # 20.5 fights with importlib-resources on freeze
-setuptools = "^80.9.0"
-tempora = "~5.6" # 5.7+ pulls in dateutil which causes warnings on freeze
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^25.12.0"
-nuitka = "^2.8.9"
-coverage = "^7.13.1"
-
-[tool.coverage.report]
-# Regexes for lines to exclude from consideration
-exclude_also = [
-    # Don't complain if non-runnable code isn't run:
-    "if __name__ == .__main__.:",
+requires-python = ">=3.10,<3.11"
+dependencies = [
+  "keyring>=25.7.0,<26",
+  "colorama>=0.4.6,<0.5",
+  "readchar>=4.2.1,<5",
+  "aiohttp>=3.13.3,<4",
+  "pywin32>=311,<312",
+  "irc==20.4.0", # 20.5 fights with importlib-resources on freeze
+  "setuptools>=80.9.0,<81",
+  "tempora>=5.6,<5.7", # 5.7+ pulls in dateutil which causes warnings on freeze
 ]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+  "black>=25.12.0,<26",
+  "nuitka>=2.8.9,<3",
+  "coverage>=7.13.1,<8",
+  "pytest>=9.0.2",
+  "pytest-mock>=3.15.1",
+  "pyoxidizer>=0.24.0",
+]
+
+[tool.coverage.report]
+exclude_also = [
+  "if __name__ == .__main__.:",
+]
