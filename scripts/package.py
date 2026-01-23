@@ -4,6 +4,7 @@ import os
 from subprocess import call
 
 from scripts.script_tools import valid_command
+
 from .update_version import update_version
 
 PLATFORM = "win" if os.name == "nt" else "linux"
@@ -15,7 +16,11 @@ PARAMETERS = {
         "--remove-output",
         "--include-package-data=jaraco.text",
         "--include-data-file=version.txt=version.txt",
-        "--onefile-tempdir-spec=./Resources",
+        "--noinclude-pytest-mode=nofollow",
+        "--noinclude-setuptools-mode=nofollow",
+        "--noinclude-unittest-mode=nofollow",
+        "--onefile-cache-mode=cached",
+        "--onefile-tempdir-spec={CACHE_DIR}/resources",
     ],
     "win": [
         "--mingw64",
@@ -23,13 +28,13 @@ PARAMETERS = {
         r"--windows-icon-from-ico=.\robot.ico",
         "-o",
         "sari_queuebot.exe",
-        r".\main.py",
+        r".\src\queuebot\main.py",
     ],
     "linux": [
         "--linux-onefile-icon=./robot.png",
         "-o",
         "sari_queuebot",
-        "./main.py",
+        "./src/queuebot/main.py",
     ],
 }
 

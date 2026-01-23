@@ -8,13 +8,13 @@ from traceback import format_exc
 import colorama
 from readchar import readchar
 
-from .irc_bot.background_bot import BackgroundBot
-from .irc_bot.irc_bot import IrcBot
-from .irc_bot.message_handler import MessageHandler
-from .tools.config import BadOAuth, Configuration, PasswordHandler, check_update
-from .tools.get_emotes import get_emotes
-from .tools.song_queue import trunc
-from .tools.text import colourise as col
+from queuebot.irc_bot.background_bot import BackgroundBot
+from queuebot.irc_bot.irc_bot import IrcBot
+from queuebot.irc_bot.message_handler import MessageHandler
+from queuebot.tools.config import BadOAuth, Configuration, PasswordHandler, check_update
+from queuebot.tools.get_emotes import get_emotes
+from queuebot.tools.song_queue import trunc
+from queuebot.tools.text import colourise as col
 
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
