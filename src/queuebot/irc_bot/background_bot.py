@@ -11,10 +11,10 @@ Functions:
 """
 
 import time
-
-from threading import Thread, Lock
 from queue import Queue
-from tools.text import colourise as col
+from threading import Lock, Thread
+
+from ..tools.text import colourise as col
 
 
 class BackgroundBot:
@@ -135,8 +135,6 @@ def background_task(background_bot):
     Returns:
         bot_thread: Handle of the new thread to control the bot with.
     """
-    bot_thread = Thread(
-        target=background_bot.run, args=(background_bot.exception_queue,)
-    )
+    bot_thread = Thread(target=background_bot.run, args=(background_bot.exception_queue,))
     bot_thread.start()
     return bot_thread

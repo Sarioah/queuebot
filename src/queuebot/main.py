@@ -8,13 +8,13 @@ from traceback import format_exc
 import colorama
 from readchar import readchar
 
-from irc_bot.background_bot import BackgroundBot
-from irc_bot.irc_bot import IrcBot
-from irc_bot.message_handler import MessageHandler
-from tools.config import BadOAuth, check_update, Configuration, PasswordHandler
-from tools.get_emotes import get_emotes
-from tools.song_queue import trunc
-from tools.text import colourise as col
+from .irc_bot.background_bot import BackgroundBot
+from .irc_bot.irc_bot import IrcBot
+from .irc_bot.message_handler import MessageHandler
+from .tools.config import BadOAuth, Configuration, PasswordHandler, check_update
+from .tools.get_emotes import get_emotes
+from .tools.song_queue import trunc
+from .tools.text import colourise as col
 
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
@@ -122,36 +122,39 @@ def setup_bot(*args):
     # else: print(col("Bot is ready for commands", "GREEN"))
 
 
-try:
-    setup_bot(*sys.argv)
-    while True:
-        if not bg_bot.exception_queue.empty():
-            raise bg_bot.exception_queue.get()
-        time.sleep(1)
-except (EOFError, KeyboardInterrupt, SystemExit):
-    pass
-except BadOAuth as exc:
-    if str(exc) == "Login authentication failed":
-        res = "oauth token is invalid"
-    elif str(exc) == "Improperly formatted auth":
-        res = "oauth token is improperly formatted"
-    else:
-        res = str(exc)
-    print(col(res + ", please restart the bot and paste in a new token", "RED"))
-    password_handler.del_password()
-    error_status.set_errored(exc)
-except Exception as exc:
-    trace = format_exc()
-    msg = col(
-        "Bot has encountered a problem and needs to close. Error is as follows:", "RED"
-    )
-    print(f"{msg}\n{trace}")
+def main():
+    try:
+        setup_bot(*sys.argv)
+        while True:
+            if not bg_bot.exception_queue.empty():
+                raise bg_bot.exception_queue.get()
+            time.sleep(1)
+    except (EOFError, KeyboardInterrupt, SystemExit):
+        pass
+    except BadOAuth as exc:
+        if str(exc) == "Login authentication failed":
+            res = "oauth token is invalid"
+        elif str(exc) == "Improperly formatted auth":
+            res = "oauth token is improperly formatted"
+        else:
+            res = str(exc)
+        print(col(res + ", please restart the bot and paste in a new token", "RED"))
+        password_handler.del_password()
+        error_status.set_errored(exc)
+    except Exception as exc:
+        trace = format_exc()
+        msg = col("Bot has encountered a problem and needs to close. Error is as follows:", "RED")
+        print(f"{msg}\n{trace}")
 
-    with open("last error.log", "w", encoding="utf-8") as file_:
-        file_.write(f"Bot {VERSION}\n")
-        file_.write(trace)
-    print(f"Error saved to {col('last error.log', 'YELLOW')}")
-    error_status.set_errored(exc)
-finally:
-    if os.name != "nt" or error_status:
-        close()
+        with open("last error.log", "w", encoding="utf-8") as file_:
+            file_.write(f"Bot {VERSION}\n")
+            file_.write(trace)
+        print(f"Error saved to {col('last error.log', 'YELLOW')}")
+        error_status.set_errored(exc)
+    finally:
+        if os.name != "nt" or error_status:
+            close()
+
+
+if __name__ == "__main__":
+    main()

@@ -16,6 +16,7 @@ Classes:
 Functions:
     trunc: Take a string then truncate it to the specified length
 """
+
 import asyncio
 import contextlib
 import time
@@ -29,9 +30,10 @@ from aiohttp.client_exceptions import ClientError
 from aiohttp.http_websocket import WebSocketError
 from aiohttp.streams import EofStream
 
-from tools.text import colourise as c, Paginate
-from tools.timed_list import TimedList
-from tools.tuple_list import TupleList
+from .text import Paginate
+from .text import colourise as c
+from .timed_list import TimedList
+from .tuple_list import TupleList
 
 SINGLE_SONG_LENGTH = 200
 MULTI_SONG_LENGTH = 50  # (for lists)
@@ -202,8 +204,8 @@ class JDMethods(BaseMethods):
         """List the last entry that was picked."""
         if self.parent.current:
             return (
-                f"Current song is \"{trunc(self.parent.current['entry'], SINGLE_SONG_LENGTH)}"
-                f"\", requested by {self.parent.current['user']}"
+                f'Current song is "{trunc(self.parent.current["entry"], SINGLE_SONG_LENGTH)}'
+                f'", requested by {self.parent.current["user"]}'
             )
         return "Nothing's been picked yet"
 
@@ -323,9 +325,7 @@ class JDMethods(BaseMethods):
                 user, song = self.parent.entries.pop(int(selection) - 1)
                 repeat_pick = user in self.parent.picked
             else:
-                (user, song), repeat_pick = self.parent.entries.random(
-                    self.parent.picked
-                )
+                (user, song), repeat_pick = self.parent.entries.random(self.parent.picked)
         except ValueError:
             return "Please specify a song number"
         except IndexError as exc:
@@ -355,8 +355,7 @@ class JDMethods(BaseMethods):
         for index, (user, song) in enumerate(self.parent):
             if song.casefold().find(search.casefold()) != -1:
                 return (
-                    f'{user} requested "{trunc(song, SINGLE_SONG_LENGTH)}" '
-                    f"at position {index+1}"
+                    f'{user} requested "{trunc(song, SINGLE_SONG_LENGTH)}" at position {index + 1}'
                 )
         return f'Song "{search}" not found in the queue'
 
@@ -435,10 +434,7 @@ class JBMethods(BaseMethods):
         """
         if self.parent.currentusers:
             res = "Currently picked users: " + " • ".join(
-                [
-                    f"{index + 1}. {user}"
-                    for (index, user) in enumerate(self.parent.currentusers)
-                ]
+                [f"{index + 1}. {user}" for (index, user) in enumerate(self.parent.currentusers)]
             )
             return Paginate(res, self.parent.msg_limit, " • ")[page]
         return "No-one's been picked yet"
@@ -468,8 +464,7 @@ class JBMethods(BaseMethods):
             self.parent.entries[sender] = sender
             self.parent.entries = self.parent.entries.deprioritise(self.parent.picked)
             msg = (
-                f"Added {sender} to the queue at position "
-                f"{self.parent.entries.index(sender) + 1}"
+                f"Added {sender} to the queue at position {self.parent.entries.index(sender) + 1}"
             )
         return msg
 

@@ -8,7 +8,7 @@
             "name": "Run bot",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/main.py",
+            "module": "queuebot.main",
             "console": "integratedTerminal"
         }
     ]

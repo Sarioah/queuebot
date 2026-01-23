@@ -33,3 +33,9 @@ exclude_also = [
   "if __name__ == .__main__.:",
 ]
 
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+queuebot = "queuebot.main:main"

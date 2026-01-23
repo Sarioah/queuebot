@@ -7,7 +7,8 @@ Classes:
 
 from irc.bot import SingleServerIRCBot
 
-from tools.text import colourise as col, trim_bytes
+from ..tools.text import colourise as col
+from ..tools.text import trim_bytes
 
 SERVER = "irc.chat.twitch.tv"
 PORT = 6667
@@ -17,9 +18,7 @@ MSG_LIMIT = 499
 class IrcBot(SingleServerIRCBot):
     """IRC Client class."""
 
-    def __init__(
-        self, username, password, channel, muted, message_handler, startup_msg, version
-    ):
+    def __init__(self, username, password, channel, muted, message_handler, startup_msg, version):
         """Create the bot.
 
         Args:

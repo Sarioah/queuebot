@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Retrieve emote strings from FrankerFaceZ and BTTV for the given channels."""
+
 import asyncio
 import json
 import sys
@@ -55,15 +56,11 @@ async def _get_bttv(channel=""):
     try:
         if not channel:
             channel = "__bttv_global"
-            j = json.loads(
-                await _get("https://api.betterttv.net/3/cached/emotes/global")
-            )
+            j = json.loads(await _get("https://api.betterttv.net/3/cached/emotes/global"))
             j = [emote["code"] for emote in j]
         else:
             twitch_channel, channel = channel, channel + "__bttv"
-            bttv_id = json.loads(
-                await _get(f"https://decapi.me/twitch/id/{twitch_channel}")
-            )
+            bttv_id = json.loads(await _get(f"https://decapi.me/twitch/id/{twitch_channel}"))
             j = json.loads(
                 await _get(f"https://api.betterttv.net/3/cached/users/twitch/{bttv_id}")
             )

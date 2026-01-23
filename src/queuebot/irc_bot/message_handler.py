@@ -8,10 +8,10 @@ Classes:
 
 import threading
 
-from irc_bot.events import HandleEvent
-from tools.chat import CommandHandler
-from tools.highlight_string import find_strings, Highlighter
-from tools.song_queue import SongQueue
+from ..tools.chat import CommandHandler
+from ..tools.highlight_string import Highlighter, find_strings
+from ..tools.song_queue import SongQueue
+from .events import HandleEvent
 
 
 class MessageHandler:
@@ -122,8 +122,6 @@ class MessageHandler:
         emote_indices = list(set(bttv_indices + twitch_indices))
 
         adjustment = len(msg["words"][0]) + 1
-        self.emote_indices_short = [
-            (i - adjustment, j - adjustment) for (i, j) in emote_indices
-        ]
+        self.emote_indices_short = [(i - adjustment, j - adjustment) for (i, j) in emote_indices]
 
         return Highlighter(True, msg["msg"], indices=emote_indices).get_highlight()

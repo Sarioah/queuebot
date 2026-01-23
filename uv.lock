@@ -647,7 +647,7 @@ wheels = [
 [[package]]
 name = "queuebot"
 version = "1.4.14.dev1+g9efe9a8"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "colorama" },
