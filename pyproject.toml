@@ -1,6 +1,6 @@
 [project]
 name = "queuebot"
-version = "1.4.14.dev4+g09d451e"
+version = "1.4.14.dev6+g8e7632b"
 description = ""
 authors = [
     { "name"= "Sarioah","email"= "3851003+Sarioah@users.noreply.github.com" }

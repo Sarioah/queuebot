@@ -16,6 +16,8 @@ def update_version(path="."):
     version = (
         subprocess.check_output("git describe --tags".split())
         .decode(encoding="utf-8")
+        .lower()
+        .removeprefix("v")
         .replace("\n", "")
     )
     segments = version.split("-")

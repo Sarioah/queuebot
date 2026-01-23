@@ -19,7 +19,7 @@ from queuebot.tools.text import colourise as col
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
     with open(version_filename) as _fd:
-        VERSION = _fd.readline().strip()
+        VERSION = f"v{_fd.readline().strip()}"
 except OSError:
     VERSION = "v0"
 
