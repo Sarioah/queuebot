@@ -1,7 +1,6 @@
 import unittest
 
-
-from tools import highlight_string
+from queuebot.tools import highlight_string
 
 
 # ruff: noqa: D101, D102

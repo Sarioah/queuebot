@@ -1,0 +1,76 @@
+{
+    "runOptions": {
+        "reevaluateOnRerun": false
+    },
+    "tasks": [
+        {
+            "args": [
+                "run",
+                "--",
+                "python",
+                "-m",
+                "coverage",
+                "run"
+            ],
+            "command": "uv",
+            "group": "test",
+            "label": "Coverage: run",
+            "problemMatcher": [],
+            "type": "process",
+            "presentation": {
+                "showReuseMessage": false,
+                "panel": "shared",
+                "clear": true
+            }
+        },
+        {
+            "args": [
+                "run",
+                "--",
+                "python",
+                "-m",
+                "coverage",
+                "report",
+                "-m"
+            ],
+            "command": "uv",
+            "label": "Coverage: report",
+            "problemMatcher": [],
+            "type": "process",
+            "presentation": {
+                "showReuseMessage": false,
+                "panel": "shared",
+                "clear": false
+            }
+        },
+        {
+            "args": [
+                "run",
+                "--",
+                "python",
+                "-m",
+                "coverage",
+                "html"
+            ],
+            "command": "uv",
+            "label": "Coverage: html",
+            "problemMatcher": [],
+            "type": "process",
+            "presentation": {
+                "showReuseMessage": false,
+                "panel": "shared",
+                "clear": false
+            }
+        },
+        {
+            "dependsOn": [
+                "Coverage: run",
+                "Coverage: report",
+                "Coverage: html"
+            ],
+            "dependsOrder": "sequence",
+            "label": "Coverage: full"
+        }
+    ],
+    "version": "2.0.0"
+}

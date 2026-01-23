@@ -1,3 +1,7 @@
+from . import text
+
+__all__ = ["text"]
+
 """Miscellaneous tools for handling things like chat, config, queues et al.
 
 Modules:

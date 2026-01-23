@@ -1,7 +1,7 @@
 import unittest
 from time import sleep
 
-from tools import timed_list
+from queuebot.tools import timed_list
 
 DELAY = 0.01
 DEFAULT_DELAY = 0.02
@@ -10,7 +10,6 @@ DATA = [1, 2, 3]
 
 # ruff: noqa: D101, D102
 class TestTimedList(unittest.TestCase):
-
     def setUp(self):
         self.t_l = timed_list.TimedList(delay=DELAY)
         self.load_data()

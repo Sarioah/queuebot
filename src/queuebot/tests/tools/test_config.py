@@ -2,7 +2,7 @@ import unittest
 from configparser import ParsingError
 from unittest.mock import Mock, patch
 
-from tools import config
+from queuebot.tools import config
 
 DEFAULTS = {
     "bot_name": "********",
@@ -16,14 +16,13 @@ DEFAULTS = {
 
 # ruff: noqa: D101, D102
 class TestPasswordHandler(unittest.TestCase):
-
-    @patch("tools.config.keyring")
+    @patch("queuebot.tools.config.keyring")
     def setUp(self, mock_keyring):
         self.mock_keyring = mock_keyring
         self.mock_keyring.get_password.return_value = "example_password"
         self.p_h = config.PasswordHandler("example_user")
 
-    @patch("tools.config.keyring")
+    @patch("queuebot.tools.config.keyring")
     @patch("builtins.input")
     def test_no_passwd(self, mocked_input, mocked_keyring):
         mocked_input.return_value = "example_token"
@@ -40,21 +39,18 @@ class TestPasswordHandler(unittest.TestCase):
         )
         mocked_keyring.get_password.assert_called_with("TMI", "example_user")
         mocked_keyring.get_password.assert_called_with("TMI", "example_user")
-        mocked_keyring.set_password.assert_called_with(
-            "TMI", "example_user", "example_token"
-        )
+        mocked_keyring.set_password.assert_called_with("TMI", "example_user", "example_token")
         self.assertGreater(mocked_keyring.get_password.call_count, 1)
 
-    @patch("tools.config.keyring")
+    @patch("queuebot.tools.config.keyring")
     def test_del_password(self, mock_keyring):
         self.p_h.del_password()
         mock_keyring.delete_password.assert_called_once_with("TMI", "example_user")
 
 
 @patch("builtins.open")
-@patch("tools.config.ConfigParser")
+@patch("queuebot.tools.config.ConfigParser")
 class TestConfiguration(unittest.TestCase):
-
     def test_init_problem(self, mock_parser, _mock_open):
         mock_parser.return_value.__getitem__ = default_config_factory()
         self.assertRaises(Exception, config.Configuration, "example_config_filename")
@@ -96,18 +92,15 @@ class TestConfiguration(unittest.TestCase):
 
 
 class TestConfigFunctions(unittest.TestCase):
-
-    @patch("tools.config.urlopen")
+    @patch("queuebot.tools.config.urlopen")
     def test_check_update(self, mock_urlopen):
-        mock_urlopen.return_value.__enter__.return_value.read.return_value = (
-            '{"name": "1.3"}'
-        )
+        mock_urlopen.return_value.__enter__.return_value.read.return_value = '{"name": "1.3"}'
         self.assertIsNone(config.check_update("1.4"))
         self.assertIsNone(config.check_update("1.3"))
         self.assertEqual(
             config.check_update("1.2"),
-            'Updated bot found, version "\x1B[34;1m1.3\x1B[0m".\nPlease visit '
-            "\x1B[33;1mhttps://github.com/Sarioah/queuebot/releases/latest\x1B[0m "
+            'Updated bot found, version "\x1b[34;1m1.3\x1b[0m".\nPlease visit '
+            "\x1b[33;1mhttps://github.com/Sarioah/queuebot/releases/latest\x1b[0m "
             "to download the new bot",
         )
         self.assertEqual(len(mock_urlopen.mock_calls), 12)

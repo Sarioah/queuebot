@@ -30,10 +30,31 @@ dev = [
   "pyoxidizer>=0.24.0",
 ]
 
-[tool.coverage.report]
-exclude_also = [
-  "if __name__ == .__main__.:",
+[tool.pytest.ini_options]
+log_level="DEBUG"
+log_cli=false
+
+[tool.coverage.run]
+data_file = "src/queuebot/tests/.coverage"
+command_line = "-m pytest --color=yes"
+relative_files = true
+source = [
+    "."
 ]
+
+[tool.coverage.report]
+show_missing = true
+omit = [
+    "*/tests/*",
+    "*_test.py",
+    "test_*.py",
+]
+exclude_also = [
+    'if __name__ == "__main__":',
+]
+
+[tool.coverage.html]
+directory = "src/queuebot/tests/report"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]

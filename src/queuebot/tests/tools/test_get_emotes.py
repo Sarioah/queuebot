@@ -2,12 +2,11 @@ import json
 import unittest
 from unittest.mock import AsyncMock, call, patch
 
-from tools import get_emotes
+from queuebot.tools import get_emotes
 
 
 # ruff: noqa: D101, D102
 class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
-
     def setUp(self):
         self.mocked_url = "https://example.com"
         self.mocked_text = "Example text"
@@ -15,9 +14,7 @@ class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(patcher.stop)
         self.mocked_client_session = patcher.start()
         self.mocked_get = AsyncMock()
-        self.mocked_client_session.return_value.__aenter__.return_value.get = (
-            self.mocked_get
-        )
+        self.mocked_client_session.return_value.__aenter__.return_value.get = self.mocked_get
         self.set_mocked_get_text(self.mocked_text)
 
     def set_mocked_get_text(self, /, *text, multiple=False):
@@ -35,25 +32,15 @@ class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
 
     async def test_get_ffz(self):
         await get_emotes._get_ffz()
-        self.mocked_get.assert_awaited_with(
-            "https://api.frankerfacez.com/v1/room/__ffz_global"
-        )
+        self.mocked_get.assert_awaited_with("https://api.frankerfacez.com/v1/room/__ffz_global")
 
         self.set_mocked_get_text(
             json.dumps(
-                {
-                    "sets": {
-                        "global": {
-                            "emoticons": [{"name": "ffzTest"}, {"name": "ffzTest2"}]
-                        }
-                    }
-                }
+                {"sets": {"global": {"emoticons": [{"name": "ffzTest"}, {"name": "ffzTest2"}]}}}
             )
         )
         res = await get_emotes._get_ffz("test_name")
-        self.mocked_get.assert_awaited_with(
-            "https://api.frankerfacez.com/v1/room/test_name"
-        )
+        self.mocked_get.assert_awaited_with("https://api.frankerfacez.com/v1/room/test_name")
         self.assertEqual(res, {"test_name__ffz": ["ffzTest", "ffzTest2"]})
 
         self.set_mocked_get_text("{}")
@@ -64,9 +51,7 @@ class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
         self.set_mocked_get_text(json.dumps([{"code": "test1"}, {"code": "test2"}]))
         res = await get_emotes._get_bttv()
         self.assertEqual(res, {"__bttv_global": ["test1", "test2"]})
-        self.mocked_get.assert_awaited_with(
-            "https://api.betterttv.net/3/cached/emotes/global"
-        )
+        self.mocked_get.assert_awaited_with("https://api.betterttv.net/3/cached/emotes/global")
 
         self.set_mocked_get_text(
             '"example_userid"',
@@ -108,9 +93,7 @@ class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(res, {"__bttv_global": []})
 
     async def test_main(self):
-        self.assertEqual(
-            await get_emotes._main(), [{"__ffz_global": []}, {"__bttv_global": []}]
-        )
+        self.assertEqual(await get_emotes._main(), [{"__ffz_global": []}, {"__bttv_global": []}])
         self.assertEqual(
             await get_emotes._main(("example_username1", "example_username2")),
             [
@@ -124,9 +107,7 @@ class TestGetEmotes(unittest.IsolatedAsyncioTestCase):
         )
 
     def test_get_emotes(self):
-        self.assertEqual(
-            get_emotes.get_emotes(), {"__ffz_global": [], "__bttv_global": []}
-        )
+        self.assertEqual(get_emotes.get_emotes(), {"__ffz_global": [], "__bttv_global": []})
         self.assertEqual(
             get_emotes.get_emotes("example_username1", "example_username2"),
             {
