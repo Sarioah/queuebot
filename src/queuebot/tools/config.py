@@ -21,9 +21,7 @@ from configparser import ConfigParser, ParsingError
 from urllib.request import urlopen
 
 import keyring
-
-# noinspection PyProtectedMember,PyUnresolvedReferences
-from setuptools._vendor.packaging import version
+from packaging.version import parse
 
 from .text import colourise as col
 
@@ -206,7 +204,7 @@ def check_update(ver):
             "https://api.github.com/repos/sarioah/queuebot/releases/latest", timeout=3
         ) as url:
             upstream = json.load(url)["name"]
-        if version.parse(upstream) > version.parse(ver):
+        if parse(upstream) > parse(ver):
             version_coloured = col(upstream, "BLUE")
             link = col("https://github.com/Sarioah/queuebot/releases/latest", "YELLOW")
             return (

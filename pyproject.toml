@@ -1,21 +1,23 @@
 [project]
 name = "queuebot"
-version = "1.4.14.dev1+g9efe9a8"
+version = "1.4.14.dev4+g09d451e"
 description = ""
 authors = [
     { "name"= "Sarioah","email"= "3851003+Sarioah@users.noreply.github.com" }
 ]
 readme = "README.md"
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.12,<3.13"
+# irc 20.5 fights with importlib-resources on freeze
+# tempora 5.7+ pulls in dateutil which causes warnings on freeze
 dependencies = [
   "keyring>=25.7.0,<26",
   "colorama>=0.4.6,<0.5",
   "readchar>=4.2.1,<5",
   "aiohttp>=3.13.3,<4",
   "pywin32>=311,<312",
-  "irc==20.4.0", # 20.5 fights with importlib-resources on freeze
-  "setuptools>=80.9.0,<81",
-  "tempora>=5.6,<5.7", # 5.7+ pulls in dateutil which causes warnings on freeze
+  "irc==20.4.0",
+  "tempora>=5.6,<5.7",
+  "packaging>=26.0",
 ]
 
 [dependency-groups]
