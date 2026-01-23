@@ -25,7 +25,7 @@ import keyring
 # noinspection PyProtectedMember,PyUnresolvedReferences
 from setuptools._vendor.packaging import version
 
-from tools.text import colourise as col
+from .text import colourise as col
 
 # The keyring import above is usually enough on windows / linux when running
 # from source, however that causes issues in the nuitka binaries. Those seem
@@ -126,15 +126,9 @@ class Configuration:
             res = self._config_empty(
                 "Configuration file not found, a default configuration file has been written to"
             )
-        elif any(
-            True
-            for k in self.config["DEFAULT"]
-            if self.config["DEFAULT"][k] == "********"
-        ):
+        elif any(True for k in self.config["DEFAULT"] if self.config["DEFAULT"][k] == "********"):
             res = self._config_empty("Default fields need to be filled out in")
-        elif any(
-            True for k in ("bot_name", "channel") if k not in self.config["DEFAULT"]
-        ):
+        elif any(True for k in ("bot_name", "channel") if k not in self.config["DEFAULT"]):
             res = self._config_empty("Fields missing in")
         else:
             res = ""

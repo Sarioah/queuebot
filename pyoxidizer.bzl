@@ -25,7 +25,7 @@ def make_exe():
     # Control support for loading Python extensions and other shared libraries
     # from memory. This is only supported on Windows and is ignored on other
     # platforms.
-    # policy.allow_in_memory_shared_library_loading = True
+    policy.allow_in_memory_shared_library_loading = True
 
     # Control whether to generate Python bytecode at various optimization
     # levels. The default optimization level used by Python is 0.
@@ -78,7 +78,7 @@ def make_exe():
     # policy.include_non_distribution_sources = True
 
     # Toggle whether files associated with tests are included.
-    # policy.include_test = False
+    policy.include_test = False
 
     # Resources are loaded from "in-memory" or "filesystem-relative" paths.
     # The locations to attempt to add resources to are defined by the
@@ -90,7 +90,7 @@ def make_exe():
     # policy.resources_location = "in-memory"
 
     # Use filesystem-relative location for adding resources by default.
-    # policy.resources_location = "filesystem-relative:prefix"
+    policy.resources_location = "filesystem-relative:prefix"
 
     # Attempt to add resources relative to the built binary when
     # `resources_location` fails.
@@ -190,10 +190,10 @@ def make_exe():
     # python_config.write_modules_directory_env = "/tmp/oxidized/loaded_modules"
 
     # Evaluate a string as Python code when the interpreter starts.
-    # python_config.run_command = "<code>"
+    # python_config.run_command = "queuebot"
 
     # Run a Python module as __main__ when the interpreter starts.
-    # python_config.run_module = "<module>"
+    python_config.run_module = "queuebot.main"
 
     # Run a Python file when the interpreter starts.
     # python_config.run_filename = "/path/to/file"
@@ -203,11 +203,9 @@ def make_exe():
     # standalone executable that will be built.
     exe = dist.to_python_executable(
         name="queuebot",
-
         # If no argument passed, the default `PythonPackagingPolicy` for the
         # distribution is used.
         packaging_policy=policy,
-
         # If no argument passed, the default `PythonInterpreterConfig` is used.
         config=python_config,
     )
@@ -238,42 +236,43 @@ def make_exe():
     # collected files inside Python wheels. `add_python_resources()` adds these
     # objects to the binary, with a load location as defined by the packaging
     # policy's resource location attributes.
-    #exe.add_python_resources(exe.pip_download(["pyflakes==2.2.0"]))
+    # exe.add_python_resources(exe.pip_download(["pyflakes==2.2.0"]))
 
     # Invoke `pip install` with our Python distribution to install a single package.
     # `pip_install()` returns objects representing installed files.
     # `add_python_resources()` adds these objects to the binary, with a load
     # location as defined by the packaging policy's resource location
     # attributes.
-    #exe.add_python_resources(exe.pip_install(["appdirs"]))
+    exe.add_python_resources(exe.pip_install(["."]))
 
     # Invoke `pip install` using a requirements file and add the collected resources
     # to our binary.
-    #exe.add_python_resources(exe.pip_install(["-r", "requirements.txt"]))
-
+    # exe.add_python_resources(exe.pip_install(["-r", "requirements.txt"]))
 
     # Read Python files from a local directory and add them to our embedded
     # context, taking just the resources belonging to the `foo` and `bar`
     # Python packages.
-    #exe.add_python_resources(exe.read_package_root(
+    # exe.add_python_resources(exe.read_package_root(
     #    path="/src/mypackage",
     #    packages=["foo", "bar"],
-    #))
+    # ))
 
     # Discover Python files from a virtualenv and add them to our embedded
     # context.
-    #exe.add_python_resources(exe.read_virtualenv(path="/path/to/venv"))
+    # exe.add_python_resources(exe.read_virtualenv(path="/path/to/venv"))
 
     # Filter all resources collected so far through a filter of names
     # in a file.
-    #exe.filter_resources_from_files(files=["/path/to/filter-file"])
+    # exe.filter_resources_from_files(files=["/path/to/filter-file"])
 
     # Return our `PythonExecutable` instance so it can be built and
     # referenced by other consumers of this target.
     return exe
 
+
 def make_embedded_resources(exe):
     return exe.to_embedded_resources()
+
 
 def make_install(exe):
     # Create an object that represents our installed application file layout.
@@ -283,6 +282,7 @@ def make_install(exe):
     files.add_python_resource(".", exe)
 
     return files
+
 
 def make_msi(exe):
     # See the full docs for more. But this will convert your Python executable
@@ -296,7 +296,7 @@ def make_msi(exe):
         # The version of your application.
         "1.0",
         # The author/manufacturer of your application.
-        "Alice Jones"
+        "Alice Jones",
     )
 
 

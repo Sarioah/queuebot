@@ -2,7 +2,7 @@
 
 import time
 
-from tools.text import colourise as col
+from .text import colourise as col
 
 
 class Commands:
@@ -19,18 +19,12 @@ class Commands:
     def help(self, *_args):
         """List available chat commands."""
         everyone = [
-            k
-            for k, (permission, _, _) in self.parent.commands.items()
-            if permission == "e"
+            k for k, (permission, _, _) in self.parent.commands.items() if permission == "e"
         ]
-        mods = [
-            k
-            for k, (permission, _, _) in self.parent.commands.items()
-            if permission == "m"
-        ]
+        mods = [k for k, (permission, _, _) in self.parent.commands.items() if permission == "m"]
         return (
-            f"Queuebot commands: \"{', '.join(everyone)}\" "
-            + f"• Queuebot moderator commands: \"{', '.join(mods)}\""
+            f'Queuebot commands: "{", ".join(everyone)}" '
+            + f'• Queuebot moderator commands: "{", ".join(mods)}"'
         )
 
     def list_aliases(self, *_args):

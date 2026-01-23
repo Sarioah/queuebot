@@ -10,9 +10,9 @@ Classes:
 # TODO: the message type / callback is just silly
 from datetime import datetime
 
-from tools.chat import format_badges
-from tools.config import BadOAuth
-from tools.text import colourise as col
+from ..tools.chat import format_badges
+from ..tools.config import BadOAuth
+from ..tools.text import colourise as col
 
 
 class HandleEvent:
@@ -132,7 +132,4 @@ class HandleEvent:
         Args:
             _args: Ignore extra positional args.
         """
-        print(
-            self.prefix
-            + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY")
-        )
+        print(self.prefix + col(f"Whisper from {self.tags['display-name']}: {self.msg}", "GREY"))
