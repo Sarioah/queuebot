@@ -1,13 +1,13 @@
 import json
 import unittest
 
-import tools.text
+from queuebot import tools
 
 PAGE_LENGTH = 100
 STRING_LENGTH = 5
 SEPARATOR = "."
 
-with open("tests/tools/text_testdata.json", encoding="UTF-8") as fd_:
+with open("src/queuebot/tests/tools/text_testdata.json", encoding="UTF-8") as fd_:
     testdata = json.load(fd_)
     DATA = testdata["inputs"]
     EXPECTED_RESULTS = testdata["expected results"]
@@ -15,7 +15,6 @@ with open("tests/tools/text_testdata.json", encoding="UTF-8") as fd_:
 
 # ruff: noqa: D101, D102
 class TestPaginate(unittest.TestCase):
-
     def setUp(self):
         self.pag = tools.text.Paginate(DATA["very long string"], PAGE_LENGTH, SEPARATOR)
 
@@ -26,14 +25,10 @@ class TestPaginate(unittest.TestCase):
         for page_num, page in enumerate(EXPECTED_RESULTS["pages"]["long string"]):
             failure_msg = f"Test failed on page {page_num + 1}"
             self.assertEqual(self.pag[page_num + 1], page, failure_msg)
-        self.assertEqual(
-            self.pag["bad index"], EXPECTED_RESULTS["pages"]["long string"][0]
-        )
+        self.assertEqual(self.pag["bad index"], EXPECTED_RESULTS["pages"]["long string"][0])
 
     def test_iter(self):
-        self.assertSequenceEqual(
-            list(self.pag), EXPECTED_RESULTS["pages"]["long string"]
-        )
+        self.assertSequenceEqual(list(self.pag), EXPECTED_RESULTS["pages"]["long string"])
 
         def generate_first_pages(sep=""):
             return [
@@ -70,7 +65,7 @@ class TestPaginate(unittest.TestCase):
 
 
 class TestFunctions(unittest.TestCase):
-    """Test the functions in the text module."""
+    """Test the functions in the tools.text module."""
 
     def test_to_string(self):
         self.assertEqual(tools.text.to_string(b"good string"), "good string")
@@ -86,30 +81,20 @@ class TestFunctions(unittest.TestCase):
         def generate_test_data(input_string):
             byte_length = len(tools.text.to_bytes(input_string))
             return [
-                tools.text.trim_bytes(input_string, length)
-                for length in range(byte_length + 1)
+                tools.text.trim_bytes(input_string, length) for length in range(byte_length + 1)
             ]
 
         self.assertSequenceEqual(
             generate_test_data(DATA["long string"]),
-            [
-                tuple(element)
-                for element in EXPECTED_RESULTS["trim bytes"]["long string"]
-            ],
+            [tuple(element) for element in EXPECTED_RESULTS["trim bytes"]["long string"]],
         )
         self.assertSequenceEqual(
             generate_test_data(DATA["long unicode string"]),
-            [
-                tuple(element)
-                for element in EXPECTED_RESULTS["trim bytes"]["long unicode string"]
-            ],
+            [tuple(element) for element in EXPECTED_RESULTS["trim bytes"]["long unicode string"]],
         )
 
     def test_colourise(self):
-        results = [
-            tools.text.colourise(DATA["long string"], colour)
-            for colour in DATA["colours"]
-        ]
+        results = [tools.text.colourise(DATA["long string"], colour) for colour in DATA["colours"]]
         self.assertSequenceEqual(results, EXPECTED_RESULTS["colourise"])
         with self.assertRaises(KeyError):
             tools.text.colourise(DATA["long string"], "bad colour")

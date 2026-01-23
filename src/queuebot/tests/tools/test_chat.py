@@ -2,9 +2,9 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
-from tools import chat
+from queuebot.tools import chat
 
-with open("tests/tools/chat_testdata.json", "r", encoding="utf-8") as fd_:
+with open("src/queuebot/tests/tools/chat_testdata.json", "r", encoding="utf-8") as fd_:
     testdata = json.load(fd_)
     DATA = testdata["input"]
     EXPECTED_RESULTS = testdata["expected_results"]
@@ -43,8 +43,7 @@ class TestChatCommands(unittest.TestCase):
 
 
 class TestChatCommandHandler(unittest.TestCase):
-
-    @patch("tools.chat.Commands")
+    @patch("queuebot.tools.chat.Commands")
     def setUp(self, mocked_commands):
         self.mocked_commands = mocked_commands
         self.c_h = chat.CommandHandler()
@@ -79,9 +78,7 @@ class TestChatCommandHandler(unittest.TestCase):
         mocked_print.assert_not_called()
 
     def test_find_command(self):
-        self.assertIsNotNone(
-            self.c_h.find_command("moderator,subscriber", "closequeue")
-        )
+        self.assertIsNotNone(self.c_h.find_command("moderator,subscriber", "closequeue"))
         self.assertIsNone(self.c_h.find_command("vip,subscriber", "openqueue"))
         self.c_h.exclusions = ["sr"]
         self.assertIsNone(self.c_h.find_command("", "sr"))
@@ -90,7 +87,6 @@ class TestChatCommandHandler(unittest.TestCase):
 
 
 class TestChatFunctions(unittest.TestCase):
-
     def test_format_badges(self):
         for k, v in DATA["format_badges"].items():
             self.assertEqual(

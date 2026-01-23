@@ -1,6 +1,6 @@
 import unittest
 
-from tools.tuple_list import TupleList
+from queuebot.tools.tuple_list import TupleList
 
 DATA = [
     ("Username 1", "Song Request 1"),
