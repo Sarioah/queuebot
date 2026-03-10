@@ -14,6 +14,7 @@ PARAMETERS = {
         "--standalone",
         "--onefile",
         "--remove-output",
+        "--include-package-data=nicegui",
         "--include-package-data=jaraco.text",
         "--include-data-file=version.txt=version.txt",
         "--noinclude-pytest-mode=nofollow",

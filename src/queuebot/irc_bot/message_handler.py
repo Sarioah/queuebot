@@ -8,9 +8,9 @@ Classes:
 
 import threading
 
+from ..state.song_queue import SongQueue
 from ..tools.chat import CommandHandler
 from ..tools.highlight_string import Highlighter, find_strings
-from ..tools.song_queue import SongQueue
 from .events import HandleEvent
 
 

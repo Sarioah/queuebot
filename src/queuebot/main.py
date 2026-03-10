@@ -6,16 +6,20 @@ import time
 from traceback import format_exc
 
 import colorama
+from nicegui import ui
 from readchar import readchar
 
+from queuebot.coordinator import Coordinator
+from queuebot.gui.gui_builder import build_ui
 from queuebot.irc_bot.background_bot import BackgroundBot
 from queuebot.irc_bot.irc_bot import IrcBot
 from queuebot.irc_bot.message_handler import MessageHandler
+from queuebot.state.song_queue import SongQueue, trunc
 from queuebot.tools.config import BadOAuth, Configuration, PasswordHandler, check_update
 from queuebot.tools.get_emotes import get_emotes
-from queuebot.tools.song_queue import trunc
 from queuebot.tools.text import colourise as col
 
+print("process", os.getpid(), "__name__", __name__)
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
     with open(version_filename) as _fd:
@@ -156,5 +160,25 @@ def main():
             close()
 
 
-if __name__ == "__main__":
-    main()
+def run_gui():
+    song_queue = SongQueue("sarioah")
+    gui_state = song_queue.as_ui_state()
+
+    gui = build_ui()
+    gui.state = gui_state
+
+    coord = Coordinator(song_queue, gui_state)
+
+    gui.add_coordinator(coord)
+    coord.subscribe_ui_handler(gui.send_command)
+
+    ui.run(
+        native=True,
+        reload=False,
+        window_size=(1280, 960),
+    )
+
+
+if __name__ in {"__main__", "__mp_main__", "__parents_main__"}:
+    # main()
+    run_gui()
