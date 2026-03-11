@@ -34,14 +34,15 @@ if sys.platform == "win32":
 
     keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
 elif sys.platform == "linux":  # pragma: no cover
+    pass
     # will grab secrets from ssh-agent after using:
     # :$ . <(ssh-agent)
     # :$ ssh-add
 
     # noinspection PyUnresolvedReferences,PyPackageRequirements
-    import sagecipher.keyring
+    # import sagecipher.keyring
 
-    keyring.set_keyring(sagecipher.keyring.Keyring())
+    # keyring.set_keyring(sagecipher.keyring.Keyring())
 
 
 DEFAULTS = {

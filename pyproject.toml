@@ -14,13 +14,15 @@ dependencies = [
   "colorama>=0.4.6,<0.5",
   "readchar>=4.2.1,<5",
   "aiohttp>=3.13.3,<4",
-  "pywin32>=311,<312",
+  "pywin32>=311,<312; sys_platform == 'windows'",
   "irc==20.4.0",
   "tempora>=5.6,<5.7",
   "packaging>=26.0",
   "nicegui>=3.8.0",
   "faker>=40.8.0",
   "pywebview>=6.1",
+  "qtpy>=2.4.3; sys_platform == 'linux'",
+  "pyqt6-webengine>=6.10.0; sys_platform == 'linux'",
 ]
 
 [dependency-groups]
@@ -31,6 +33,7 @@ dev = [
   "pytest>=9.0.2",
   "pytest-mock>=3.15.1",
   "pyoxidizer>=0.24.0",
+  "sagecipher>=0.7.5; sys_platform == 'linux'",
 ]
 
 [tool.pytest.ini_options]

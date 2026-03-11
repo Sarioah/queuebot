@@ -9,7 +9,10 @@
             "type": "debugpy",
             "request": "launch",
             "module": "queuebot.main",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+            }
         }
     ]
 }

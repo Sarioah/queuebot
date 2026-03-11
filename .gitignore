@@ -18,3 +18,4 @@ build/
 Resources/
 tools/version.py
 VERSION
+src/queuebot.egg-info
