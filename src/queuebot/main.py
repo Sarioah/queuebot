@@ -95,16 +95,6 @@ def setup_bot(*args):
         exit(1)
     bot_name = ctx.channel_name.casefold()
 
-    if os.name == "nt":
-        # TODO: Put this somewhere else
-        import win32api
-
-        win32api.SetConsoleCtrlHandler(close, True)
-        win32api.SetConsoleTitle(
-            f"Sari queuebot {VERSION} acting as "
-            + f"'{config['bot_name']}' in channel '{channel}'"
-        )
-
     print(col("Checking for FFZ/BTTV emotes...", "GREY"))
     emotes = get_emotes(channel)
     global message_handler
