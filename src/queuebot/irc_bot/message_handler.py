@@ -115,7 +115,7 @@ class MessageHandler:
                 for t in msg["tags"]["emotes"].split("/")
                 for p in t.split(":")[1].split(",")
             ]
-        except AttributeError:
+        except (AttributeError, IndexError, KeyError):
             twitch_indices = []
 
         bttv_indices = find_strings(msg["msg"], self.emotes)

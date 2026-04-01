@@ -103,6 +103,7 @@ class HandleEvent:
         if self.msg in (
             "Improperly formatted auth",
             "Login authentication failed",
+            "Login unsuccessful",
         ):
             raise BadOAuth(self.msg)
         print(self.prefix + col(self.msg, "GREY"))

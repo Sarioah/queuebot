@@ -3,6 +3,7 @@
 import os
 import sys
 import time
+from pathlib import Path
 from traceback import format_exc
 
 import colorama
@@ -15,7 +16,7 @@ from queuebot.tools.config import BadOAuth, Configuration, check_update
 from queuebot.tools.get_emotes import get_emotes
 from queuebot.tools.song_queue import trunc
 from queuebot.tools.text import colourise as col
-from queuebot.twitch_auth import AuthorisedContext
+from queuebot.tools.twitch_auth import AuthorisedContext
 
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
@@ -85,8 +86,14 @@ def setup_bot(*args):
         sys.exit()
 
     channel = args[1].casefold() if len(args) > 1 else config["channel"].casefold()
-    bot_name = config["bot_name"].casefold()
-    ctx = AuthorisedContext(bot_name)
+    try:
+        ctx = AuthorisedContext()
+    except Exception:
+        print("\033[31;1mLogin failure, please restart the bot and try again\033[0m")
+        print("\nPress any key to exit...")
+        readchar()
+        exit(1)
+    bot_name = ctx.channel_name.casefold()
 
     if os.name == "nt":
         # TODO: Put this somewhere else
@@ -98,15 +105,12 @@ def setup_bot(*args):
             + f"'{config['bot_name']}' in channel '{channel}'"
         )
 
-    # global password_handler
-    # password_handler = PasswordHandler(bot_name)
     print(col("Checking for FFZ/BTTV emotes...", "GREY"))
     emotes = get_emotes(channel)
     global message_handler
     message_handler = MessageHandler(
         channel, config["bot_prefix"], trunc, config["logging"], emotes
     )
-    # f"oauth:{ctx.token.get('access_token')}",
     irc_bot = IrcBot(
         bot_name,
         f"oauth:{ctx.token.get('access_token')}",
@@ -118,11 +122,6 @@ def setup_bot(*args):
     )
     global bg_bot
     bg_bot = BackgroundBot(irc_bot)
-
-    # while not bot.joined:
-    #     bot.poll()
-    #     time.sleep(1)
-    # else: print(col("Bot is ready for commands", "GREEN"))
 
 
 def main():
@@ -139,9 +138,16 @@ def main():
             res = "oauth token is invalid"
         elif str(exc) == "Improperly formatted auth":
             res = "oauth token is improperly formatted"
+        elif str(exc) == "Login unsuccessful":
+            res = "oauth token was rejected"
         else:
             res = str(exc)
-        print(col(res + ", please restart the bot and paste in a new token", "RED"))
+        print(col(res + ", please restart the bot and log in again", "RED"))
+        try:
+            print("removing broken auth file")
+            Path("data/login auth.json").unlink()
+        except Exception as exc2:
+            print(f"{exc2.__class__}: {exc2}")
         error_status.set_errored(exc)
     except Exception as exc:
         trace = format_exc()
