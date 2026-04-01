@@ -532,7 +532,7 @@ wheels = [
 
 [[package]]
 name = "queuebot"
-version = "1.5.1.dev4+g3c7e351"
+version = "1.5.1.dev5+g5fe188f"
 source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },

@@ -92,7 +92,7 @@ def setup_bot(*args):
         print("\033[31;1mLogin failure, please restart the bot and try again\033[0m")
         print("\nPress any key to exit...")
         readchar()
-        exit(1)
+        sys.exit(1)
     bot_name = ctx.channel_name.casefold()
 
     print(col("Checking for FFZ/BTTV emotes...", "GREY"))

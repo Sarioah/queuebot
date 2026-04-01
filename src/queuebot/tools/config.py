@@ -24,8 +24,6 @@ from packaging.version import parse
 from .text import colourise as col
 
 DEFAULTS = {
-    "bot_name": "********",
-    "channel": "********",
     "bot_prefix": "!",
     "muted": "False",
     "logging": "False",
@@ -58,21 +56,14 @@ class Configuration:
             self.config.read(configfile)
         except ParsingError as exc:
             raise self._config_bad() from exc
-        # TODO: Giant if-elif and convoluted timing of raising / writing
-        # TODO: needs revising
+
         if not self.config["DEFAULT"]:
-            res = self._config_empty(
-                "Configuration file not found, a default configuration file has been written to"
+            channel = input(
+                "\n\033[34;1mPlease enter the channel the bot shall listen to / post in\033[0m: \033[32;1m"
             )
-        elif any(True for k in self.config["DEFAULT"] if self.config["DEFAULT"][k] == "********"):
-            res = self._config_empty("Default fields need to be filled out in")
-        elif any(True for k in ("bot_name", "channel") if k not in self.config["DEFAULT"]):
-            res = self._config_empty("Fields missing in")
-        else:
-            res = ""
+            print("\033[0m", end="")
+            self.config["DEFAULT"]["channel"] = channel
         self.write_config()
-        if res:
-            raise res
 
     def get_config(self):
         """Retrieve the dict containing the loaded configuration data."""
@@ -85,38 +76,6 @@ class Configuration:
                 self.config["DEFAULT"][key] = value
         with open(self.configfile, "w", encoding="utf-8") as file_:
             self.config.write(file_)
-
-    def _config_empty(self, msg):
-        """Return an exception if fields missing from the config file.
-
-        Args:
-            msg: Description of the problem to pass through to the Exception.
-
-        Returns:
-            Exception describing the issue, as well as a short description of
-            the config file's fields.
-        """
-        res = (
-            f"{msg} '{col(self.configfile, 'YELLOW')}'.\n"
-            "Please open this file and fill out the relevant fields:\n"
-            f"     {col('bot_name', 'GREEN')}    : "
-            "Name of the twitch account the bot will login with\n"
-            f"     {col('channel', 'GREEN')}     : "
-            "Name of the twitch channel the bot will listen "
-            "in, and send messages to\n"
-            f"     {col('bot_prefix', 'GREEN')}  : "
-            "Symbol that should appear at the front of "
-            "bot commands in chat. Default is '!'\n"
-            f"     {col('muted', 'GREEN')}       : "
-            "Mutes the bot if you need to stop it sending messages\n"
-            f"     {col('logging', 'GREEN')}     : "
-            "Saves each received chat message in "
-            f"'{col('messages.log', 'YELLOW')}', useful for debugging\n"
-            f"     {col('startup_msg', 'GREEN')} : "
-            "Send a message in chat when the bot has successfully connected\n"
-            f"\nOnce these are filled in, restart the bot."
-        )
-        return Exception(res)
 
     def _config_bad(self):
         """Return an exception if config file could not be properly loaded."""

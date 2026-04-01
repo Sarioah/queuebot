@@ -30,7 +30,7 @@ class AuthorisedContext:
         self.channel_name = self.token.get("channel_name")
         self.scopes = scopes
         try:
-            print("Logging in")
+            print("\033[30;1mLogging in...\033[0m")
             if self.validate_token():
                 raise Exception("Token is not usable")
         except Exception:
