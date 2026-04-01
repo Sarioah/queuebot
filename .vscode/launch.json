@@ -10,6 +10,13 @@
             "request": "launch",
             "module": "queuebot.main",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "twitch auth",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "queuebot.twitch_auth",
+            "console": "integratedTerminal"
         }
     ]
 }

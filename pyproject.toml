@@ -1,6 +1,6 @@
 [project]
 name = "queuebot"
-version = "1.4.14.dev6+g8e7632b"
+version = "1.5.0"
 description = ""
 authors = [
     { "name"= "Sarioah","email"= "3851003+Sarioah@users.noreply.github.com" }
@@ -14,20 +14,19 @@ dependencies = [
   "colorama>=0.4.6,<0.5",
   "readchar>=4.2.1,<5",
   "aiohttp>=3.13.3,<4",
-  "pywin32>=311,<312",
+  "pywin32>=311,<312; sys_platform == 'windows'",
   "irc==20.4.0",
   "tempora>=5.6,<5.7",
   "packaging>=26.0",
+  "requests>=2.33.1",
 ]
 
 [dependency-groups]
 dev = [
-  "black>=25.12.0,<26",
   "nuitka>=2.8.9,<3",
   "coverage>=7.13.1,<8",
   "pytest>=9.0.2",
   "pytest-mock>=3.15.1",
-  "pyoxidizer>=0.24.0",
 ]
 
 [tool.pytest.ini_options]

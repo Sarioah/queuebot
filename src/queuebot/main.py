@@ -11,10 +11,11 @@ from readchar import readchar
 from queuebot.irc_bot.background_bot import BackgroundBot
 from queuebot.irc_bot.irc_bot import IrcBot
 from queuebot.irc_bot.message_handler import MessageHandler
-from queuebot.tools.config import BadOAuth, Configuration, PasswordHandler, check_update
+from queuebot.tools.config import BadOAuth, Configuration, check_update
 from queuebot.tools.get_emotes import get_emotes
 from queuebot.tools.song_queue import trunc
 from queuebot.tools.text import colourise as col
+from queuebot.twitch_auth import AuthorisedContext
 
 try:
     version_filename = os.path.join(os.path.dirname(__file__), "version.txt")
@@ -85,6 +86,7 @@ def setup_bot(*args):
 
     channel = args[1].casefold() if len(args) > 1 else config["channel"].casefold()
     bot_name = config["bot_name"].casefold()
+    ctx = AuthorisedContext(bot_name)
 
     if os.name == "nt":
         # TODO: Put this somewhere else
@@ -96,17 +98,18 @@ def setup_bot(*args):
             + f"'{config['bot_name']}' in channel '{channel}'"
         )
 
-    global password_handler
-    password_handler = PasswordHandler(bot_name)
+    # global password_handler
+    # password_handler = PasswordHandler(bot_name)
     print(col("Checking for FFZ/BTTV emotes...", "GREY"))
     emotes = get_emotes(channel)
     global message_handler
     message_handler = MessageHandler(
         channel, config["bot_prefix"], trunc, config["logging"], emotes
     )
+    # f"oauth:{ctx.token.get('access_token')}",
     irc_bot = IrcBot(
         bot_name,
-        password_handler.get_password(),
+        f"oauth:{ctx.token.get('access_token')}",
         channel,
         config["muted"],
         message_handler.handle_msg,
@@ -139,7 +142,6 @@ def main():
         else:
             res = str(exc)
         print(col(res + ", please restart the bot and paste in a new token", "RED"))
-        password_handler.del_password()
         error_status.set_errored(exc)
     except Exception as exc:
         trace = format_exc()

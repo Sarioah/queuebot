@@ -18,3 +18,5 @@ build/
 Resources/
 tools/version.py
 VERSION
+.env
+src/queuebot.egg-info/PKG-INFO

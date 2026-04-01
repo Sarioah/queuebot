@@ -16,33 +16,12 @@ Exceptions:
 
 import contextlib
 import json
-import sys
 from configparser import ConfigParser, ParsingError
 from urllib.request import urlopen
 
-import keyring
 from packaging.version import parse
 
 from .text import colourise as col
-
-# The keyring import above is usually enough on windows / linux when running
-# from source, however that causes issues in the nuitka binaries. Those seem
-# to require the following extra steps. MacOS binary support TBD, will likely
-# need a third case below.
-if sys.platform == "win32":
-    import keyring.backends.Windows
-
-    keyring.set_keyring(keyring.backends.Windows.WinVaultKeyring())
-elif sys.platform == "linux":  # pragma: no cover
-    # will grab secrets from ssh-agent after using:
-    # :$ . <(ssh-agent)
-    # :$ ssh-add
-
-    # noinspection PyUnresolvedReferences,PyPackageRequirements
-    import sagecipher.keyring
-
-    keyring.set_keyring(sagecipher.keyring.Keyring())
-
 
 DEFAULTS = {
     "bot_name": "********",
@@ -56,45 +35,6 @@ DEFAULTS = {
 
 class BadOAuth(Exception):
     """Raise exception when a server rejects an oauth token."""
-
-
-class PasswordHandler:
-    """Handle storing and retrieving passwords."""
-
-    def __init__(self, user):
-        """Create the handler.
-
-        Args:
-            user: Name of the user whose passwords we should handle.
-        """
-        self.user = user
-        while not self.get_password():
-            self._no_passwd()
-
-    def _no_passwd(self):
-        """Prompt the user to enter the password tied to self.user."""
-        link = col("https://twitchapps.com/tmi:", "BLUE")
-        print(
-            "Please log into twitch using your bot account, then visit "
-            f"{link} to generate an oauth code for the bot to login with. "
-            "Then paste it here and press enter.\n"
-        )
-        passwd = input("Input your oauth code, including the 'oauth:' at the front: ")
-        keyring.set_password("TMI", self.user, passwd)
-
-    def get_password(self):
-        """Return the password tied to self.user."""
-        return keyring.get_password("TMI", self.user)
-
-    def del_password(self):
-        """Delete the password tied to self.user.
-
-        May propagate a PasswordDeleteError if the password didn't exist.
-
-        Returns:
-            None if the operation succeeds.
-        """
-        return keyring.delete_password("TMI", self.user)
 
 
 class Configuration:
