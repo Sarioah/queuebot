@@ -1,6 +1,6 @@
 [project]
 name = "queuebot"
-version = "1.5.1.dev3+g021d709"
+version = "1.5.1.dev4+g3c7e351"
 description = ""
 authors = [
     { "name"= "Sarioah","email"= "3851003+Sarioah@users.noreply.github.com" }
@@ -19,6 +19,7 @@ dependencies = [
   "tempora>=5.6,<5.7",
   "packaging>=26.0",
   "requests>=2.33.1",
+  "charset-normalizer>=3.4.6",
 ]
 
 [dependency-groups]
