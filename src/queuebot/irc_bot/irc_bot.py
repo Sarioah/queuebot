@@ -96,8 +96,10 @@ class IrcBot(SingleServerIRCBot):
         """Respond to actions posted in the channel."""
         self.message_handler(msg, "action")
 
-    def on_join(self, client, _msg):
+    def on_join(self, client, event):
         """Additional behaviour called when joining the channel."""
+        if event.source.nick != self.connection.get_nickname():
+            return
         self.joined = True
         self.client = client
         print(col(f'Bot has joined channel "{self.channel[1:]}"', "GREEN"))
