@@ -5,13 +5,16 @@ Classes:
         in the channel.
 """
 
+import ssl
+
 from irc.bot import SingleServerIRCBot
+from irc.connection import Factory
 
 from ..tools.text import colourise as col
 from ..tools.text import trim_bytes
 
 SERVER = "irc.chat.twitch.tv"
-PORT = 6667
+PORT = 6697
 MSG_LIMIT = 499
 
 
@@ -31,6 +34,9 @@ class IrcBot(SingleServerIRCBot):
                 has finished initialising.
             version: Bot version number.
         """
+        ssl_ctx = ssl.create_default_context()
+        factory = Factory(wrapper=lambda sock: ssl_ctx.wrap_socket(sock, server_hostname=SERVER))
+
         self.channel = "#" + channel
         self.client = None
         self.joined = False
@@ -44,6 +50,7 @@ class IrcBot(SingleServerIRCBot):
             server_list=[(SERVER, PORT, password)],
             nickname=username,
             realname=username,
+            connect_factory=factory,
         )
         print(col("Initialising bot...", "GREY"))
         if self.muted:
@@ -59,16 +66,11 @@ class IrcBot(SingleServerIRCBot):
             client (irc.client.ServerConnection): Connection instance for the
                 bot to use when sending data.
         """
-        client.cap("REQ", ":twitch.tv/membership")
-        client.cap("REQ", ":twitch.tv/tags")
-        client.cap("REQ", ":twitch.tv/commands")
-        client.join(self.channel)
+        client.cap("REQ", ":twitch.tv/membership twitch.tv/tags twitch.tv/commands")
 
-        self.client = client
-        self.joined = True
-        print(col(f'Welcomed into channel "{self.channel[1:]}"', "GREEN"))
-        if self.startup_msg:
-            self.send_msg(f"Queuebot {self.version} started")
+    def on_cap(self, client, event):
+        if event.arguments[0] == "ACK":
+            client.join(self.channel)
 
     def on_pubmsg(self, _client, msg):
         """Respond to messages posted in the channel."""
@@ -94,8 +96,13 @@ class IrcBot(SingleServerIRCBot):
         """Respond to actions posted in the channel."""
         self.message_handler(msg, "action")
 
-    def on_join(self, _client, _msg):
+    def on_join(self, client, _msg):
         """Additional behaviour called when joining the channel."""
+        self.joined = True
+        self.client = client
+        print(col(f'Bot has joined channel "{self.channel[1:]}"', "GREEN"))
+        if self.startup_msg:
+            self.send_msg(f"Queuebot {self.version} started")
 
     def on_leave(self, _client, _msg):
         """Additional behaviour called when parting from a channel."""
